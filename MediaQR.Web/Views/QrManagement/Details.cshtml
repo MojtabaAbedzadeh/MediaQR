@@ -1,0 +1,487 @@
+﻿@model MediaQR.Application.DTOs.Qr.QrCodeDetailsDto
+
+@{
+    ViewData["Title"] = "جزئیات QR Code";
+
+    var qrImageSrc =
+        $"data:image/png;base64,{Model.QrImageBase64}";
+
+    var qrFileName =
+        $"qr-{Model.Code}.png";
+}
+
+<div class="container py-4" dir="rtl">
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @successMessage
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="بستن">
+            </button>
+
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                جزئیات QR Code
+            </h1>
+
+            <p class="text-muted mb-0">
+                مشاهده و مدیریت QR Code
+            </p>
+        </div>
+
+        <div>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                بازگشت به لیست
+
+            </a>
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">
+
+                ویرایش
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- QR -->
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header text-center">
+                    <strong>QR Code</strong>
+                </div>
+
+                <div class="card-body text-center">
+
+                    <div class="mb-3">
+
+                        <img src="@qrImageSrc"
+                             alt="QR Code"
+                             class="img-fluid border rounded p-2"
+                             style="max-width: 320px;" />
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <a href="@qrImageSrc"
+                           download="@qrFileName"
+                           class="btn btn-success">
+
+                            دانلود QR Code
+
+                        </a>
+
+                    </div>
+
+                    <div class="text-break">
+
+                        <small class="text-muted">
+                            URL
+                        </small>
+
+                        <div class="mt-1">
+                            <code>@Model.QrUrl</code>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Information -->
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <strong>اطلاعات QR</strong>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                شناسه
+                            </label>
+
+                            <div class="fw-semibold">
+                                @Model.Id
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                Code
+                            </label>
+
+                            <div>
+                                <code>@Model.Code</code>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                عنوان QR
+                            </label>
+
+                            <div>
+                                @(string.IsNullOrWhiteSpace(Model.Title)
+                                                                ? "بدون عنوان"
+                                                                : Model.Title)
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                وضعیت
+                            </label>
+
+                            <div>
+
+                                @if (!Model.IsActive)
+                                {
+                                    <span class="badge bg-danger">
+                                        غیرفعال
+                                    </span>
+                                }
+                                else if (Model.IsExpired)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        منقضی‌شده
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        فعال
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label class="form-label text-muted">
+                                توضیحات QR
+                            </label>
+
+                            <div>
+
+                                @if (string.IsNullOrWhiteSpace(Model.Description))
+                                {
+                                    <span class="text-muted">
+                                        توضیحی ثبت نشده است.
+                                    </span>
+                                }
+                                else
+                                {
+                                    @Model.Description
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-12">
+                            <hr />
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                رسانه مرتبط
+                            </label>
+
+                            <div class="fw-semibold">
+                                @Model.MediaTitle
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                نوع رسانه
+                            </label>
+
+                            <div>
+
+                                @switch (Model.MediaType)
+                                {
+                                    case "Image":
+                                        <span class="badge bg-info text-dark">
+                                            تصویر
+                                        </span>
+                                        break;
+
+                                    case "Audio":
+                                        <span class="badge bg-primary">
+                                            صوت
+                                        </span>
+                                        break;
+
+                                    case "Video":
+                                        <span class="badge bg-dark">
+                                            ویدئو
+                                        </span>
+                                        break;
+
+                                    default:
+                                        <span class="badge bg-secondary">
+                                            @Model.MediaType
+                                        </span>
+                                        break;
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                نام فایل
+                            </label>
+
+                            <div class="text-break">
+                                @Model.OriginalFileName
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                Content Type
+                            </label>
+
+                            <div>
+                                <code>@Model.ContentType</code>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                حجم فایل
+                            </label>
+
+                            <div>
+                                @FormatFileSize(Model.FileSize)
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                شناسه رسانه
+                            </label>
+
+                            <div>
+                                @Model.MediaFileId
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                تاریخ ایجاد
+                            </label>
+
+                            <div>
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("yyyy/MM/dd HH:mm")
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                تاریخ انقضا
+                            </label>
+
+                            <div>
+
+                                @if (Model.ExpiresAt.HasValue)
+                                {
+                                @Model.ExpiresAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                                                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        بدون انقضا
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+
+            <div class="card shadow-sm mt-4">
+
+                <div class="card-header">
+                    <strong>عملیات</strong>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        <a href="/m/@Model.Code"
+                           target="_blank"
+                           class="btn btn-outline-primary">
+
+                            مشاهده رسانه
+
+                        </a>
+
+
+                        <a asp-action="Edit"
+                           asp-route-id="@Model.Id"
+                           class="btn btn-primary">
+
+                            ویرایش QR
+
+                        </a>
+
+
+                        <form asp-action="Toggle"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              class="d-inline">
+
+                            @Html.AntiForgeryToken()
+
+                            @if (Model.IsActive)
+                            {
+                                <button type="submit"
+                                        class="btn btn-warning">
+
+                                    غیرفعال کردن
+
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit"
+                                        class="btn btn-success">
+
+                                    فعال کردن
+
+                                </button>
+                            }
+
+                        </form>
+
+
+                        <form asp-action="Delete"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('آیا از حذف این QR Code اطمینان دارید؟');">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+
+                                حذف QR
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@functions
+{
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes:N0} B";
+
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024.0:N2} KB";
+
+        if (bytes < 1024L * 1024L * 1024L)
+            return $"{bytes / (1024.0 * 1024.0):N2} MB";
+
+        return $"{bytes / (1024.0 * 1024.0 * 1024.0):N2} GB";
+    }
+}

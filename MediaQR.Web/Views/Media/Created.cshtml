@@ -1,0 +1,117 @@
+﻿@model MediaQR.Application.DTOs.Media.CreateMediaResultDto
+
+@{
+    ViewData["Title"] = "رسانه با موفقیت ایجاد شد";
+}
+
+<div class="container mt-5" dir="rtl">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center p-5">
+
+                    <div class="mb-4">
+
+                        <h2 class="text-success">
+                            رسانه با موفقیت ایجاد شد
+                        </h2>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <img src="data:image/png;base64,@Model.QrImageBase64"
+                             alt="QR Code"
+                             class="img-fluid"
+                             style="max-width:300px;" />
+
+                    </div>
+
+                    <div class="text-start">
+
+                        <div class="mb-3">
+
+                            <strong>
+                                عنوان:
+                            </strong>
+
+                            @Model.Title
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <strong>
+                                فایل:
+                            </strong>
+
+                            @Model.OriginalFileName
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <strong>
+                                نوع رسانه:
+                            </strong>
+
+                            @Model.MediaType
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <strong>
+                                کد QR:
+                            </strong>
+
+                            <code>
+                                @Model.QrCode
+                            </code>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <strong>
+                                آدرس QR:
+                            </strong>
+
+                            <div class="mt-2">
+
+                                <a href="@Model.QrUrl"
+                                   target="_blank">
+                                    @Model.QrUrl
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4">
+
+                        <a asp-controller="Media"
+                           asp-action="Create"
+                           class="btn btn-primary">
+
+                            آپلود رسانه جدید
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

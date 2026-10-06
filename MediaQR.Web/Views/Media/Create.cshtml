@@ -1,0 +1,110 @@
+﻿@model MediaQR.Application.DTOs.Media.CreateMediaDto
+
+@{
+    ViewData["Title"] = "آپلود رسانه";
+}
+
+<div class="container mt-5" dir="rtl">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h2 class="mb-4">
+                        آپلود رسانه
+                    </h2>
+
+                    <form asp-controller="Media"
+                          asp-action="Create"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="Title"
+                                   class="form-label">
+                                عنوان رسانه
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control"
+                                   placeholder="مثلاً معرفی محصول X" />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+                                توضیحات
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="توضیحات اختیاری">
+                            </textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label asp-for="File"
+                                   class="form-label">
+                                فایل رسانه
+                            </label>
+
+                            <input asp-for="File"
+                                   type="file"
+                                   class="form-control"
+                                   accept="image/*,audio/*,video/*" />
+
+                            <div class="form-text">
+                                فرمت‌های مجاز:
+                                JPG, PNG, WebP, GIF,
+                                MP3, WAV, OGG, M4A,
+                                MP4, WebM, MOV
+                            </div>
+
+                            <span asp-validation-for="File"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            آپلود و ایجاد QR
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

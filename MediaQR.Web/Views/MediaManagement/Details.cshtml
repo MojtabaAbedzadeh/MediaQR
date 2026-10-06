@@ -1,0 +1,612 @@
+﻿@model MediaQR.Application.DTOs.Media.MediaDetailsDto
+
+@{
+    ViewData["Title"] = "جزئیات رسانه";
+
+    var mediaTypeText = Model.MediaType switch
+    {
+        "Image" => "تصویر",
+        "Audio" => "صوت",
+        "Video" => "ویدئو",
+        _ => Model.MediaType
+    };
+}
+
+<div class="container-fluid mt-4" dir="rtl">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                @Model.Title
+            </h1>
+
+            <div class="text-muted">
+                جزئیات رسانه
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                بازگشت به لیست
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- اطلاعات اصلی رسانه -->
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+
+                    <strong>
+                        اطلاعات رسانه
+                    </strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                عنوان
+                            </label>
+
+                            <div class="fw-semibold">
+                                @Model.Title
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                نوع رسانه
+                            </label>
+
+                            <div>
+
+                                @switch (Model.MediaType)
+                                {
+                                    case "Image":
+                                        <span class="badge bg-info">
+                                            تصویر
+                                        </span>
+                                        break;
+
+                                    case "Audio":
+                                        <span class="badge bg-warning text-dark">
+                                            صوت
+                                        </span>
+                                        break;
+
+                                    case "Video":
+                                        <span class="badge bg-primary">
+                                            ویدئو
+                                        </span>
+                                        break;
+
+                                    default:
+                                        <span class="badge bg-secondary">
+                                            @mediaTypeText
+                                        </span>
+                                        break;
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                نام فایل
+                            </label>
+
+                            <div>
+                                @Model.OriginalFileName
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                Content Type
+                            </label>
+
+                            <div>
+                                <code>
+                                    @Model.ContentType
+                                </code>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                حجم فایل
+                            </label>
+
+                            <div>
+                                @FormatFileSize(Model.FileSize)
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                وضعیت
+                            </label>
+
+                            <div>
+
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        فعال
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        غیرفعال
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                تاریخ ایجاد
+                            </label>
+
+                            <div>
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("yyyy/MM/dd HH:mm")
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label text-muted">
+                                شناسه
+                            </label>
+
+                            <div>
+                                @Model.Id
+                            </div>
+
+                        </div>
+
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <div class="col-12">
+
+                                <label class="form-label text-muted">
+                                    توضیحات
+                                </label>
+
+                                <div class="border rounded p-3 bg-light">
+                                    @Model.Description
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- QR Codes -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <strong>
+                            QR Codeهای مرتبط
+                        </strong>
+
+                        <span class="badge bg-secondary">
+                            @Model.QrCodes.Count
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    @if (!Model.QrCodes.Any())
+                    {
+                        <div class="text-center p-5 text-muted">
+
+                            هیچ QR Codeای برای این رسانه ثبت نشده است.
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table table-hover align-middle mb-0">
+
+                                <thead class="table-light">
+
+                                    <tr>
+
+                                        <th>
+                                            کد
+                                        </th>
+
+                                        <th>
+                                            عنوان
+                                        </th>
+
+                                        <th>
+                                            وضعیت
+                                        </th>
+
+                                        <th>
+                                            انقضا
+                                        </th>
+
+                                        <th class="text-center">
+                                            عملیات
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var qr in Model.QrCodes)
+                                    {
+                                        var isExpired =
+                                        qr.ExpiresAt.HasValue &&
+                                        qr.ExpiresAt.Value <= DateTime.UtcNow;
+
+                                        <tr>
+
+                                            <td>
+
+                                                <code>
+                                                    @qr.Code
+                                                </code>
+
+                                            </td>
+
+                                            <td>
+
+                                                @if (!string.IsNullOrWhiteSpace(qr.Title))
+                                                {
+                                                    @qr.Title
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">
+                                                        بدون عنوان
+                                                    </span>
+                                                }
+
+                                            </td>
+
+                                            <td>
+
+                                                @if (!qr.IsActive)
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        غیرفعال
+                                                    </span>
+                                                }
+                                                else if (isExpired)
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        منقضی
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        فعال
+                                                    </span>
+                                                }
+
+                                            </td>
+
+                                            <td>
+
+                                                @if (qr.ExpiresAt.HasValue)
+                                                {
+                                                    @qr.ExpiresAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">
+                                                        بدون انقضا
+                                                    </span>
+                                                }
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <a asp-controller="QrManagement"
+                                                   asp-action="Details"
+                                                   asp-route-id="@qr.Id"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    جزئیات QR
+                                                </a>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sidebar -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+
+                    <strong>
+                        وضعیت رسانه
+                    </strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success fs-6 px-4 py-2">
+                                فعال
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary fs-6 px-4 py-2">
+                                غیرفعال
+                            </span>
+                        }
+
+                    </div>
+
+                    <form asp-action="Toggle"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn @(Model.IsActive ? "btn-warning" : "btn-success") w-100">
+
+                            @if (Model.IsActive)
+                            {
+                                <span>
+                                    غیرفعال کردن رسانه
+                                </span>
+                            }
+                            else
+                            {
+                                <span>
+                                    فعال کردن رسانه
+                                </span>
+                            }
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- عملیات -->
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+
+                    <strong>
+                        عملیات
+                    </strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.QrCodes.Any())
+                    {
+                        <div class="alert alert-warning">
+
+                            <small>
+                                برای حذف این رسانه ابتدا باید تمام
+                                QR Codeهای مرتبط با آن حذف شوند.
+                            </small>
+
+                        </div>
+                    }
+
+                    <form asp-action="Delete"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          onsubmit="return confirm('آیا از حذف این رسانه اطمینان دارید؟');">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-danger w-100"
+                                @(Model.QrCodes.Any() ? "disabled" : "")>
+
+                            حذف رسانه
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- اطلاعات آماری -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white">
+
+                    <strong>
+                        خلاصه
+                    </strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            تعداد QR
+                        </span>
+
+                        <strong>
+                            @Model.QrCodes.Count
+                        </strong>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            نوع
+                        </span>
+
+                        <strong>
+                            @mediaTypeText
+                        </strong>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+
+                        <span class="text-muted">
+                            حجم
+                        </span>
+
+                        <strong>
+                            @FormatFileSize(Model.FileSize)
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@functions
+{
+    private string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes:N0} B";
+
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024d:N2} KB";
+
+        if (bytes < 1024L * 1024L * 1024L)
+            return $"{bytes / (1024d * 1024d):N2} MB";
+
+        return $"{bytes / (1024d * 1024d * 1024d):N2} GB";
+    }
+}

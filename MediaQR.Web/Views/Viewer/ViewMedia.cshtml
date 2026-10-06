@@ -1,0 +1,102 @@
+﻿@model MediaQR.Application.DTOs.Viewer.MediaViewerDto
+
+@{
+    ViewData["Title"] = Model.Title;
+
+    var mediaUrl = Url.Action(
+        "Content",
+        "Viewer",
+        new { code = Model.QrCode });
+}
+
+<div class="container mt-5" dir="rtl">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h1 class="h3 text-center mb-3">
+                        @Model.Title
+                    </h1>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="text-muted text-center mb-4">
+                            @Model.Description
+                        </p>
+                    }
+
+                    <div class="text-center">
+
+                        @if (Model.MediaType == "Image")
+                        {
+                            <img src="@mediaUrl"
+                                 alt="@Model.Title"
+                                 class="img-fluid rounded"
+                                 style="max-height:70vh;" />
+                        }
+                        else if (Model.MediaType == "Audio")
+                        {
+                            <audio controls
+                                   preload="metadata"
+                                   class="w-100"
+                                   data-qr-code-id="@Model.QrCodeId"
+                                   data-media-type="Audio">
+
+                                <source src="@mediaUrl"
+                                        type="@Model.ContentType" />
+
+                                مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند.
+
+                            </audio>
+                        }
+                        else if (Model.MediaType == "Video")
+                        {
+                            <video controls
+                                   preload="metadata"
+                                   class="w-100 rounded"
+                                   style="max-height:70vh;"
+                                   data-qr-code-id="@Model.QrCodeId"
+                                   data-media-type="Video">
+
+                                <source src="@mediaUrl"
+                                        type="@Model.ContentType" />
+
+                                مرورگر شما از پخش این فایل ویدئویی پشتیبانی نمی‌کند.
+
+                            </video>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                نوع رسانه پشتیبانی نمی‌شود.
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="text-center text-muted mt-4">
+
+                        <small>
+                            @Model.OriginalFileName
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+@section Scripts
+{
+    <script src="~/js/media-analytics.js" asp-append-version="true"></script>
+}

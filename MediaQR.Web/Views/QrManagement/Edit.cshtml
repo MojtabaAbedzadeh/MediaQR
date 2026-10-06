@@ -1,0 +1,234 @@
+﻿@model MediaQR.Application.DTOs.Qr.UpdateQrCodeDto
+
+@{
+    ViewData["Title"] = "ویرایش QR Code";
+
+    var qrCodeId = ViewBag.QrCodeId;
+    var qrCode = ViewBag.QrCode as string;
+    var mediaTitle = ViewBag.MediaTitle as string;
+}
+
+<div class="container py-4" dir="rtl">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                ویرایش QR Code
+            </h1>
+
+            <p class="text-muted mb-0">
+                اطلاعات QR Code را ویرایش کنید.
+            </p>
+        </div>
+
+        <div>
+
+            <a asp-action="Details"
+               asp-route-id="@qrCodeId"
+               class="btn btn-outline-secondary">
+
+                بازگشت
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <strong>
+                        اطلاعات QR
+                    </strong>
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="Edit"
+                          asp-route-id="@qrCodeId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+
+                        <!-- QR Code -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                QR Code
+                            </label>
+
+                            <div class="input-group">
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@qrCode"
+                                       readonly />
+
+                            </div>
+
+                            <div class="form-text">
+                                QR Code قابل ویرایش نیست تا QR چاپ‌شده
+                                همچنان معتبر باقی بماند.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Media -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                رسانه مرتبط
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@mediaTitle"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- Title -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="Title"
+                                   class="form-label">
+
+                                عنوان QR
+
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control"
+                                   maxlength="250"
+                                   placeholder="عنوان QR را وارد کنید..." />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Description -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+
+                                توضیحات
+
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="1000"
+                                      placeholder="توضیحات QR را وارد کنید..."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Expiration -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="ExpiresAt"
+                                   class="form-label">
+
+                                تاریخ انقضا
+
+                            </label>
+
+                            <input asp-for="ExpiresAt"
+                                   type="datetime-local"
+                                   class="form-control" />
+
+                            <div class="form-text">
+                                در صورت خالی بودن، QR بدون تاریخ انقضا خواهد بود.
+                            </div>
+
+                            <span asp-validation-for="ExpiresAt"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Active -->
+
+                        <div class="form-check form-switch mb-4">
+
+                            <input asp-for="IsActive"
+                                   class="form-check-input"
+                                   role="switch" />
+
+                            <label asp-for="IsActive"
+                                   class="form-check-label">
+
+                                QR فعال باشد
+
+                            </label>
+
+                        </div>
+
+
+                        <hr />
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Details"
+                               asp-route-id="@qrCodeId"
+                               class="btn btn-outline-secondary">
+
+                                انصراف
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                ذخیره تغییرات
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}
