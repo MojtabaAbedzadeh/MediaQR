@@ -4,189 +4,1333 @@
     ViewData["Title"] = "مدیریت کاربران";
 }
 
-<div class="container py-4" dir="rtl">
+<div class="users-page" dir="rtl">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Background Decorations -->
+    <div class="users-bg users-bg-1"></div>
+    <div class="users-bg users-bg-2"></div>
+    <div class="users-bg users-bg-3"></div>
 
-        <div>
-            <h2 class="mb-1">
-                مدیریت کاربران
-            </h2>
+    <div class="users-wrapper">
 
-            <p class="text-muted mb-0">
-                مدیریت کاربران و نقش‌های سیستم
-            </p>
+        <!-- Header -->
+        <div class="users-header">
+
+            <div class="users-header-main">
+
+                <div class="users-header-icon">
+                    <span>♙</span>
+                </div>
+
+                <div>
+
+                    <div class="users-badge">
+                        <span class="users-badge-dot"></span>
+                        مدیریت سیستم
+                    </div>
+
+                    <h1 class="users-title">
+                        مدیریت کاربران
+                    </h1>
+
+                    <p class="users-subtitle">
+                        مدیریت کاربران، نقش‌ها و وضعیت دسترسی حساب‌های سیستم
+                    </p>
+
+                </div>
+
+            </div>
+
+            <a asp-action="Create"
+               class="users-add-button">
+
+                <span class="add-icon">
+                    +
+                </span>
+
+                <span>
+                    افزودن کاربر
+                </span>
+
+            </a>
+
         </div>
 
-        <a asp-action="Create"
-           class="btn btn-primary">
-            افزودن کاربر
-        </a>
 
-    </div>
+        <!-- Error -->
+        @if (TempData["Error"] is string errorMessage)
+        {
+            <div class="users-alert">
 
-    @if (TempData["Error"] is string errorMessage)
-    {
-        <div class="alert alert-danger">
-            @errorMessage
+                <div class="alert-icon">
+                    !
+                </div>
+
+                <div>
+                    <strong>
+                        خطا
+                    </strong>
+
+                    <span>
+                        @errorMessage
+                    </span>
+                </div>
+
+            </div>
+        }
+
+
+        <!-- Statistics -->
+        <div class="users-stats">
+
+            <div class="users-stat-card">
+
+                <div class="stat-icon stat-icon-purple">
+                    ♙
+                </div>
+
+                <div class="stat-content">
+
+                    <span class="stat-label">
+                        مجموع کاربران
+                    </span>
+
+                    <strong>
+                        @(Model.Users?.Count() ?? 0)
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="users-stat-card">
+
+                <div class="stat-icon stat-icon-green">
+                    ✓
+                </div>
+
+                <div class="stat-content">
+
+                    <span class="stat-label">
+                        کاربران فعال
+                    </span>
+
+                    <strong>
+                        @(Model.Users?.Count(x => !x.IsLockedOut) ?? 0)
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="users-stat-card">
+
+                <div class="stat-icon stat-icon-pink">
+                    ✉
+                </div>
+
+                <div class="stat-content">
+
+                    <span class="stat-label">
+                        ایمیل‌های تأیید شده
+                    </span>
+
+                    <strong>
+                        @(Model.Users?.Count(x => x.EmailConfirmed) ?? 0)
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="users-stat-card">
+
+                <div class="stat-icon stat-icon-orange">
+                    !
+                </div>
+
+                <div class="stat-content">
+
+                    <span class="stat-label">
+                        کاربران قفل‌شده
+                    </span>
+
+                    <strong>
+                        @(Model.Users?.Count(x => x.IsLockedOut) ?? 0)
+                    </strong>
+
+                </div>
+
+            </div>
+
         </div>
-    }
 
-    <div class="card shadow-sm">
 
-        <div class="card-body p-0">
+        <!-- Users Card -->
+        <div class="users-card">
 
-            <div class="table-responsive">
+            <div class="users-card-header">
 
-                <table class="table table-hover mb-0 align-middle">
+                <div class="users-card-title">
 
-                    <thead>
-                        <tr>
-                            <th>نام کاربری</th>
-                            <th>ایمیل</th>
-                            <th>نقش</th>
-                            <th>ایمیل</th>
-                            <th>وضعیت</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
+                    <div class="card-title-icon">
+                        ♡
+                    </div>
 
-                    <tbody>
+                    <div>
 
-                        @if (!Model.Users.Any())
-                        {
-                            <tr>
-                                <td colspan="6"
-                                    class="text-center text-muted py-4">
-                                    کاربری وجود ندارد.
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            foreach (var user in Model.Users)
-                            {
+                        <h2>
+                            فهرست کاربران
+                        </h2>
+
+                        <p>
+                            حساب‌های کاربری سیستم را مدیریت کنید.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="users-count">
+
+                    @(Model.Users?.Count() ?? 0)
+                    کاربر
+
+                </div>
+
+            </div>
+
+
+            <div class="users-card-body">
+
+                @if (Model.Users == null || !Model.Users.Any())
+                {
+                    <!-- Empty State -->
+
+                    <div class="users-empty">
+
+                        <div class="empty-icon">
+                            ♙
+                        </div>
+
+                        <h3>
+                            هنوز کاربری وجود ندارد
+                        </h3>
+
+                        <p>
+                            برای شروع، اولین حساب کاربری سیستم را ایجاد کنید.
+                        </p>
+
+                        <a asp-action="Create"
+                           class="empty-add-button">
+
+                            <span>+</span>
+
+                            افزودن اولین کاربر
+
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="users-table-wrapper">
+
+                        <table class="users-table">
+
+                            <thead>
+
                                 <tr>
 
-                                    <td>
-                                        @user.UserName
-                                    </td>
+                                    <th class="user-col">
+                                        کاربر
+                                    </th>
 
-                                    <td>
-                                        @user.Email
-                                    </td>
+                                    <th class="email-col">
+                                        ایمیل
+                                    </th>
 
-                                    <td>
-                                        @string.Join(", ", user.Roles)
-                                    </td>
+                                    <th class="role-col">
+                                        نقش
+                                    </th>
 
-                                    <td>
-                                        @if (user.EmailConfirmed)
-                                        {
-                                            <span class="badge bg-success">
-                                                تأیید شده
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">
-                                                تأیید نشده
-                                            </span>
-                                        }
-                                    </td>
+                                    <th class="confirm-col">
+                                        تأیید ایمیل
+                                    </th>
 
-                                    <td>
-                                        @if (user.IsLockedOut)
-                                        {
-                                            <span class="badge bg-danger">
-                                                قفل شده
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-success">
-                                                فعال
-                                            </span>
-                                        }
-                                    </td>
+                                    <th class="status-col">
+                                        وضعیت
+                                    </th>
 
-                                    <td>
+                                    <th class="actions-col">
+                                        عملیات
+                                    </th>
 
-                                        <div class="d-flex gap-1">
+                                </tr>
 
-                                            @if (user.UserName != User.Identity?.Name)
-                                            {
-                                                <a asp-action="ChangePassword"
-                                                   asp-route-id="@user.Id"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    تغییر رمز
-                                                </a>
-                                            }
+                            </thead>
 
-                                            @if (user.IsLockedOut)
-                                            {
-                                                <form asp-action="Unlock"
-                                                      asp-route-id="@user.Id"
-                                                      method="post">
+                            <tbody>
 
-                                                    @Html.AntiForgeryToken()
+                                @foreach (var user in Model.Users)
+                                {
+                                    var isCurrentUser =
+                                    user.UserName == User.Identity?.Name;
 
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-success">
-                                                        بازکردن قفل
-                                                    </button>
+                                    <tr>
 
-                                                </form>
-                                            }
-                                            else if (user.UserName != User.Identity?.Name)
-                                            {
-                                                <form asp-action="Lock"
-                                                      asp-route-id="@user.Id"
-                                                      method="post">
+                                        <!-- User -->
+                                        <td>
 
-                                                    @Html.AntiForgeryToken()
+                                            <div class="user-cell">
 
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-warning">
-                                                        قفل
-                                                    </button>
+                                                <div class="user-avatar">
 
-                                                </form>
-                                            }
+                                                    @if (!string.IsNullOrWhiteSpace(user.UserName))
+                                                    {
+                                                        @user.UserName.Substring(0, 1).ToUpper()
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>♙</span>
+                                                    }
 
-                                            @if (user.UserName != User.Identity?.Name)
-                                            {
-                                                <form asp-action="Delete"
-                                                      asp-route-id="@user.Id"
-                                                      method="post"
-                                                      onsubmit="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">
+                                                </div>
 
-                                                    @Html.AntiForgeryToken()
+                                                <div class="user-info">
 
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger">
-                                                        حذف
-                                                    </button>
+                                                    <strong>
+                                                        @user.UserName
+                                                    </strong>
 
-                                                </form>
-                                            }
+                                                    @if (isCurrentUser)
+                                                    {
+                                                        <span class="current-user">
+                                                            حساب شما
+                                                        </span>
+                                                    }
+
+                                            </div>
 
                                         </div>
 
                                     </td>
 
-                                </tr>
-                            }
-                        }
 
-                    </tbody>
+                                    <!-- Email -->
+                                    <td>
 
-                </table>
+                                        <div class="email-cell">
+
+                                            <span class="email-icon">
+                                                ✉
+                                            </span>
+
+                                            <span>
+                                                @(string.IsNullOrWhiteSpace(user.Email)
+                                                                                            ? "—"
+                                                                                            : user.Email)
+                                        </span>
+
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- Role -->
+                                        <td>
+
+                                            <div class="roles-cell">
+
+                                        @if (user.Roles != null && user.Roles.Any())
+                                                {
+                                                    foreach (var role in user.Roles)
+                                                    {
+                                                        <span class="role-badge">
+                                                            @role
+                                                        </span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="no-role">
+                                                        بدون نقش
+                                                    </span>
+                                                }
+
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- Email Confirmed -->
+                                        <td>
+
+                                            @if (user.EmailConfirmed)
+                                            {
+                                                <span class="status-badge status-confirmed">
+
+                                                    <span class="status-dot"></span>
+
+                                                    تأیید شده
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-unconfirmed">
+
+                                                    <span class="status-dot"></span>
+
+                                                    تأیید نشده
+
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- Account Status -->
+                                        <td>
+
+                                            @if (user.IsLockedOut)
+                                            {
+                                                <span class="status-badge status-locked">
+
+                                                    <span class="status-dot"></span>
+
+                                                    قفل شده
+
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-active">
+
+                                                    <span class="status-dot"></span>
+
+                                                    فعال
+
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- Actions -->
+                                        <td>
+
+                                            <div class="user-actions">
+
+                                                @if (!isCurrentUser)
+                                                {
+                                                    <a asp-action="ChangePassword"
+                                                       asp-route-id="@user.Id"
+                                                       class="user-action user-action-password"
+                                                       title="تغییر رمز عبور">
+
+                                                        <span>
+                                                            ◆
+                                                        </span>
+
+                                                        <span class="action-label">
+                                                            تغییر رمز
+                                                        </span>
+
+                                                    </a>
+                                                }
+
+
+                                                @if (user.IsLockedOut)
+                                                {
+                                                    <form asp-action="Unlock"
+                                                          asp-route-id="@user.Id"
+                                                          method="post">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <button type="submit"
+                                                                class="user-action user-action-unlock"
+                                                                title="باز کردن قفل">
+
+                                                            <span>
+                                                                ✓
+                                                            </span>
+
+                                                            <span class="action-label">
+                                                                بازکردن قفل
+                                                            </span>
+
+                                                        </button>
+
+                                                    </form>
+                                                }
+                                                else if (!isCurrentUser)
+                                                {
+                                                    <form asp-action="Lock"
+                                                          asp-route-id="@user.Id"
+                                                          method="post">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <button type="submit"
+                                                                class="user-action user-action-lock"
+                                                                title="قفل کردن کاربر">
+
+                                                            <span>
+                                                                ◈
+                                                            </span>
+
+                                                            <span class="action-label">
+                                                                قفل
+                                                            </span>
+
+                                                        </button>
+
+                                                    </form>
+                                                }
+
+
+                                                @if (!isCurrentUser)
+                                                {
+                                                    <form asp-action="Delete"
+                                                          asp-route-id="@user.Id"
+                                                          method="post"
+                                                          class="delete-user-form">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <button type="submit"
+                                                                class="user-action user-action-delete"
+                                                                title="حذف کاربر">
+
+                                                            <span>
+                                                                ×
+                                                            </span>
+
+                                                            <span class="action-label">
+                                                                حذف
+                                                            </span>
+
+                                                        </button>
+
+                                                    </form>
+                                                }
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
 
             </div>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="users-footer">
+
+            <span>
+                مدیریت امن کاربران
+            </span>
+
+            <span class="footer-dot"></span>
+
+            <span>
+                MediaQR
+            </span>
 
         </div>
 
     </div>
 
 </div>
+
+
+<style>
+
+    /* =========================================================
+           Users Page
+        ========================================================= */
+
+    .users-page {
+        position: relative;
+        min-height: calc(100vh - 70px);
+        padding: 40px 20px 55px;
+        overflow: hidden;
+        background: radial-gradient( circle at 10% 15%, rgba(244, 114, 182, .13), transparent 30% ), radial-gradient( circle at 90% 20%, rgba(139, 92, 246, .12), transparent 30% ), radial-gradient( circle at 50% 100%, rgba(96, 165, 250, .10), transparent 35% ), #faf8ff;
+    }
+
+
+    /* Background */
+
+    .users-bg {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .users-bg-1 {
+        width: 300px;
+        height: 300px;
+        top: -120px;
+        right: -90px;
+        background: radial-gradient( circle, rgba(236,72,153,.14), transparent 70% );
+    }
+
+    .users-bg-2 {
+        width: 360px;
+        height: 360px;
+        bottom: -180px;
+        left: -140px;
+        background: radial-gradient( circle, rgba(139,92,246,.13), transparent 70% );
+    }
+
+    .users-bg-3 {
+        width: 180px;
+        height: 180px;
+        top: 45%;
+        right: 3%;
+        background: radial-gradient( circle, rgba(96,165,250,.08), transparent 70% );
+    }
+
+
+    /* Wrapper */
+
+    .users-wrapper {
+        position: relative;
+        z-index: 2;
+        width: min(100%, 1250px);
+        margin: 0 auto;
+    }
+
+
+    /* Header */
+
+    .users-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .users-header-main {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .users-header-icon {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+        color: #be185d;
+        font-size: 27px;
+        border: 1px solid rgba(236,72,153,.10);
+        box-shadow: 0 10px 30px rgba(139,92,246,.10);
+    }
+
+    .users-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 11px;
+        margin-bottom: 6px;
+        border-radius: 20px;
+        background: rgba(253,242,248,.9);
+        color: #be185d;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .users-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ec4899;
+        box-shadow: 0 0 0 4px rgba(236,72,153,.10);
+    }
+
+    .users-title {
+        margin: 0;
+        color: #3b1b5a;
+        font-size: clamp(23px, 3vw, 31px);
+        font-weight: 900;
+    }
+
+    .users-subtitle {
+        margin: 5px 0 0;
+        color: #8b7b98;
+        font-size: 13px;
+    }
+
+
+    /* Add Button */
+
+    .users-add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-width: 145px;
+        height: 47px;
+        padding: 0 17px;
+        border-radius: 14px;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        color: #fff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 900;
+        box-shadow: 0 9px 24px rgba(139,92,246,.22);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .users-add-button:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 13px 30px rgba(139,92,246,.28);
+        }
+
+    .add-icon {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+
+    /* Alert */
+
+    .users-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(255,241,242,.95);
+        border: 1px solid #fecdd3;
+        color: #be123c;
+    }
+
+    .alert-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #ffe4e6;
+        font-weight: 900;
+    }
+
+    .users-alert strong {
+        display: block;
+        font-size: 11px;
+    }
+
+    .users-alert span {
+        font-size: 11px;
+    }
+
+
+    /* Statistics */
+
+    .users-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .users-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 82px;
+        padding: 15px;
+        border-radius: 18px;
+        background: rgba(255,255,255,.76);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 10px 30px rgba(88,28,135,.06);
+        backdrop-filter: blur(15px);
+    }
+
+    .stat-icon {
+        width: 43px;
+        height: 43px;
+        flex: 0 0 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .stat-icon-purple {
+        background: #f3e8ff;
+        color: #7e22ce;
+    }
+
+    .stat-icon-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .stat-icon-pink {
+        background: #fce7f3;
+        color: #be185d;
+    }
+
+    .stat-icon-orange {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
+    .stat-content {
+        min-width: 0;
+    }
+
+    .stat-label {
+        display: block;
+        margin-bottom: 3px;
+        color: #9a8aa6;
+        font-size: 10px;
+    }
+
+    .stat-content strong {
+        color: #4c1d95;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+
+    /* Main Card */
+
+    .users-card {
+        position: relative;
+        overflow: visible;
+        border-radius: 25px;
+        background: rgba(255,255,255,.84);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 25px 70px rgba(88,28,135,.09), 0 5px 20px rgba(0,0,0,.03);
+        backdrop-filter: blur(18px);
+    }
+
+    .users-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 22px 25px;
+        border-bottom: 1px solid #f3e8ff;
+    }
+
+    .users-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card-title-icon {
+        width: 41px;
+        height: 41px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+        color: #be185d;
+    }
+
+    .users-card-title h2 {
+        margin: 0 0 3px;
+        color: #4c1d95;
+        font-size: 15px;
+        font-weight: 900;
+    }
+
+    .users-card-title p {
+        margin: 0;
+        color: #9a8aa6;
+        font-size: 10px;
+    }
+
+    .users-count {
+        padding: 7px 11px;
+        border-radius: 10px;
+        background: #faf5ff;
+        color: #7e22ce;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+
+    /* Table */
+
+    .users-card-body {
+        padding: 0;
+        overflow: visible;
+    }
+
+    .users-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .users-table {
+        width: 100%;
+        min-width: 950px;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .users-table thead th {
+            height: 50px;
+            padding: 0 18px;
+            background: #fcfaff;
+            color: #8b7b98;
+            border-bottom: 1px solid #f3e8ff;
+            font-size: 10px;
+            font-weight: 900;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .users-table tbody td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #f5effa;
+            color: #5d4d68;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+
+        .users-table tbody tr {
+            transition: background .2s ease;
+        }
+
+            .users-table tbody tr:hover {
+                background: rgba(253,242,248,.55);
+            }
+
+            .users-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+
+    /* User */
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+        color: #a21caf;
+        font-size: 15px;
+        font-weight: 900;
+        box-shadow: 0 5px 15px rgba(139,92,246,.08);
+    }
+
+    .user-info strong {
+        display: block;
+        color: #49355a;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .current-user {
+        display: inline-block;
+        margin-top: 3px;
+        padding: 2px 6px;
+        border-radius: 5px;
+        background: #fdf2f8;
+        color: #be185d;
+        font-size: 8px;
+        font-weight: 800;
+    }
+
+
+    /* Email */
+
+    .email-cell {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .email-icon {
+        color: #c084fc;
+        font-size: 13px;
+    }
+
+
+    /* Roles */
+
+    .roles-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 8px;
+        border-radius: 8px;
+        background: #f3e8ff;
+        color: #7e22ce;
+        font-size: 9px;
+        font-weight: 800;
+    }
+
+    .no-role {
+        color: #b8aabe;
+        font-size: 10px;
+    }
+
+
+    /* Status */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border-radius: 9px;
+        font-size: 9px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+    }
+
+    .status-confirmed {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+        .status-confirmed .status-dot {
+            background: #10b981;
+        }
+
+    .status-unconfirmed {
+        background: #f5f3f5;
+        color: #786d80;
+    }
+
+        .status-unconfirmed .status-dot {
+            background: #a8a29e;
+        }
+
+    .status-active {
+        background: #ecfdf5;
+        color: #15803d;
+    }
+
+        .status-active .status-dot {
+            background: #22c55e;
+        }
+
+    .status-locked {
+        background: #fff1f2;
+        color: #be123c;
+    }
+
+        .status-locked .status-dot {
+            background: #f43f5e;
+        }
+
+
+    /* Actions */
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+        .user-actions form {
+            margin: 0;
+        }
+
+    .user-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 0 8px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #eadcff;
+        font-family: inherit;
+        font-size: 9px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+
+        .user-action:hover {
+            transform: translateY(-1px);
+        }
+
+    .user-action-password {
+        color: #7e22ce;
+    }
+
+        .user-action-password:hover {
+            background: #faf5ff;
+            border-color: #d8b4fe;
+            color: #6b21a8;
+        }
+
+    .user-action-unlock {
+        color: #15803d;
+        border-color: #bbf7d0;
+    }
+
+        .user-action-unlock:hover {
+            background: #f0fdf4;
+        }
+
+    .user-action-lock {
+        color: #c2410c;
+        border-color: #fed7aa;
+    }
+
+        .user-action-lock:hover {
+            background: #fff7ed;
+        }
+
+    .user-action-delete {
+        color: #be123c;
+        border-color: #fecdd3;
+    }
+
+        .user-action-delete:hover {
+            background: #fff1f2;
+        }
+
+
+    /* Empty */
+
+    .users-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 78px;
+        height: 78px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        border-radius: 25px;
+        background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+        color: #a21caf;
+        font-size: 31px;
+        box-shadow: 0 15px 35px rgba(139,92,246,.10);
+    }
+
+    .users-empty h3 {
+        margin: 0 0 7px;
+        color: #4c1d95;
+        font-size: 17px;
+        font-weight: 900;
+    }
+
+    .users-empty p {
+        margin: 0 0 20px;
+        color: #9a8aa6;
+        font-size: 11px;
+    }
+
+    .empty-add-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        height: 42px;
+        padding: 0 16px;
+        border-radius: 12px;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        color: white;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(139,92,246,.20);
+    }
+
+        .empty-add-button span {
+            font-size: 18px;
+        }
+
+
+    /* Footer */
+
+    .users-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        margin-top: 22px;
+        color: #a99ab4;
+        font-size: 10px;
+    }
+
+    .footer-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #d8b4fe;
+    }
+
+
+    /* =========================================================
+           Responsive
+        ========================================================= */
+
+    @@media (max-width: 900px) {
+
+        .users-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .action-label {
+            display: none;
+        }
+
+        .user-action {
+            width: 32px;
+            padding: 0;
+        }
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .users-page {
+            padding: 25px 14px 40px;
+        }
+
+        .users-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .users-add-button {
+            width: 100%;
+        }
+
+        .users-header-main {
+            align-items: flex-start;
+        }
+
+        .users-card-header {
+            padding: 18px;
+        }
+    }
+
+
+    @@media (max-width: 480px) {
+
+        .users-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .users-stat-card {
+            min-height: 70px;
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            flex-basis: 36px;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .stat-label {
+            font-size: 8px;
+        }
+
+        .stat-content strong {
+            font-size: 17px;
+        }
+
+        .users-title {
+            font-size: 22px;
+        }
+
+        .users-subtitle {
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .users-header-icon {
+            width: 48px;
+            height: 48px;
+            flex-basis: 48px;
+            border-radius: 15px;
+            font-size: 22px;
+        }
+
+        .users-card {
+            border-radius: 21px;
+        }
+
+        .users-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .users-count {
+            align-self: flex-start;
+        }
+    }
+
+</style>

@@ -4,133 +4,450 @@
     ViewData["Title"] = "افزودن کاربر";
 }
 
-<div class="container py-4" dir="rtl">
+<div class="create-user-page" dir="rtl">
 
-    <div class="row justify-content-center">
+    <!-- Background Decorations -->
+    <div class="create-user-bg create-user-bg-1"></div>
+    <div class="create-user-bg create-user-bg-2"></div>
+    <div class="create-user-bg create-user-bg-3"></div>
 
-        <div class="col-md-7 col-lg-6">
+    <div class="create-user-wrapper">
 
-            <div class="card shadow-sm">
+        <!-- Header -->
+        <div class="create-user-header">
 
-                <div class="card-body p-4">
+            <div class="create-user-header-main">
 
-                    <h2 class="mb-4">
-                        افزودن کاربر
-                    </h2>
+                <div class="create-user-header-icon">
+                    <span>♙</span>
+                </div>
 
-                    <form asp-action="Create"
-                          method="post">
+                <div>
+                    <div class="create-user-badge">
+                        <span class="badge-dot"></span>
+                        مدیریت کاربران
+                    </div>
 
-                        @Html.AntiForgeryToken()
+                    <h1 class="create-user-title">
+                        افزودن کاربر جدید
+                    </h1>
 
-                        <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3">
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="UserName"
-                                   class="form-label">
-                            </label>
-
-                            <input asp-for="UserName"
-                                   class="form-control"
-                                   autocomplete="username" />
-
-                            <span asp-validation-for="UserName"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="Email"
-                                   class="form-label">
-                            </label>
-
-                            <input asp-for="Email"
-                                   class="form-control"
-                                   autocomplete="email" />
-
-                            <span asp-validation-for="Email"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="Password"
-                                   class="form-label">
-                            </label>
-
-                            <input asp-for="Password"
-                                   class="form-control"
-                                   autocomplete="new-password" />
-
-                            <span asp-validation-for="Password"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="ConfirmPassword"
-                                   class="form-label">
-                            </label>
-
-                            <input asp-for="ConfirmPassword"
-                                   class="form-control"
-                                   autocomplete="new-password" />
-
-                            <span asp-validation-for="ConfirmPassword"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-4">
-
-                            <label asp-for="Role"
-                                   class="form-label">
-                            </label>
-
-                            <select asp-for="Role"
-                                    class="form-select">
-
-                                <option value="Admin">
-                                    Admin
-                                </option>
-
-                            </select>
-
-                            <span asp-validation-for="Role"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="d-flex gap-2">
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-                                ایجاد کاربر
-                            </button>
-
-                            <a asp-action="Index"
-                               class="btn btn-outline-secondary">
-                                انصراف
-                            </a>
-
-                        </div>
-
-                    </form>
-
+                    <p class="create-user-subtitle">
+                        اطلاعات کاربر جدید را وارد کنید تا حساب کاربری ایجاد شود.
+                    </p>
                 </div>
 
             </div>
+
+            <a asp-action="Index"
+               class="create-user-back">
+                <span>→</span>
+                بازگشت به کاربران
+            </a>
+
+        </div>
+
+
+        <!-- Main Card -->
+        <div class="create-user-card">
+
+            <div class="create-user-card-header">
+
+                <div class="card-header-icon">
+                    ♡
+                </div>
+
+                <div>
+                    <h2>
+                        اطلاعات حساب کاربری
+                    </h2>
+
+                    <p>
+                        فیلدهای زیر را با دقت تکمیل کنید.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="create-user-card-body">
+
+                <form asp-action="Create"
+                      method="post"
+                      id="createUserForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- Validation -->
+                    <div asp-validation-summary="ModelOnly"
+                         class="create-user-validation">
+                    </div>
+
+
+                    <!-- Account Information -->
+                    <div class="create-user-section">
+
+                        <div class="create-user-section-title">
+
+                            <span class="section-number">
+                                01
+                            </span>
+
+                            <div>
+                                <strong>اطلاعات حساب</strong>
+                                <small>
+                                    مشخصات ورود کاربر
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="create-user-grid">
+
+                            <!-- Username -->
+                            <div class="user-form-group">
+
+                                <label asp-for="UserName"
+                                       class="user-form-label">
+
+                                    <span class="label-icon">
+                                        ♙
+                                    </span>
+
+                                    نام کاربری
+
+                                </label>
+
+                                <div class="user-input-wrapper">
+
+                                    <span class="user-input-icon">
+                                        @@
+                                    </span>
+
+                                    <input asp-for="UserName"
+                                           class="user-form-input"
+                                           autocomplete="username"
+                                           placeholder="نام کاربری را وارد کنید" />
+
+                                </div>
+
+                                <span asp-validation-for="UserName"
+                                      class="user-validation">
+                                </span>
+
+                            </div>
+
+
+                            <!-- Email -->
+                            <div class="user-form-group">
+
+                                <label asp-for="Email"
+                                       class="user-form-label">
+
+                                    <span class="label-icon">
+                                        ✉
+                                    </span>
+
+                                    ایمیل
+
+                                </label>
+
+                                <div class="user-input-wrapper">
+
+                                    <span class="user-input-icon">
+                                        ✉
+                                    </span>
+
+                                    <input asp-for="Email"
+                                           type="email"
+                                           class="user-form-input"
+                                           autocomplete="email"
+                                           placeholder="example@email.com"
+                                           dir="ltr" />
+
+                                </div>
+
+                                <span asp-validation-for="Email"
+                                      class="user-validation">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password -->
+                    <div class="create-user-section">
+
+                        <div class="create-user-section-title">
+
+                            <span class="section-number">
+                                02
+                            </span>
+
+                            <div>
+                                <strong>امنیت حساب</strong>
+                                <small>
+                                    رمز عبور ایمن برای کاربر تعیین کنید.
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="create-user-grid">
+
+                            <!-- Password -->
+                            <div class="user-form-group">
+
+                                <label asp-for="Password"
+                                       class="user-form-label">
+
+                                    <span class="label-icon">
+                                        ♢
+                                    </span>
+
+                                    رمز عبور
+
+                                </label>
+
+                                <div class="user-input-wrapper">
+
+                                    <span class="user-input-icon">
+                                        ◆
+                                    </span>
+
+                                    <input asp-for="Password"
+                                           type="password"
+                                           class="user-form-input password-input"
+                                           autocomplete="new-password"
+                                           placeholder="رمز عبور را وارد کنید"
+                                           dir="ltr" />
+
+                                    <button type="button"
+                                            class="password-toggle"
+                                            data-target="Password"
+                                            aria-label="نمایش رمز عبور">
+
+                                        <span class="show-password-icon">
+                                            ◉
+                                        </span>
+
+                                    </button>
+
+                                </div>
+
+                                <span asp-validation-for="Password"
+                                      class="user-validation">
+                                </span>
+
+                            </div>
+
+
+                            <!-- Confirm Password -->
+                            <div class="user-form-group">
+
+                                <label asp-for="ConfirmPassword"
+                                       class="user-form-label">
+
+                                    <span class="label-icon">
+                                        ✓
+                                    </span>
+
+                                    تکرار رمز عبور
+
+                                </label>
+
+                                <div class="user-input-wrapper">
+
+                                    <span class="user-input-icon">
+                                        ◆
+                                    </span>
+
+                                    <input asp-for="ConfirmPassword"
+                                           type="password"
+                                           class="user-form-input password-input"
+                                           autocomplete="new-password"
+                                           placeholder="رمز عبور را دوباره وارد کنید"
+                                           dir="ltr" />
+
+                                    <button type="button"
+                                            class="password-toggle"
+                                            data-target="ConfirmPassword"
+                                            aria-label="نمایش رمز عبور">
+
+                                        <span class="show-password-icon">
+                                            ◉
+                                        </span>
+
+                                    </button>
+
+                                </div>
+
+                                <span asp-validation-for="ConfirmPassword"
+                                      class="user-validation">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Password Hint -->
+                        <div class="password-security-note">
+
+                            <div class="security-note-icon">
+                                ✦
+                            </div>
+
+                            <div>
+                                <strong>
+                                    نکته امنیتی
+                                </strong>
+
+                                <p>
+                                    برای امنیت بیشتر، از یک رمز عبور قوی و غیرقابل حدس استفاده کنید.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Role -->
+                    <div class="create-user-section">
+
+                        <div class="create-user-section-title">
+
+                            <span class="section-number">
+                                03
+                            </span>
+
+                            <div>
+                                <strong>سطح دسترسی</strong>
+                                <small>
+                                    نقش و سطح دسترسی کاربر را مشخص کنید.
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="user-form-group role-group">
+
+                            <label asp-for="Role"
+                                   class="user-form-label">
+
+                                <span class="label-icon">
+                                    ♧
+                                </span>
+
+                                نقش کاربر
+
+                            </label>
+
+                            <div class="user-select-wrapper">
+
+                                <span class="user-input-icon">
+                                    ♧
+                                </span>
+
+                                <select asp-for="Role"
+                                        class="user-form-select">
+
+                                    <option value="Admin">
+                                        مدیر سیستم (Admin)
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <span asp-validation-for="Role"
+                                  class="user-validation">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Form Footer -->
+                    <div class="create-user-form-footer">
+
+                        <div class="form-footer-info">
+
+                            <span class="footer-info-icon">
+                                ✓
+                            </span>
+
+                            <span>
+                                اطلاعات واردشده را بررسی کرده و سپس حساب را ایجاد کنید.
+                            </span>
+
+                        </div>
+
+
+                        <div class="create-user-actions">
+
+                            <a asp-action="Index"
+                               class="user-cancel-button">
+
+                                <span>
+                                    ×
+                                </span>
+
+                                انصراف
+
+                            </a>
+
+
+                            <button type="submit"
+                                    class="user-submit-button"
+                                    id="createUserButton">
+
+                                <span class="submit-icon">
+                                    ♡
+                                </span>
+
+                                <span class="submit-text">
+                                    ایجاد کاربر
+                                </span>
+
+                                <span class="submit-arrow">
+                                    ←
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="create-user-footer">
+
+            <span>
+                مدیریت امن کاربران
+            </span>
+
+            <span class="footer-dot"></span>
+
+            <span>
+                MediaQR
+            </span>
 
         </div>
 
@@ -138,7 +455,1111 @@
 
 </div>
 
+
+<style>
+
+    /* =========================================================
+       Create User Page
+    ========================================================= */
+
+    .create-user-page {
+        position: relative;
+        min-height: calc(100vh - 70px);
+
+        padding: 40px 20px 55px;
+
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at 10% 15%,
+                rgba(244, 114, 182, .13),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 90% 20%,
+                rgba(139, 92, 246, .12),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 50% 100%,
+                rgba(96, 165, 250, .10),
+                transparent 35%
+            ),
+            #faf8ff;
+    }
+
+
+    /* Background shapes */
+
+    .create-user-bg {
+        position: absolute;
+
+        border-radius: 50%;
+
+        filter: blur(2px);
+
+        pointer-events: none;
+
+        opacity: .6;
+    }
+
+    .create-user-bg-1 {
+        width: 280px;
+        height: 280px;
+
+        top: -120px;
+        right: -80px;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(236, 72, 153, .15),
+                transparent 70%
+            );
+    }
+
+    .create-user-bg-2 {
+        width: 350px;
+        height: 350px;
+
+        bottom: -180px;
+        left: -130px;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(139, 92, 246, .14),
+                transparent 70%
+            );
+    }
+
+    .create-user-bg-3 {
+        width: 180px;
+        height: 180px;
+
+        top: 40%;
+        right: 4%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(96, 165, 250, .10),
+                transparent 70%
+            );
+    }
+
+
+    /* Wrapper */
+
+    .create-user-wrapper {
+        position: relative;
+
+        z-index: 2;
+
+        width: min(100%, 900px);
+
+        margin: 0 auto;
+    }
+
+
+    /* Header */
+
+    .create-user-header {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 25px;
+
+        margin-bottom: 28px;
+    }
+
+    .create-user-header-main {
+        display: flex;
+
+        align-items: center;
+
+        gap: 16px;
+    }
+
+    .create-user-header-icon {
+        width: 58px;
+        height: 58px;
+
+        flex: 0 0 58px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 18px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fce7f3,
+                #ede9fe
+            );
+
+        border: 1px solid rgba(236,72,153,.10);
+
+        box-shadow:
+            0 10px 30px rgba(139,92,246,.10);
+
+        color: #be185d;
+
+        font-size: 27px;
+    }
+
+    .create-user-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 7px;
+
+        padding: 5px 11px;
+
+        margin-bottom: 6px;
+
+        border-radius: 20px;
+
+        background: rgba(253,242,248,.9);
+
+        color: #be185d;
+
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: #ec4899;
+
+        box-shadow:
+            0 0 0 4px rgba(236,72,153,.10);
+    }
+
+    .create-user-title {
+        margin: 0;
+
+        color: #3b1b5a;
+
+        font-size: clamp(23px, 3vw, 31px);
+
+        font-weight: 900;
+
+        letter-spacing: -.5px;
+    }
+
+    .create-user-subtitle {
+        margin: 5px 0 0;
+
+        color: #8b7b98;
+
+        font-size: 13px;
+    }
+
+
+    /* Back */
+
+    .create-user-back {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 11px 15px;
+
+        border-radius: 13px;
+
+        background: rgba(255,255,255,.75);
+
+        border: 1px solid rgba(139,92,246,.10);
+
+        color: #6d28d9;
+
+        font-size: 12px;
+        font-weight: 800;
+
+        text-decoration: none;
+
+        box-shadow:
+            0 7px 20px rgba(88,28,135,.06);
+
+        transition: all .2s ease;
+    }
+
+    .create-user-back:hover {
+        color: #be185d;
+
+        background: #fff;
+
+        transform: translateY(-1px);
+    }
+
+    .create-user-back span {
+        font-size: 17px;
+    }
+
+
+    /* Main Card */
+
+    .create-user-card {
+        position: relative;
+
+        overflow: visible;
+
+        border-radius: 28px;
+
+        background: rgba(255,255,255,.82);
+
+        border: 1px solid rgba(255,255,255,.9);
+
+        box-shadow:
+            0 25px 70px rgba(88,28,135,.10),
+            0 5px 20px rgba(0,0,0,.035);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+
+    /* Card Header */
+
+    .create-user-card-header {
+        display: flex;
+
+        align-items: center;
+
+        gap: 13px;
+
+        padding: 23px 27px;
+
+        border-bottom: 1px solid #f3e8ff;
+    }
+
+    .card-header-icon {
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fce7f3,
+                #ede9fe
+            );
+
+        color: #be185d;
+
+        font-size: 19px;
+    }
+
+    .create-user-card-header h2 {
+        margin: 0 0 3px;
+
+        color: #4c1d95;
+
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .create-user-card-header p {
+        margin: 0;
+
+        color: #9a8aa6;
+
+        font-size: 11px;
+    }
+
+
+    /* Card Body */
+
+    .create-user-card-body {
+        padding: 28px;
+
+        overflow: visible;
+    }
+
+
+    /* Validation */
+
+    .create-user-validation {
+        margin-bottom: 24px;
+
+        padding: 13px 15px;
+
+        border-radius: 14px;
+
+        background: #fff1f2;
+
+        border: 1px solid #fecdd3;
+
+        color: #be123c;
+
+        font-size: 12px;
+    }
+
+    .create-user-validation:empty {
+        display: none;
+    }
+
+
+    /* Section */
+
+    .create-user-section {
+        position: relative;
+
+        margin-bottom: 30px;
+
+        padding-bottom: 28px;
+
+        border-bottom: 1px solid #f5edff;
+    }
+
+    .create-user-section:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .create-user-section-title {
+        display: flex;
+
+        align-items: center;
+
+        gap: 11px;
+
+        margin-bottom: 21px;
+    }
+
+    .section-number {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fce7f3,
+                #ede9fe
+            );
+
+        color: #a21caf;
+
+        font-size: 10px;
+        font-weight: 900;
+    }
+
+    .create-user-section-title strong {
+        display: block;
+
+        color: #4c1d95;
+
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    .create-user-section-title small {
+        display: block;
+
+        margin-top: 3px;
+
+        color: #9a8aa6;
+
+        font-size: 10px;
+    }
+
+
+    /* Grid */
+
+    .create-user-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 20px;
+    }
+
+
+    /* Form Group */
+
+    .user-form-group {
+        position: relative;
+
+        min-width: 0;
+    }
+
+    .user-form-label {
+        display: flex;
+
+        align-items: center;
+
+        gap: 7px;
+
+        margin-bottom: 8px;
+
+        color: #4b3a59;
+
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .label-icon {
+        color: #c026d3;
+
+        font-size: 14px;
+    }
+
+
+    /* Input */
+
+    .user-input-wrapper {
+        position: relative;
+    }
+
+    .user-input-icon {
+        position: absolute;
+
+        right: 14px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #c084fc;
+
+        font-size: 14px;
+
+        pointer-events: none;
+
+        z-index: 2;
+    }
+
+    .user-form-input,
+    .user-form-select {
+        width: 100%;
+
+        height: 48px;
+
+        border-radius: 14px;
+
+        border: 1px solid #eadcff;
+
+        background: rgba(255,255,255,.92);
+
+        color: #3f3150;
+
+        font-family: inherit;
+
+        font-size: 13px;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            background .2s ease;
+    }
+
+    .user-form-input {
+        padding: 0 43px 0 15px;
+    }
+
+    .user-form-input::placeholder {
+        color: #c1b5ca;
+    }
+
+    .user-form-input:focus,
+    .user-form-select:focus {
+        border-color: #c084fc;
+
+        background: #fff;
+
+        box-shadow:
+            0 0 0 4px rgba(192,132,252,.11);
+    }
+
+
+    /* LTR values */
+
+    .user-form-input[dir="ltr"] {
+        text-align: left;
+    }
+
+
+    /* Password Toggle */
+
+    .password-toggle {
+        position: absolute;
+
+        left: 9px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        width: 31px;
+        height: 31px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 9px;
+
+        background: #faf5ff;
+
+        color: #a855f7;
+
+        cursor: pointer;
+
+        transition: all .2s ease;
+    }
+
+    .password-toggle:hover {
+        background: #f3e8ff;
+
+        color: #9333ea;
+    }
+
+    .show-password-icon {
+        font-size: 13px;
+    }
+
+
+    /* Select */
+
+    .user-select-wrapper {
+        position: relative;
+    }
+
+    .user-form-select {
+        appearance: none;
+
+        -webkit-appearance: none;
+
+        padding:
+            0 43px 0 40px;
+
+        cursor: pointer;
+    }
+
+
+    /* Validation */
+
+    .user-validation {
+        display: block;
+
+        margin-top: 6px;
+
+        color: #e11d48;
+
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    /* Security Note */
+
+    .password-security-note {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        margin-top: 20px;
+
+        padding: 13px 15px;
+
+        border-radius: 15px;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(253,242,248,.9),
+                rgba(245,243,255,.9)
+            );
+
+        border: 1px solid rgba(192,132,252,.10);
+    }
+
+    .security-note-icon {
+        width: 34px;
+        height: 34px;
+
+        flex: 0 0 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #fff;
+
+        color: #c026d3;
+
+        box-shadow:
+            0 4px 12px rgba(139,92,246,.08);
+    }
+
+    .password-security-note strong {
+        display: block;
+
+        margin-bottom: 2px;
+
+        color: #6b21a8;
+
+        font-size: 11px;
+    }
+
+    .password-security-note p {
+        margin: 0;
+
+        color: #9a8aa6;
+
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+
+    /* Footer */
+
+    .create-user-form-footer {
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding-top: 24px;
+    }
+
+    .form-footer-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 7px;
+
+        color: #9a8aa6;
+
+        font-size: 10px;
+    }
+
+    .footer-info-icon {
+        width: 22px;
+        height: 22px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 7px;
+
+        background: #fdf2f8;
+
+        color: #db2777;
+
+        font-size: 11px;
+    }
+
+    .create-user-actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+    }
+
+
+    /* Cancel */
+
+    .user-cancel-button {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        min-width: 105px;
+        height: 45px;
+
+        padding: 0 15px;
+
+        border-radius: 13px;
+
+        background: #fff;
+
+        border: 1px solid #eadcff;
+
+        color: #7c6a88;
+
+        font-size: 12px;
+        font-weight: 800;
+
+        text-decoration: none;
+
+        transition: all .2s ease;
+    }
+
+    .user-cancel-button:hover {
+        background: #faf5ff;
+
+        color: #6b21a8;
+
+        border-color: #d8b4fe;
+    }
+
+    .user-cancel-button span {
+        font-size: 18px;
+    }
+
+
+    /* Submit */
+
+    .user-submit-button {
+        position: relative;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 9px;
+
+        min-width: 165px;
+        height: 45px;
+
+        padding: 0 17px;
+
+        border: none;
+        border-radius: 13px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ec4899,
+                #8b5cf6
+            );
+
+        color: white;
+
+        font-family: inherit;
+
+        font-size: 12px;
+        font-weight: 900;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 8px 20px rgba(139,92,246,.22);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .user-submit-button:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 12px 28px rgba(139,92,246,.28);
+    }
+
+    .submit-icon {
+        font-size: 15px;
+    }
+
+    .submit-arrow {
+        font-size: 17px;
+
+        transition: transform .2s ease;
+    }
+
+    .user-submit-button:hover .submit-arrow {
+        transform: translateX(-3px);
+    }
+
+
+    /* Footer */
+
+    .create-user-footer {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 9px;
+
+        margin-top: 22px;
+
+        color: #a99ab4;
+
+        font-size: 10px;
+    }
+
+    .footer-dot {
+        width: 4px;
+        height: 4px;
+
+        border-radius: 50%;
+
+        background: #d8b4fe;
+    }
+
+
+    /* =========================================================
+       Responsive
+    ========================================================= */
+
+    @@media (max-width: 768px) {
+
+        .create-user-page {
+            padding: 25px 14px 40px;
+        }
+
+        .create-user-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+        .create-user-back {
+            align-self: flex-start;
+        }
+
+        .create-user-card-header {
+            padding: 20px;
+        }
+
+        .create-user-card-body {
+            padding: 20px;
+        }
+
+        .create-user-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .create-user-form-footer {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+        .form-footer-info {
+            align-items: flex-start;
+        }
+
+        .create-user-actions {
+            width: 100%;
+        }
+
+        .user-cancel-button,
+        .user-submit-button {
+            flex: 1;
+        }
+    }
+
+
+    @@media (max-width: 480px) {
+
+        .create-user-header-main {
+            align-items: flex-start;
+        }
+
+        .create-user-header-icon {
+            width: 48px;
+            height: 48px;
+
+            flex-basis: 48px;
+
+            border-radius: 15px;
+
+            font-size: 22px;
+        }
+
+        .create-user-title {
+            font-size: 22px;
+        }
+
+        .create-user-subtitle {
+            font-size: 11px;
+
+            line-height: 1.8;
+        }
+
+        .create-user-card {
+            border-radius: 22px;
+        }
+
+        .create-user-card-header {
+            padding: 17px;
+        }
+
+        .create-user-card-body {
+            padding: 17px;
+        }
+
+        .create-user-section {
+            padding-bottom: 22px;
+            margin-bottom: 22px;
+        }
+
+        .create-user-section-title {
+            align-items: flex-start;
+        }
+
+        .create-user-actions {
+            flex-direction: column-reverse;
+        }
+
+        .user-cancel-button,
+        .user-submit-button {
+            width: 100%;
+        }
+
+        .create-user-footer {
+            flex-wrap: wrap;
+        }
+    }
+
+</style>
+
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* =====================================================
+               Password Show / Hide
+            ===================================================== */
+
+            document
+                .querySelectorAll(".password-toggle")
+                .forEach(function (button) {
+
+                    button.addEventListener("click", function () {
+
+                        const targetId =
+                            button.getAttribute("data-target");
+
+                        const input =
+                            document.getElementById(targetId);
+
+                        if (!input)
+                            return;
+
+                        if (input.type === "password") {
+
+                            input.type = "text";
+
+                            button
+                                .setAttribute(
+                                    "aria-label",
+                                    "مخفی کردن رمز عبور"
+                                );
+
+                            button
+                                .classList
+                                .add("password-visible");
+
+                        }
+                        else {
+
+                            input.type = "password";
+
+                            button
+                                .setAttribute(
+                                    "aria-label",
+                                    "نمایش رمز عبور"
+                                );
+
+                            button
+                                .classList
+                                .remove("password-visible");
+                        }
+
+                    });
+
+                });
+
+
+            /* =====================================================
+               Submit Loading
+            ===================================================== */
+
+            const form =
+                document.getElementById("createUserForm");
+
+            const submitButton =
+                document.getElementById("createUserButton");
+
+
+            if (form && submitButton) {
+
+                form.addEventListener("submit", function () {
+
+                    /*
+                     * فقط زمانی حالت loading فعال شود
+                     * که Validation سمت کلاینت اجازه Submit بدهد.
+                     */
+
+                    if (
+                        typeof $ !== "undefined" &&
+                        $.validator &&
+                        !$(form).valid()
+                    ) {
+                        return;
+                    }
+
+                    submitButton.disabled = true;
+
+                    submitButton.style.opacity = ".75";
+
+                    const text =
+                        submitButton.querySelector(".submit-text");
+
+                    if (text) {
+                        text.textContent = "در حال ایجاد...";
+                    }
+
+                    const icon =
+                        submitButton.querySelector(".submit-icon");
+
+                    if (icon) {
+                        icon.textContent = "…";
+                    }
+
+                });
+
+            }
+
+        });
+
+    </script>
 }

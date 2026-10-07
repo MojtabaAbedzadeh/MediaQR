@@ -1,8 +1,474 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "MediaQR";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="mediaqr-home" dir="rtl">
+
+    <!-- =========================================
+         HERO
+    ========================================== -->
+
+    <section class="hero-section">
+
+        <!-- Decorative shapes -->
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
+
+
+        <div class="container">
+
+            <div class="row align-items-center justify-content-center g-5">
+
+                <!-- CONTENT -->
+                <div class="col-lg-7">
+
+                    <div class="hero-content">
+
+                        <div class="hero-badge">
+                            <span>♡</span>
+                            پیام‌هایی که ماندگار می‌شوند
+                        </div>
+
+
+                        <h1 class="hero-title">
+
+                            حرف دلت را
+
+                            <span>
+                                با یک QR Code
+                            </span>
+
+                            بفرست
+
+                        </h1>
+
+
+                        <p class="hero-description">
+
+                            یک پیام صوتی از خودت بساز،
+                            برایش یک QR Code اختصاصی دریافت کن
+                            و آن را با کسی که دوستش داری به اشتراک بگذار.
+
+                        </p>
+
+
+                        <div class="hero-actions">
+
+                            <a asp-controller="AudioMessage"
+                               asp-action="Create"
+                               class="hero-button">
+
+                                <span class="hero-button-icon">
+                                    🎙️
+                                </span>
+
+                                <span>
+                                    ساخت پیام صوتی
+                                </span>
+
+                                <span class="hero-button-arrow">
+                                    ←
+                                </span>
+
+                            </a>
+
+
+                            <div class="hero-note">
+
+                                <span>
+                                    ✨
+                                </span>
+
+                                ساده، سریع و دوست‌داشتنی
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VISUAL -->
+                <div class="col-lg-5">
+
+                    <div class="hero-visual">
+
+                        <!-- Floating hearts -->
+                        <span class="floating-heart heart-1">
+                            ♥
+                        </span>
+
+                        <span class="floating-heart heart-2">
+                            ♥
+                        </span>
+
+                        <span class="floating-heart heart-3">
+                            ♥
+                        </span>
+
+
+                        <!-- Main Card -->
+                        <div class="qr-hero-card">
+
+                            <div class="qr-card-top">
+
+                                <div class="qr-card-logo">
+                                    ♡
+                                </div>
+
+                                <span>
+                                    MediaQR
+                                </span>
+
+                            </div>
+
+
+                            <div class="fake-qr">
+
+                                <div class="qr-pattern">
+
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="qr-card-message">
+
+                                <div class="message-icon">
+                                    🎧
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        یک پیام برای تو
+                                    </strong>
+
+                                    <small>
+                                        برای شنیدن لمس کن
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="qr-wave">
+
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         HOW IT WORKS
+    ========================================== -->
+
+    <section class="how-section">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    ✨ خیلی ساده
+                </div>
+
+                <h2 class="section-title">
+                    چطور کار می‌کند؟
+                </h2>
+
+                <p class="section-description">
+                    فقط سه قدم تا ساخت یک پیام خاص و ماندگار فاصله داری.
+                </p>
+
+            </div>
+
+
+            <div class="steps-wrapper">
+
+                <!-- STEP 1 -->
+
+                <div class="step-card">
+
+                    <div class="step-top">
+
+                        <div class="step-icon step-icon-pink">
+                            🎙️
+                        </div>
+
+                        <div class="step-number">
+                            ۰۱
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        پیام صوتی را بساز
+                    </h3>
+
+                    <p>
+                        فایل صوتی خودت را انتخاب کن و یک عنوان زیبا
+                        برای پیام بنویس.
+                    </p>
+
+                    <div class="step-line"></div>
+
+                </div>
+
+
+                <!-- STEP 2 -->
+
+                <div class="step-card">
+
+                    <div class="step-top">
+
+                        <div class="step-icon step-icon-purple">
+                            ▦
+                        </div>
+
+                        <div class="step-number">
+                            ۰۲
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        QR دریافت کن
+                    </h3>
+
+                    <p>
+                        MediaQR برای پیام تو یک QR Code اختصاصی
+                        و منحصر‌به‌فرد ایجاد می‌کند.
+                    </p>
+
+                    <div class="step-line"></div>
+
+                </div>
+
+
+                <!-- STEP 3 -->
+
+                <div class="step-card">
+
+                    <div class="step-top">
+
+                        <div class="step-icon step-icon-blue">
+                            💌
+                        </div>
+
+                        <div class="step-number">
+                            ۰۳
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        به اشتراک بگذار
+                    </h3>
+
+                    <p>
+                        QR Code یا لینک پیام را برای کسی که دوستش
+                        داری ارسال کن.
+                    </p>
+
+                    <div class="step-line"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         FEATURES
+    ========================================== -->
+
+    <section class="features-section">
+
+        <div class="container">
+
+            <div class="features-card">
+
+                <div class="features-content">
+
+                    <div class="section-label">
+                        💕 چرا MediaQR؟
+                    </div>
+
+                    <h2>
+                        یک راه متفاوت برای
+                        <span>
+                            گفتن حرف‌های مهم
+                        </span>
+                    </h2>
+
+                    <p>
+                        بعضی حرف‌ها را نمی‌شود فقط در یک پیام متنی نوشت.
+                        صدای تو می‌تواند حس واقعی حرف‌هایت را منتقل کند.
+                    </p>
+
+                </div>
+
+
+                <div class="features-list">
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            🎧
+                        </div>
+
+                        <div>
+                            <strong>
+                                پیام صوتی
+                            </strong>
+
+                            <span>
+                                صدای واقعی خودت را به اشتراک بگذار.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            🔗
+                        </div>
+
+                        <div>
+                            <strong>
+                                لینک اختصاصی
+                            </strong>
+
+                            <span>
+                                هر پیام یک لینک اختصاصی دارد.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            ▦
+                        </div>
+
+                        <div>
+                            <strong>
+                                QR Code
+                            </strong>
+
+                            <span>
+                                پیام خودت را به یک QR زیبا تبدیل کن.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         FINAL CTA
+    ========================================== -->
+
+    <section class="final-cta">
+
+        <div class="cta-decoration cta-decoration-1"></div>
+        <div class="cta-decoration cta-decoration-2"></div>
+
+        <div class="container">
+
+            <div class="cta-content">
+
+                <div class="cta-icon">
+                    💗
+                </div>
+
+                <h2>
+                    آماده‌ای پیامت را بسازی؟
+                </h2>
+
+                <p>
+                    اولین پیام صوتی خودت را همین حالا ایجاد کن.
+                </p>
+
+                <a asp-controller="AudioMessage"
+                   asp-action="Create"
+                   class="cta-button">
+
+                    <span>
+                        🎙️
+                    </span>
+
+                    ساخت پیام صوتی
+
+                    <span>
+                        ←
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>

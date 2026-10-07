@@ -2,6 +2,7 @@
     "use strict";
 
     function initializePlayer(player) {
+
         if (!player) {
             return;
         }
@@ -14,7 +15,8 @@
 
         var mediaType = player.dataset.mediaType;
 
-        if (mediaType !== "Audio" && mediaType !== "Video") {
+        if (mediaType !== "Audio" &&
+            mediaType !== "Video") {
             return;
         }
 
@@ -25,46 +27,57 @@
             100: false
         };
 
-        var lastProgressSent = -1;
-        var lastProgressSentAt = 0;
-
         var hasCompleted = false;
 
+
         function getDuration() {
+
             if (!Number.isFinite(player.duration) ||
                 player.duration <= 0) {
+
                 return null;
             }
 
             return player.duration;
         }
 
+
         function getCurrentTime() {
+
             if (!Number.isFinite(player.currentTime) ||
                 player.currentTime < 0) {
+
                 return null;
             }
 
             return player.currentTime;
         }
 
+
         function getProgress() {
+
             var duration = getDuration();
             var currentTime = getCurrentTime();
 
             if (duration === null ||
                 currentTime === null) {
+
                 return null;
             }
 
-            var progress = (currentTime / duration) * 100;
+            var progress =
+                (currentTime / duration) * 100;
 
             if (!Number.isFinite(progress)) {
                 return null;
             }
 
-            return Math.max(0, Math.min(100, progress));
+            return Math.max(
+                0,
+                Math.min(100, progress)
+            );
         }
+
 
         function buildPayload(
             eventType,
@@ -76,13 +89,16 @@
                 eventType: eventType
             };
 
+
             if (durationSeconds !== undefined &&
                 durationSeconds !== null &&
                 Number.isFinite(durationSeconds) &&
                 durationSeconds >= 0) {
 
-                payload.durationSeconds = durationSeconds;
+                payload.durationSeconds =
+                    durationSeconds;
             }
+
 
             if (progressPercent !== undefined &&
                 progressPercent !== null &&
@@ -90,11 +106,14 @@
                 progressPercent >= 0 &&
                 progressPercent <= 100) {
 
-                payload.progressPercent = progressPercent;
+                payload.progressPercent =
+                    progressPercent;
             }
+
 
             return payload;
         }
+
 
         function sendEvent(
             eventType,
@@ -104,20 +123,38 @@
             var payload = buildPayload(
                 eventType,
                 durationSeconds,
-                progressPercent);
+                progressPercent
+            );
 
-            fetch("/api/analytics/track", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload),
-                keepalive: true,
-                credentials: "same-origin"
-            }).catch(function () {
-                // Analytics نباید باعث اختلال در Player شود.
+
+            fetch(
+                "/api/analytics/track",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(payload),
+
+                    keepalive: true,
+
+                    credentials:
+                        "same-origin"
+                }
+            ).catch(function () {
+
+                /*
+                 * Analytics نباید باعث اختلال
+                 * در پخش Media شود.
+                 */
+
             });
         }
+
 
         function sendEventWithBeacon(
             eventType,
@@ -127,215 +164,279 @@
             var payload = buildPayload(
                 eventType,
                 durationSeconds,
-                progressPercent);
+                progressPercent
+            );
+
 
             try {
-                var blob = new Blob(
-                    [JSON.stringify(payload)],
-                    {
-                        type: "application/json"
-                    });
 
-                var sent = navigator.sendBeacon(
-                    "/api/analytics/track",
-                    blob);
+                var blob =
+                    new Blob(
+                        [JSON.stringify(payload)],
+                        {
+                            type:
+                                "application/json"
+                        }
+                    );
+
+
+                var sent =
+                    navigator.sendBeacon(
+                        "/api/analytics/track",
+                        blob
+                    );
+
 
                 if (sent) {
-                    return true;
+                    return;
                 }
+
             }
             catch (error) {
-                // در صورت عدم پشتیبانی، fetch استفاده می‌شود.
+
+                /*
+                 * در صورت عدم پشتیبانی
+                 * از Beacon، از fetch استفاده می‌کنیم.
+                 */
+
             }
+
 
             sendEvent(
                 eventType,
                 durationSeconds,
-                progressPercent);
-
-            return false;
+                progressPercent
+            );
         }
 
-        function markMilestone(percent, eventType) {
+
+        function markMilestone(
+            percent,
+            eventType) {
+
             if (sentMilestones[percent]) {
                 return;
             }
 
             sentMilestones[percent] = true;
 
-            var currentTime = getCurrentTime();
+            var currentTime =
+                getCurrentTime();
+
 
             sendEvent(
                 eventType,
                 currentTime,
-                percent);
+                percent
+            );
         }
 
-        player.addEventListener("play", function () {
 
-            var currentTime = getCurrentTime();
-            var progress = getProgress();
+        /*
+         * PLAY
+         */
+        player.addEventListener(
+            "play",
+            function () {
 
-            sendEvent(
-                2,
-                currentTime,
-                progress);
-        });
+                var currentTime =
+                    getCurrentTime();
 
-        player.addEventListener("pause", function () {
+                var progress =
+                    getProgress();
 
-            if (hasCompleted) {
-                return;
+
+                sendEvent(
+                    2,
+                    currentTime,
+                    progress
+                );
             }
+        );
 
-            var currentTime = getCurrentTime();
-            var progress = getProgress();
 
-            sendEvent(
-                3,
-                currentTime,
-                progress);
-        });
+        /*
+         * PAUSE
+         */
+        player.addEventListener(
+            "pause",
+            function () {
 
-        player.addEventListener("timeupdate", function () {
+                if (hasCompleted) {
+                    return;
+                }
 
-            var progress = getProgress();
+                var currentTime =
+                    getCurrentTime();
 
-            if (progress === null) {
-                return;
+                var progress =
+                    getProgress();
+
+
+                sendEvent(
+                    3,
+                    currentTime,
+                    progress
+                );
             }
+        );
 
-            /*
-             * timeupdate در بعضی مرورگرها تعداد زیادی
-             * بار در ثانیه اجرا می‌شود.
-             *
-             * بنابراین فقط زمانی milestone را بررسی می‌کنیم
-             * که progress به محدوده جدیدی وارد شده باشد.
-             */
 
-            if (progress >= 25) {
-                markMilestone(25, 4);
+        /*
+         * PROGRESS
+         */
+        player.addEventListener(
+            "timeupdate",
+            function () {
+
+                var progress =
+                    getProgress();
+
+
+                if (progress === null) {
+                    return;
+                }
+
+
+                if (progress >= 25) {
+
+                    markMilestone(
+                        25,
+                        4
+                    );
+                }
+
+
+                if (progress >= 50) {
+
+                    markMilestone(
+                        50,
+                        5
+                    );
+                }
+
+
+                if (progress >= 75) {
+
+                    markMilestone(
+                        75,
+                        6
+                    );
+                }
+
+
+                if (progress >= 100) {
+
+                    markMilestone(
+                        100,
+                        7
+                    );
+                }
             }
+        );
 
-            if (progress >= 50) {
-                markMilestone(50, 5);
-            }
 
-            if (progress >= 75) {
-                markMilestone(75, 6);
-            }
+        /*
+         * COMPLETE
+         */
+        player.addEventListener(
+            "ended",
+            function () {
 
-            if (progress >= 100) {
-                markMilestone(100, 7);
-            }
+                if (hasCompleted) {
+                    return;
+                }
 
-            /*
-             * فقط برای جلوگیری از پردازش بیش از حد
-             * وضعیت progress را نگه می‌داریم.
-             */
+                hasCompleted = true;
 
-            var now = Date.now();
 
-            if (lastProgressSent === -1 ||
-                Math.abs(progress - lastProgressSent) >= 1 ||
-                now - lastProgressSentAt >= 5000) {
+                var duration =
+                    getDuration();
 
-                lastProgressSent = progress;
-                lastProgressSentAt = now;
-            }
-        });
 
-        player.addEventListener("ended", function () {
+                /*
+                 * اطمینان از ثبت 100%
+                 */
+                markMilestone(
+                    100,
+                    7
+                );
 
-            if (hasCompleted) {
-                return;
-            }
 
-            hasCompleted = true;
-
-            /*
-             * در ended، مرورگر باید currentTime را
-             * تقریباً برابر duration قرار داده باشد.
-             */
-
-            var duration = getDuration();
-
-            if (duration !== null) {
-
-                markMilestone(100, 7);
-
+                /*
+                 * ثبت Complete
+                 */
                 sendEventWithBeacon(
                     8,
                     duration,
-                    100);
-
+                    100
+                );
             }
-            else {
+        );
 
-                markMilestone(100, 7);
-
-                sendEventWithBeacon(
-                    8,
-                    null,
-                    100);
-            }
-        });
 
         /*
-         * اگر کاربر صفحه را ترک کند، eventهای مهمی که
-         * قبل از unload در حال ارسال هستند تا حد ممکن
-         * با keepalive / Beacon ارسال می‌شوند.
+         * PAGE HIDE
          *
-         * فعلاً event جدیدی هنگام خروج ایجاد نمی‌کنیم؛
-         * چون نمی‌خواهیم خروج از صفحه را به اشتباه
-         * به عنوان Pause ثبت کنیم.
+         * اگر کاربر صفحه را ترک کند،
+         * آن را به عنوان Pause ثبت می‌کنیم.
          */
+        window.addEventListener(
+            "pagehide",
+            function () {
 
-        window.addEventListener("pagehide", function () {
+                if (hasCompleted) {
+                    return;
+                }
 
-            if (hasCompleted) {
-                return;
-            }
 
-            var currentTime = getCurrentTime();
-            var progress = getProgress();
+                var currentTime =
+                    getCurrentTime();
 
-            if (currentTime === null) {
-                return;
-            }
 
-            if (progress === null) {
+                if (currentTime === null) {
+                    return;
+                }
+
+
+                var progress =
+                    getProgress();
+
+
                 sendEventWithBeacon(
                     3,
                     currentTime,
-                    null);
-
-                return;
+                    progress
+                );
             }
-
-            sendEventWithBeacon(
-                3,
-                currentTime,
-                progress);
-        });
+        );
     }
+
 
     function initialize() {
 
-        var players = document.querySelectorAll(
-            "audio[data-qr-code-id], video[data-qr-code-id]"
-        );
+        var players =
+            document.querySelectorAll(
+                "audio[data-qr-code-id], " +
+                "video[data-qr-code-id]"
+            );
 
-        players.forEach(function (player) {
-            initializePlayer(player);
-        });
+
+        players.forEach(
+            function (player) {
+
+                initializePlayer(player);
+            }
+        );
     }
+
 
     if (document.readyState === "loading") {
 
         document.addEventListener(
             "DOMContentLoaded",
-            initialize);
+            initialize
+        );
 
     }
     else {

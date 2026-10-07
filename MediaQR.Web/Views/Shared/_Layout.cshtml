@@ -1,86 +1,1214 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MediaQR.Web</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MediaQR.Web.styles.css" asp-append-version="true" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Padideh</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/MediaQR.Web.styles.css"
+          asp-append-version="true" />
+
+    <!-- Google Font -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+
+    <style>
+
+        /* =========================================
+                           GLOBAL
+           ========================================= */
+
+        :root {
+            --pink: #ff5fa2;
+            --pink-light: #fff0f7;
+            --pink-soft: #ffd6e8;
+            --purple: #9b6cff;
+            --purple-light: #f2edff;
+            --blue: #6ecbff;
+            --yellow: #ffd966;
+            --text: #493d52;
+            --muted: #91869a;
+            --white: #ffffff;
+            --shadow: 0 10px 35px rgba(167, 102, 174, 0.12);
+            --shadow-hover: 0 15px 45px rgba(167, 102, 174, 0.20);
+        }
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            font-size: 16px;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            background: radial-gradient( circle at 10% 10%, rgba(255, 183, 213, .35), transparent 25% ), radial-gradient( circle at 90% 15%, rgba(181, 159, 255, .30), transparent 25% ), radial-gradient( circle at 80% 90%, rgba(110, 203, 255, .20), transparent 25% ), linear-gradient( 135deg, #fff8fc 0%, #fff 45%, #faf7ff 100% );
+            overflow-x: hidden;
+        }
+
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .site-header {
+            position: sticky;
+            top: 15px;
+            z-index: 900;
+            width: calc(100% - 30px);
+            max-width: 1250px;
+            margin: 15px auto;
+        }
+
+
+        .main-navbar {
+            width: 100%;
+        }
+
+
+        .navbar-inner {
+            min-height: 70px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.90);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 35px rgba(150, 90, 160, 0.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+
+        /* =========================================
+           BRAND
+        ========================================= */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-decoration: none !important;
+            color: #583d60;
+            transition: .25s ease;
+        }
+
+
+            .brand:hover {
+                color: #d94f91;
+            }
+
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient( 135deg, #ffe0ef, #eee1ff );
+            box-shadow: 0 6px 18px rgba(218, 101, 157, .15);
+        }
+
+
+            .brand-icon img {
+                width: 22px !important;
+                height: 22px;
+                object-fit: contain;
+            }
+
+
+        .brand-text {
+            font-size: 17px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+
+        /* =========================================
+           MENU BUTTON
+        ========================================= */
+
+        .cute-toggler {
+            width: 46px;
+            height: 46px;
+            padding: 0;
+            border: none;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: #fff0f7;
+            cursor: pointer;
+            transition: transform .25s ease, background .25s ease, box-shadow .25s ease;
+        }
+
+
+            .cute-toggler:hover {
+                transform: translateY(-2px);
+                background: #ffe3f0;
+                box-shadow: 0 8px 20px rgba(220, 90, 150, .18);
+            }
+
+
+            .cute-toggler span {
+                display: block;
+                width: 21px;
+                height: 2px;
+                border-radius: 10px;
+                background: linear-gradient( 90deg, #ff5fa3, #9b68ff );
+                transition: .3s ease;
+            }
+
+
+        /* =========================================
+           OVERLAY
+        ========================================= */
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(48, 31, 52, .35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .35s ease, visibility .35s ease;
+        }
+
+
+            .menu-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+
+        /* =========================================
+           SIDE MENU
+        ========================================= */
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            width: min(390px, 88vw);
+            height: 100vh;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, .98);
+            border-radius: 28px 0 0 28px;
+            box-shadow: -15px 0 50px rgba(90, 50, 100, .18);
+            transform: translateX(105%);
+            transition: transform .4s cubic-bezier(.77, 0, .18, 1);
+            overflow-y: auto;
+        }
+
+
+            .side-menu.active {
+                transform: translateX(0);
+            }
+
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+
+        /* =========================================
+           SIDE MENU HEADER
+        ========================================= */
+
+        .side-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1e5ef;
+        }
+
+
+        .side-menu-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        .side-brand-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: linear-gradient( 135deg, #ffe1ef, #e9dcff );
+        }
+
+
+            .side-brand-icon img {
+                width: 25px;
+                height: 25px;
+                object-fit: contain;
+            }
+
+
+        .side-brand-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+
+            .side-brand-info strong {
+                font-size: 15px;
+                color: #513958;
+            }
+
+
+            .side-brand-info small {
+                font-size: 11px;
+                color: #a28fa5;
+            }
+
+
+        /* =========================================
+           CLOSE BUTTON
+        ========================================= */
+
+        .close-menu-button {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 14px;
+            background: #fff0f6;
+            color: #c94f89;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+
+            .close-menu-button:hover {
+                background: #ffe0ec;
+                transform: rotate(90deg);
+            }
+
+
+        /* =========================================
+           NAVIGATION
+        ========================================= */
+
+        .side-menu-nav {
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+
+        .side-menu-item {
+            width: 100%;
+            min-height: 58px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            border-radius: 17px;
+            background: transparent;
+            color: #604c64;
+            text-decoration: none !important;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .25s ease, transform .25s ease, color .25s ease;
+        }
+
+
+            .side-menu-item:hover {
+                background: linear-gradient( 90deg, #fff0f7, #f5efff );
+                color: #d14e8d;
+                transform: translateX(-4px);
+            }
+
+
+        .menu-item-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #faf3f8;
+            font-size: 18px;
+        }
+
+
+        .menu-item-text {
+            flex: 1;
+        }
+
+
+        .menu-arrow {
+            font-size: 18px;
+            opacity: .45;
+            transition: .25s ease;
+        }
+
+
+        .side-menu-item:hover .menu-arrow {
+            opacity: 1;
+            transform: translateX(-4px);
+        }
+
+
+        /* =========================================
+           SEPARATOR
+        ========================================= */
+
+        .menu-separator {
+            height: 1px;
+            margin: 10px 4px;
+            background: linear-gradient( 90deg, transparent, #eadbea, transparent );
+        }
+
+
+        /* =========================================
+           USER
+        ========================================= */
+
+        .menu-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            margin-bottom: 6px;
+            border-radius: 18px;
+            background: linear-gradient( 135deg, #fff3f8, #f6f0ff );
+        }
+
+
+        .menu-user-avatar {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: white;
+            color: #d95b96;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(190, 100, 150, .10);
+        }
+
+
+        .menu-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+
+            .menu-user-info strong {
+                font-size: 14px;
+                color: #543c59;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+
+            .menu-user-info small {
+                font-size: 11px;
+                color: #a18ba4;
+            }
+
+
+        /* =========================================
+           LOGOUT
+        ========================================= */
+
+        .logout-item {
+            color: #c95378;
+        }
+
+
+            .logout-item:hover {
+                background: linear-gradient( 90deg, #fff0f3, #fff5f8 );
+                color: #c43f69;
+            }
+
+
+        /* =========================================
+           LOGIN
+        ========================================= */
+
+        .side-menu-login {
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            border-radius: 17px;
+            text-decoration: none !important;
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            background: linear-gradient( 135deg, #ff67a7, #a76cff );
+            box-shadow: 0 10px 25px rgba(181, 92, 166, .20);
+            transition: .25s ease;
+        }
+
+
+            .side-menu-login:hover {
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 14px 30px rgba(181, 92, 166, .28);
+            }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .side-menu-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #ad9aad;
+        }
+
+
+            .side-menu-footer strong {
+                color: #d65c96;
+            }
+
+
+        .menu-heart {
+            color: #ef649d;
+            animation: menuHeart 1.5s ease-in-out infinite;
+        }
+
+
+        @@keyframes menuHeart {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @@media (max-width: 576px) {
+            .site-header
+
+        {
+            width: calc(100% - 20px);
+            margin-top: 10px;
+        }
+
+
+        .navbar-inner {
+            min-height: 62px;
+            padding: 8px 12px;
+            border-radius: 18px;
+        }
+
+
+        .brand-text {
+            font-size: 14px;
+        }
+
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+        }
+
+
+        .cute-toggler {
+            width: 42px;
+            height: 42px;
+        }
+
+
+        .side-menu {
+            width: 90vw;
+            padding: 18px;
+            border-radius: 24px 0 0 24px;
+        }
+
+        }
+
+        /* =========================================
+                           BACKGROUND DECORATIONS
+           ========================================= */
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: .35;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+
+        body::before {
+            top: 20%;
+            right: -80px;
+            background: linear-gradient( 135deg, #ff9ac5, #c69cff );
+        }
+
+
+        body::after {
+            bottom: 10%;
+            left: -90px;
+            background: linear-gradient( 135deg, #91dcff, #c7a8ff );
+        }
+
+        /* =========================================
+                           USER AREA
+           ========================================= */
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: auto;
+        }
+
+
+        .user-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 13px;
+            border-radius: 14px;
+            color: #776b7e;
+            background: #fff6fb;
+            border: 1px solid #ffe0ee;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            background: linear-gradient( 135deg, #ff71aa, #a274ff );
+        }
+
+
+        /* =========================================
+                           BUTTONS
+                        ========================================= */
+
+        .cute-btn {
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 15px;
+            border-radius: 13px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all .25s ease;
+            cursor: pointer;
+        }
+
+
+            .cute-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(130, 90, 150, .15);
+            }
+
+
+        .btn-password {
+            color: #7958c9;
+            background: #f3eeff;
+            border: 1px solid #e5dcff;
+        }
+
+
+            .btn-password:hover {
+                color: white;
+                background: linear-gradient( 135deg, #9a72ff, #7652d6 );
+            }
+
+
+        .btn-logout {
+            color: #e74e87;
+            background: #fff0f6;
+            border: 1px solid #ffd8e8;
+        }
+
+
+            .btn-logout:hover {
+                color: white;
+                background: linear-gradient( 135deg, #ff6ca8, #e94b8a );
+            }
+
+
+        .btn-login {
+            color: white !important;
+            padding: 10px 22px;
+            border-radius: 14px;
+            background: linear-gradient( 135deg, #ff61a5, #9c68ff );
+            box-shadow: 0 7px 20px rgba(197, 103, 177, .25);
+        }
+
+
+            .btn-login:hover {
+                color: white !important;
+                transform: translateY(-2px);
+                box-shadow: 0 11px 27px rgba(197, 103, 177, .35);
+            }
+
+
+        /* =========================================
+                           TOGGLER
+                        ========================================= */
+
+        .cute-toggler {
+            border: none;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: #fff0f7;
+        }
+
+
+            .cute-toggler:focus {
+                box-shadow: 0 0 0 3px rgba(255, 95, 162, .15);
+            }
+
+
+        /* =========================================
+                           PAGE
+                        ========================================= */
+
+        .page-container {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 10px 20px 40px;
+        }
+
+
+        .main-content {
+            min-height: calc(100vh - 190px);
+        }
+
+
+        /* =========================================
+                           FOOTER
+                        ========================================= */
+
+        .main-footer {
+            width: calc(100% - 30px);
+            max-width: 1250px;
+            margin: 20px auto;
+            padding: 18px 25px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.70);
+            border: 1px solid rgba(255,255,255,.9);
+            box-shadow: 0 8px 30px rgba(160,100,160,.08);
+            color: #948897;
+            font-size: 13px;
+            text-align: center;
+        }
+
+
+        .footer-heart {
+            color: #ff6ba8;
+            animation: heartbeat 1.5s infinite;
+        }
+
+
+        @@keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+
+        /* =========================================
+                           MOBILE
+                        ========================================= */
+
+        @@media (max-width: 768px) {
+            .main-navbar {
+                margin: 10px;
+                width: calc(100% - 20px);
+                border-radius: 20px;
+            }
+
+
+            .navbar-inner {
+                padding: 9px 12px;
+            }
+
+
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+
+            .brand {
+                font-size: 17px;
+            }
+
+
+            .main-nav {
+                margin: 10px 0;
+                padding-top: 10px;
+                border-top: 1px solid #f5e8f1;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+
+                .main-nav .nav-link {
+                    text-align: center;
+                }
+
+
+            .user-area {
+                margin: 5px 0 0;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+
+            .user-name {
+                width: 100%;
+                justify-content: center;
+            }
+
+
+            .page-container {
+                padding: 5px 12px 30px;
+            }
+
+
+            .main-footer {
+                width: calc(100% - 20px);
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+
+
+        /* =========================================
+                           BOOTSTRAP OVERRIDES
+                        ========================================= */
+
+        .btn:focus,
+        button:focus,
+        a:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(255, 95, 162, .15) !important;
+        }
+
+    </style>
+
 </head>
+
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MediaQR.Web</a>
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <div class="d-flex align-items-center gap-2">
 
-                        <span class="text-muted">
-                            @User.Identity.Name
-                        </span>
-                        <a asp-controller="Account"
-                           asp-action="ChangePassword"
-                           class="btn btn-outline-secondary btn-sm">
-                            تغییر رمز
-                        </a>
-                        <form asp-controller="Account"
-                              asp-action="Logout"
-                              method="post"
-                              class="d-inline">
 
-                            @Html.AntiForgeryToken()
+    <!-- =========================================
+         NAVBAR
+    ========================================= -->
 
-                            <button type="submit"
-                                    class="btn btn-outline-danger btn-sm">
-                                خروج
-                            </button>
+    <header class="site-header">
 
-                        </form>
+        <nav class="main-navbar">
 
-                    </div>
-                }
-                else
-                {
-                    <a asp-controller="Account"
-                       asp-action="Login"
-                       class="btn btn-primary btn-sm">
-                        ورود
-                    </a>
-                }
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+            <div class="navbar-inner container-fluid">
+
+                <!-- BRAND -->
+                <a class="brand"
+                   asp-area=""
+                   asp-controller="Home"
+                   asp-action="Index">
+
+                    <span class="brand-icon">
+                        <img src="~/images/padideh-icon.png"
+                             alt="کیک و شیرینی پدیده" />
+                    </span>
+
+                    <span class="brand-text">
+                        کیک و شیرینی پدیده
+                    </span>
+
+                </a>
+
+
+                <!-- MENU BUTTON -->
+                <button type="button"
+                        id="menuButton"
+                        class="cute-toggler"
+                        aria-label="نمایش منو"
+                        aria-controls="sideMenu"
+                        aria-expanded="false">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+
             </div>
+
         </nav>
+
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+
+    <!-- MENU OVERLAY -->
+    <div id="menuOverlay"
+         class="menu-overlay">
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MediaQR.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+    <!-- SIDE MENU -->
+    <aside id="sideMenu"
+           class="side-menu"
+           aria-hidden="true">
+
+
+        <!-- MENU HEADER -->
+        <div class="side-menu-header">
+
+            <div class="side-menu-brand">
+
+                <div class="side-brand-icon">
+
+                    <img src="~/images/padideh-icon.png"
+                         alt="پدیده" />
+
+                </div>
+
+                <div class="side-brand-info">
+
+                    <strong>
+                        کیک و شیرینی پدیده
+                    </strong>
+
+                    <small>
+                        منوی اصلی
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- CLOSE -->
+            <button type="button"
+                    id="closeMenuButton"
+                    class="close-menu-button"
+                    aria-label="بستن منو">
+
+                ×
+
+            </button>
+
         </div>
+
+
+        <!-- MENU -->
+        <nav class="side-menu-nav">
+
+
+            <!-- HOME -->
+            <a class="side-menu-item"
+               asp-area=""
+               asp-controller="Home"
+               asp-action="Index">
+
+                <span class="menu-item-icon">
+                    🏠
+                </span>
+
+                <span class="menu-item-text">
+                    خانه
+                </span>
+
+                <span class="menu-arrow">
+                    ←
+                </span>
+
+            </a>
+
+
+            <!-- PRIVACY -->
+            <a class="side-menu-item"
+               asp-area=""
+               asp-controller="Home"
+               asp-action="Privacy">
+
+                <span class="menu-item-icon">
+                    🔒
+                </span>
+
+                <span class="menu-item-text">
+                    حریم خصوصی
+                </span>
+
+                <span class="menu-arrow">
+                    ←
+                </span>
+
+            </a>
+
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+
+                <div class="menu-separator"></div>
+
+
+                <!-- USER -->
+                <div class="menu-user">
+
+                    <div class="menu-user-avatar">
+
+                        ♡
+
+                    </div>
+
+                    <div class="menu-user-info">
+
+                        <strong>
+                            @User.Identity.Name
+                        </strong>
+
+                        <small>
+                            حساب کاربری
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CHANGE PASSWORD -->
+                <a asp-controller="Account"
+                   asp-action="ChangePassword"
+                   class="side-menu-item">
+
+                    <span class="menu-item-icon">
+                        🔐
+                    </span>
+
+                    <span class="menu-item-text">
+                        تغییر رمز عبور
+                    </span>
+
+                    <span class="menu-arrow">
+                        ←
+                    </span>
+
+                </a>
+
+
+                <!-- LOGOUT -->
+                <form asp-controller="Account"
+                      asp-action="Logout"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="side-menu-item logout-item">
+
+                        <span class="menu-item-icon">
+                            🚪
+                        </span>
+
+                        <span class="menu-item-text">
+                            خروج از حساب
+                        </span>
+
+                        <span class="menu-arrow">
+                            ←
+                        </span>
+
+                    </button>
+
+                </form>
+
+            }
+            else
+            {
+
+                <div class="menu-separator"></div>
+
+
+                <!-- LOGIN -->
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="side-menu-login">
+
+                    <span>
+                        ✨
+                    </span>
+
+                    <span>
+                        ورود به حساب
+                    </span>
+
+                </a>
+
+            }
+
+        </nav>
+
+
+        <!-- FOOTER -->
+        <div class="side-menu-footer">
+
+            <span>
+                ساخته شده با
+            </span>
+
+            <strong>
+                پدیده
+            </strong>
+
+            <span class="menu-heart">
+                ♥
+            </span>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENT
+    ========================================= -->
+
+    <div class="page-container">
+
+        <main role="main"
+              class="main-content">
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================= -->
+
+    <footer class="main-footer">
+
+        <div>
+
+            © 2026
+            <strong>Padideh</strong>
+
+            <span class="footer-heart">
+                ♥
+            </span>
+
+            ساخته شده با عشق
+
+        </div>
+
     </footer>
+
+
+    <!-- =========================================
+         SCRIPTS
+    ========================================= -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
+
 </html>

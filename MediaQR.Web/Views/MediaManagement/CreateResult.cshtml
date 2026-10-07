@@ -10,171 +10,895 @@
         $"qr-{Model.QrCode}.png";
 }
 
-<div class="container mt-5 mb-5" dir="rtl">
+<style>
 
-    <div class="row justify-content-center">
+    .media-success-page {
+        min-height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+        padding: 40px 20px 60px;
+        background: radial-gradient( circle at 10% 10%, rgba(244, 114, 182, .12), transparent 30% ), radial-gradient( circle at 90% 15%, rgba(139, 92, 246, .12), transparent 30% ), linear-gradient( 135deg, #fff7fb 0%, #f8f5ff 50%, #f4f8ff 100% );
+    }
 
-        <div class="col-lg-8">
 
-            <div class="card shadow-sm">
+    /* =========================
+           Decorative shapes
+           ========================= */
 
-                <div class="card-body p-5 text-center">
+    .media-success-bg {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(3px);
+    }
 
-                    <div class="mb-4">
+    .media-success-bg-1 {
+        width: 320px;
+        height: 320px;
+        top: -160px;
+        right: -100px;
+        background: rgba(236, 72, 153, .08);
+    }
 
-                        <div class="display-5 text-success">
-                            ✓
+    .media-success-bg-2 {
+        width: 360px;
+        height: 360px;
+        bottom: -190px;
+        left: -130px;
+        background: rgba(139, 92, 246, .08);
+    }
+
+    .media-success-bg-3 {
+        width: 180px;
+        height: 180px;
+        top: 45%;
+        left: 7%;
+        background: rgba(59, 130, 246, .045);
+    }
+
+
+    .media-success-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+
+    /* =========================
+           Main card
+           ========================= */
+
+    .media-success-card {
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.8);
+        border-radius: 30px;
+        background: rgba(255,255,255,.84);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 25px 70px rgba(55,40,80,.10);
+    }
+
+
+    /* =========================
+           Success header
+           ========================= */
+
+    .media-success-header {
+        position: relative;
+        text-align: center;
+        padding: 42px 30px 30px;
+    }
+
+
+    .success-icon-wrapper {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 24px;
+        color: #fff;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        box-shadow: 0 15px 35px rgba(139,92,246,.24);
+        font-size: 32px;
+        animation: successPop .55s ease-out;
+    }
+
+
+    .success-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 13px;
+        margin-bottom: 13px;
+        border-radius: 20px;
+        color: #7c3aed;
+        background: rgba(139,92,246,.08);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    .media-success-title {
+        margin: 0 0 9px;
+        color: #30283b;
+        font-size: 28px;
+        font-weight: 850;
+    }
+
+
+    .media-success-subtitle {
+        max-width: 580px;
+        margin: 0 auto;
+        color: #8e8597;
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+
+    /* =========================
+           Content
+           ========================= */
+
+    .media-success-content {
+        padding: 0 32px 35px;
+    }
+
+
+    /* =========================
+           Information
+           ========================= */
+
+    .media-info-card {
+        margin-bottom: 28px;
+        padding: 20px;
+        border: 1px solid rgba(139,92,246,.08);
+        border-radius: 20px;
+        background: linear-gradient( 135deg, rgba(255,255,255,.90), rgba(249,247,253,.85) );
+    }
+
+
+    .media-info-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 17px;
+        color: #3b3345;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+
+    .media-info-header-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: #7c3aed;
+        background: rgba(139,92,246,.10);
+    }
+
+
+    .media-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+
+    .media-info-item {
+        min-height: 74px;
+        padding: 13px 15px;
+        border-radius: 14px;
+        background: rgba(248,246,251,.80);
+        border: 1px solid rgba(100,80,120,.055);
+    }
+
+
+    .media-info-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #9a91a3;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    .media-info-value {
+        display: block;
+        color: #403748;
+        font-size: 13px;
+        font-weight: 750;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .media-info-code {
+        direction: ltr;
+        text-align: right;
+        color: #7c3aed;
+        font-family: monospace;
+        font-size: 12px;
+    }
+
+
+    /* =========================
+           QR section
+           ========================= */
+
+    .qr-section {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+
+    .qr-section-title {
+        margin-bottom: 7px;
+        color: #342c3e;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+
+    .qr-section-description {
+        margin-bottom: 20px;
+        color: #968d9f;
+        font-size: 12px;
+    }
+
+
+    .qr-frame {
+        display: inline-flex;
+        padding: 17px;
+        border-radius: 24px;
+        background: #fff;
+        border: 1px solid rgba(139,92,246,.10);
+        box-shadow: 0 15px 40px rgba(70,50,100,.10);
+    }
+
+
+    .qr-image {
+        display: block;
+        width: 300px;
+        height: 300px;
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+
+    .qr-code-label {
+        margin-top: 13px;
+        color: #aaa1b1;
+        font-size: 11px;
+    }
+
+
+        .qr-code-label strong {
+            color: #71677c;
+            direction: ltr;
+            display: inline-block;
+        }
+
+
+    /* =========================
+           URL
+           ========================= */
+
+    .qr-url-section {
+        margin-bottom: 28px;
+    }
+
+
+    .qr-url-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 9px;
+        color: #4b4254;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+
+        .qr-url-label i {
+            color: #8b5cf6;
+        }
+
+
+    .qr-url-wrapper {
+        display: flex;
+        align-items: stretch;
+        overflow: hidden;
+        border: 1px solid rgba(139,92,246,.14);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(60,40,90,.045);
+    }
+
+
+    .qr-url-input {
+        min-width: 0;
+        flex: 1;
+        height: 48px;
+        padding: 0 15px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #62596c;
+        direction: ltr;
+        text-align: left;
+        font-size: 12px;
+    }
+
+
+    .qr-copy-button {
+        min-width: 88px;
+        border: 0;
+        color: #fff;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+
+        .qr-copy-button:hover {
+            filter: brightness(1.04);
+        }
+
+
+        .qr-copy-button i {
+            margin-left: 5px;
+        }
+
+
+    /* =========================
+           Actions
+           ========================= */
+
+    .media-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+
+    .media-action {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 16px;
+        border-radius: 13px;
+        text-decoration: none !important;
+        font-size: 12px;
+        font-weight: 750;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+
+        .media-action:hover {
+            transform: translateY(-2px);
+        }
+
+
+    .media-action-primary {
+        color: #fff !important;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        box-shadow: 0 10px 25px rgba(139,92,246,.18);
+    }
+
+
+    .media-action-success {
+        color: #047857 !important;
+        background: rgba(16,185,129,.09);
+        border: 1px solid rgba(16,185,129,.10);
+    }
+
+
+    .media-action-secondary {
+        color: #6d28d9 !important;
+        background: rgba(139,92,246,.07);
+        border: 1px solid rgba(139,92,246,.10);
+    }
+
+
+    .media-action-neutral {
+        color: #62596d !important;
+        background: rgba(100,116,139,.07);
+        border: 1px solid rgba(100,116,139,.10);
+    }
+
+
+    /* =========================
+           Footer
+           ========================= */
+
+    .media-success-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding-top: 24px;
+        color: #a098a8;
+        font-size: 11px;
+    }
+
+
+        .media-success-footer i {
+            color: #ec4899;
+        }
+
+
+    /* =========================
+           Toast
+           ========================= */
+
+    .copy-toast {
+        position: fixed;
+        right: 50%;
+        bottom: 28px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 230px;
+        padding: 13px 17px;
+        border-radius: 14px;
+        color: #fff;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        box-shadow: 0 15px 35px rgba(80,50,120,.25);
+        transform: translate(50%, 100px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform .3s ease, opacity .3s ease;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+        .copy-toast.show {
+            transform: translate(50%, 0);
+            opacity: 1;
+        }
+
+
+    .copy-toast-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: rgba(255,255,255,.18);
+    }
+
+
+    /* =========================
+           Animation
+           ========================= */
+
+    @@keyframes successPop {
+
+        0% {
+            opacity: 0;
+            transform: scale(.65);
+        }
+
+        70% {
+            transform: scale(1.08);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+
+    /* =========================
+           Responsive
+           ========================= */
+
+    @@media (max-width: 700px) {
+
+        .media-success-page {
+            padding: 25px 12px 40px;
+        }
+
+        .media-success-header {
+            padding: 32px 18px 24px;
+        }
+
+        .media-success-content {
+            padding: 0 16px 25px;
+        }
+
+        .media-success-title {
+            font-size: 23px;
+        }
+
+        .media-success-subtitle {
+            font-size: 12px;
+        }
+
+        .media-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .qr-image {
+            width: 260px;
+            height: 260px;
+        }
+
+        .media-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .qr-url-wrapper {
+            flex-direction: column;
+        }
+
+        .qr-url-input {
+            width: 100%;
+        }
+
+        .qr-copy-button {
+            height: 44px;
+        }
+    }
+
+
+    @@media (max-width: 400px) {
+
+        .qr-image {
+            width: 220px;
+            height: 220px;
+        }
+
+        .qr-frame {
+            padding: 12px;
+        }
+
+        .media-success-title {
+            font-size: 21px;
+        }
+    }
+
+</style>
+
+
+<div class="media-success-page" dir="rtl">
+
+    <!-- Decorative shapes -->
+
+    <div class="media-success-bg media-success-bg-1"></div>
+    <div class="media-success-bg media-success-bg-2"></div>
+    <div class="media-success-bg media-success-bg-3"></div>
+
+
+    <div class="media-success-wrapper">
+
+        <div class="media-success-card">
+
+
+            <!-- =========================
+                 Success Header
+                 ========================= -->
+
+            <div class="media-success-header">
+
+                <div class="success-icon-wrapper">
+
+                    <i class="bi bi-check-lg"></i>
+
+                </div>
+
+
+                <div class="success-badge">
+
+                    <i class="bi bi-stars"></i>
+
+                    عملیات با موفقیت انجام شد
+
+                </div>
+
+
+                <h1 class="media-success-title">
+
+                    رسانه با موفقیت ایجاد شد
+
+                </h1>
+
+
+                <p class="media-success-subtitle">
+
+                    رسانه شما با موفقیت ثبت شد و یک QR Code اختصاصی
+                    برای دسترسی سریع به آن ایجاد گردید.
+
+                </p>
+
+            </div>
+
+
+            <div class="media-success-content">
+
+
+                <!-- =========================
+                     Information
+                     ========================= -->
+
+                <div class="media-info-card">
+
+                    <div class="media-info-header">
+
+                        <div class="media-info-header-icon">
+
+                            <i class="bi bi-info-circle"></i>
+
                         </div>
 
-                        <h1 class="h3 mt-3">
-                            رسانه با موفقیت ایجاد شد
-                        </h1>
-
-                        <p class="text-muted">
-                            رسانه ثبت شده و QR Code اختصاصی آن ایجاد شد.
-                        </p>
+                        <span>
+                            اطلاعات رسانه
+                        </span>
 
                     </div>
 
 
-                    <!-- اطلاعات -->
-
-                    <div class="border rounded p-4 mb-4 text-start">
-
-                        <div class="row g-3">
-
-                            <div class="col-md-6">
-
-                                <div class="text-muted small">
-                                    عنوان
-                                </div>
-
-                                <div class="fw-semibold">
-                                    @Model.Title
-                                </div>
-
-                            </div>
+                    <div class="media-info-grid">
 
 
-                            <div class="col-md-6">
+                        <div class="media-info-item">
 
-                                <div class="text-muted small">
-                                    فایل
-                                </div>
+                            <span class="media-info-label">
+                                عنوان رسانه
+                            </span>
 
-                                <div>
-                                    @Model.OriginalFileName
-                                </div>
+                            <span class="media-info-value"
+                                  title="@Model.Title">
 
-                            </div>
+                                @Model.Title
 
+                            </span>
 
-                            <div class="col-md-6">
-
-                                <div class="text-muted small">
-                                    نوع رسانه
-                                </div>
-
-                                <div>
-                                    @Model.MediaType
-                                </div>
-
-                            </div>
+                        </div>
 
 
-                            <div class="col-md-6">
+                        <div class="media-info-item">
 
-                                <div class="text-muted small">
-                                    کد QR
-                                </div>
+                            <span class="media-info-label">
+                                فایل
+                            </span>
 
-                                <code>
-                                    @Model.QrCode
-                                </code>
+                            <span class="media-info-value"
+                                  title="@Model.OriginalFileName">
 
-                            </div>
+                                @Model.OriginalFileName
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="media-info-item">
+
+                            <span class="media-info-label">
+                                نوع رسانه
+                            </span>
+
+                            <span class="media-info-value">
+
+                                @switch (Model.MediaType)
+                                {
+                                    case "Image":
+
+                                        <span>
+                                            <i class="bi bi-image me-1"></i>
+                                            تصویر
+                                        </span>
+
+                                        break;
+
+                                    case "Audio":
+
+                                        <span>
+                                            <i class="bi bi-music-note-beamed me-1"></i>
+                                            صوت
+                                        </span>
+
+                                        break;
+
+                                    case "Video":
+
+                                        <span>
+                                            <i class="bi bi-camera-video me-1"></i>
+                                            ویدئو
+                                        </span>
+
+                                        break;
+
+                                    default:
+
+                                        @Model.MediaType
+
+                                        break;
+                                }
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="media-info-item">
+
+                            <span class="media-info-label">
+                                کد QR
+                            </span>
+
+                            <span class="media-info-value media-info-code">
+
+                                @Model.QrCode
+
+                            </span>
 
                         </div>
 
                     </div>
 
+                </div>
 
-                    <!-- QR -->
 
-                    <div class="mb-4">
+                <!-- =========================
+                     QR Code
+                     ========================= -->
 
-                        <h2 class="h5 mb-3">
-                            QR Code
-                        </h2>
+                <div class="qr-section">
 
-                        <div class="border rounded p-4 d-inline-block">
+                    <div class="qr-section-title">
+                        QR Code اختصاصی شما
+                    </div>
 
-                            <img src="@qrImageSrc"
-                                 alt="QR Code"
-                                 class="img-fluid"
-                                 style="width:300px;height:300px;" />
+                    <div class="qr-section-description">
 
-                        </div>
+                        این کد را می‌توانید چاپ کنید یا با دیگران به اشتراک بگذارید.
 
                     </div>
 
 
-                    <!-- URL -->
+                    <div class="qr-frame">
 
-                    <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            آدرس QR
-                        </label>
-
-                        <div class="input-group">
-
-                            <input type="text"
-                                   class="form-control"
-                                   value="@Model.QrUrl"
-                                   readonly />
-
-                            <button type="button"
-                                    class="btn btn-outline-secondary"
-                                    onclick="copyQrUrl()">
-                                کپی
-                            </button>
-
-                        </div>
+                        <img src="@qrImageSrc"
+                             alt="QR Code رسانه @Model.Title"
+                             class="qr-image" />
 
                     </div>
 
 
-                    <!-- عملیات -->
+                    <div class="qr-code-label">
 
-                    <div class="d-flex justify-content-center flex-wrap gap-2">
+                        کد:
 
-                        <a href="@qrImageSrc"
-                           download="@qrFileName"
-                           class="btn btn-success">
-                            دانلود QR
-                        </a>
-
-                        <a href="@Model.QrUrl"
-                           target="_blank"
-                           class="btn btn-primary">
-                            مشاهده رسانه
-                        </a>
-
-                        <a asp-action="Details"
-                           asp-route-id="@Model.MediaFileId"
-                           class="btn btn-outline-primary">
-                            جزئیات رسانه
-                        </a>
-
-                        <a asp-controller="QrManagement"
-                           asp-action="Details"
-                           asp-route-id="@Model.QrCodeId"
-                           class="btn btn-outline-secondary">
-                            مدیریت QR
-                        </a>
+                        <strong>
+                            @Model.QrCode
+                        </strong>
 
                     </div>
+
+                </div>
+
+
+                <!-- =========================
+                     URL
+                     ========================= -->
+
+                <div class="qr-url-section">
+
+                    <div class="qr-url-label">
+
+                        <i class="bi bi-link-45deg"></i>
+
+                        آدرس دسترسی به رسانه
+
+                    </div>
+
+
+                    <div class="qr-url-wrapper">
+
+                        <input id="qrUrlInput"
+                               type="text"
+                               class="qr-url-input"
+                               value="@Model.QrUrl"
+                               readonly />
+
+
+                        <button id="copyQrButton"
+                                type="button"
+                                class="qr-copy-button"
+                                onclick="copyQrUrl()">
+
+                            <i class="bi bi-copy"></i>
+
+                            کپی لینک
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     Actions
+                     ========================= -->
+
+                <div class="media-actions">
+
+
+                    <a href="@qrImageSrc"
+                       download="@qrFileName"
+                       class="media-action media-action-success">
+
+                        <i class="bi bi-download"></i>
+
+                        دانلود QR Code
+
+                    </a>
+
+
+                    <a href="@Model.QrUrl"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="media-action media-action-primary">
+
+                        <i class="bi bi-box-arrow-up-left"></i>
+
+                        مشاهده رسانه
+
+                    </a>
+
+
+                    <a asp-action="Details"
+                       asp-route-id="@Model.MediaFileId"
+                       class="media-action media-action-secondary">
+
+                        <i class="bi bi-file-earmark-text"></i>
+
+                        جزئیات رسانه
+
+                    </a>
+
+
+                    <a asp-controller="QrManagement"
+                       asp-action="Details"
+                       asp-route-id="@Model.QrCodeId"
+                       class="media-action media-action-neutral">
+
+                        <i class="bi bi-qr-code"></i>
+
+                        مدیریت QR
+
+                    </a>
+
+                </div>
+
+
+                <!-- Footer -->
+
+                <div class="media-success-footer">
+
+                    <i class="bi bi-heart-fill"></i>
+
+                    <span>
+                        رسانه شما آماده استفاده است
+                    </span>
 
                 </div>
 
@@ -187,28 +911,99 @@
 </div>
 
 
+<!-- =========================
+     Copy Toast
+     ========================= -->
+
+<div id="copyToast"
+     class="copy-toast">
+
+    <div class="copy-toast-icon">
+
+        <i class="bi bi-check-lg"></i>
+
+    </div>
+
+    <span>
+        آدرس QR با موفقیت کپی شد
+    </span>
+
+</div>
+
+
 @section Scripts
 {
     <script>
-        function copyQrUrl() {
+
+        async function copyQrUrl() {
+
             const input =
-                document.querySelector(
-                    'input[readonly]'
-                );
+                document.getElementById('qrUrlInput');
+
+            const button =
+                document.getElementById('copyQrButton');
+
+            const toast =
+                document.getElementById('copyToast');
+
 
             if (!input) {
                 return;
             }
 
-            navigator.clipboard.writeText(input.value)
-                .then(function () {
-                    alert('آدرس QR کپی شد.');
-                })
-                .catch(function () {
-                    input.select();
-                    document.execCommand('copy');
-                    alert('آدرس QR کپی شد.');
-                });
+
+            const url = input.value;
+
+
+            try {
+
+                await navigator.clipboard.writeText(url);
+
+            }
+            catch {
+
+                input.focus();
+                input.select();
+
+                document.execCommand('copy');
+            }
+
+
+            /* تغییر موقت دکمه */
+
+            if (button) {
+
+                const originalHtml =
+                    button.innerHTML;
+
+                button.innerHTML =
+                    '<i class="bi bi-check-lg"></i> کپی شد';
+
+                setTimeout(function () {
+
+                    button.innerHTML =
+                        originalHtml;
+
+                }, 1800);
+
+            }
+
+
+            /* نمایش Toast */
+
+            if (toast) {
+
+                toast.classList.add('show');
+
+                setTimeout(function () {
+
+                    toast.classList.remove('show');
+
+                }, 2500);
+
+            }
+
         }
+
     </script>
 }

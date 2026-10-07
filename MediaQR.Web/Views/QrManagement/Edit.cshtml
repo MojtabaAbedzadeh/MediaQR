@@ -8,217 +8,1443 @@
     var mediaTitle = ViewBag.MediaTitle as string;
 }
 
-<div class="container py-4" dir="rtl">
+<style>
+    .qr-date-picker-wrapper {
+        position: relative;
+        width: 100%;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    .qr-date-input-wrapper {
+        position: relative;
+    }
 
-        <div>
-            <h1 class="h3 mb-1">
-                ویرایش QR Code
-            </h1>
+    .qr-date-input {
+        padding-right: 48px !important;
+        padding-left: 42px !important;
+        cursor: pointer;
+        background: #fff;
+    }
 
-            <p class="text-muted mb-0">
-                اطلاعات QR Code را ویرایش کنید.
-            </p>
-        </div>
+    .qr-date-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 19px;
+        z-index: 2;
+        pointer-events: none;
+    }
 
-        <div>
+    .qr-date-clear {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 50%;
+        background: #fce7f3;
+        color: #be185d;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: all .2s ease;
+    }
+
+        .qr-date-clear:hover {
+            background: #fbcfe8;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+
+    /* =========================
+       Persian Date Picker
+    ========================= */
+
+    .persian-date-picker {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 340px;
+        background: rgba(255,255,255,.98);
+        border: 1px solid rgba(236,72,153,.12);
+        border-radius: 22px;
+        box-shadow: 0 20px 60px rgba(88,28,135,.16), 0 4px 15px rgba(0,0,0,.05);
+        padding: 18px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity .2s ease, visibility .2s ease, transform .2s ease;
+    }
+
+        .persian-date-picker.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+
+    /* Header */
+
+    .datepicker-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .datepicker-month-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 15px;
+        font-weight: 800;
+        color: #4c1d95;
+    }
+
+    .datepicker-nav {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 12px;
+        background: #fdf2f8;
+        color: #be185d;
+        font-size: 25px;
+        line-height: 1;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+        .datepicker-nav:hover {
+            background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+            transform: scale(1.05);
+        }
+
+
+    /* Weekdays */
+
+    .datepicker-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        margin-bottom: 7px;
+    }
+
+        .datepicker-weekdays span {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #a78bfa;
+        }
+
+
+    /* Days */
+
+    .datepicker-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .datepicker-day {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        border: none;
+        background: transparent;
+        color: #374151;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .18s ease;
+    }
+
+        .datepicker-day:hover {
+            background: #fdf2f8;
+            color: #be185d;
+        }
+
+        .datepicker-day.empty {
+            cursor: default;
+        }
+
+        .datepicker-day.today {
+            border: 1px solid #f9a8d4;
+            color: #be185d;
+        }
+
+        .datepicker-day.selected {
+            color: #fff;
+            background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+            box-shadow: 0 5px 14px rgba(236,72,153,.25);
+        }
+
+        .datepicker-day.disabled {
+            opacity: .3;
+            cursor: not-allowed;
+        }
+
+
+    /* Time */
+
+    .datepicker-time {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid #f3e8ff;
+    }
+
+    .time-title {
+        margin-bottom: 12px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #6b21a8;
+    }
+
+    .time-inputs {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .time-field {
+        flex: 1;
+    }
+
+        .time-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 10px;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        .time-field select {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #eadcff;
+            border-radius: 12px;
+            background: #faf7ff;
+            color: #4c1d95;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+        }
+
+            .time-field select:focus {
+                border-color: #c084fc;
+                box-shadow: 0 0 0 3px rgba(192,132,252,.12);
+            }
+
+    .time-separator {
+        margin-bottom: 11px;
+        font-size: 18px;
+        font-weight: 800;
+        color: #c084fc;
+    }
+
+    .datepicker-confirm {
+        width: 100%;
+        height: 44px;
+        margin-top: 14px;
+        border: none;
+        border-radius: 13px;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        color: white;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 7px 18px rgba(139,92,246,.2);
+        transition: all .2s ease;
+    }
+
+        .datepicker-confirm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(139,92,246,.28);
+        }
+
+
+    @@media (max-width: 576px) {
+
+        .persian-date-picker {
+            width: 100%;
+            min-width: 300px;
+        }
+    }
+    .qr-edit-page {
+        min-height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+        padding: 35px 20px 60px;
+        background: radial-gradient( circle at 8% 8%, rgba(251, 207, 232, .23), transparent 28% ), radial-gradient( circle at 92% 15%, rgba(221, 214, 254, .26), transparent 28% ), radial-gradient( circle at 50% 100%, rgba(191, 219, 254, .17), transparent 35% ), #faf9fc;
+    }
+
+    .qr-edit-wrapper {
+        position: relative;
+        z-index: 2;
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    /* Background */
+
+    .qr-edit-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .55;
+    }
+
+    .qr-edit-bg-1 {
+        width: 300px;
+        height: 300px;
+        top: -110px;
+        right: -90px;
+        background: rgba(251, 207, 232, .25);
+    }
+
+    .qr-edit-bg-2 {
+        width: 240px;
+        height: 240px;
+        bottom: 30px;
+        left: -100px;
+        background: rgba(191, 219, 254, .23);
+    }
+
+    /* Header */
+
+    .qr-edit-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 28px;
+    }
+
+    .qr-edit-header-main {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .qr-edit-header-icon {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        font-size: 28px;
+        color: #7c3aed;
+        background: linear-gradient( 135deg, rgba(251, 207, 232, .9), rgba(221, 214, 254, .95) );
+        box-shadow: 0 12px 30px rgba(124, 58, 237, .12), inset 0 1px 0 rgba(255,255,255,.85);
+    }
+
+    .qr-edit-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 12px;
+        margin-bottom: 7px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(221,214,254,.75);
+        color: #7c3aed;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 5px 15px rgba(0,0,0,.04);
+    }
+
+    .qr-edit-title {
+        margin: 0;
+        color: #312e41;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .qr-edit-subtitle {
+        margin: 5px 0 0;
+        color: #77758a;
+        font-size: 14px;
+    }
+
+    .qr-edit-back {
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 16px;
+        border-radius: 13px;
+        color: #625d6f;
+        background: rgba(255,255,255,.75);
+        border: 1px solid #e8e4ee;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+        .qr-edit-back:hover {
+            color: #403b4c;
+            background: #fff;
+            transform: translateY(-1px);
+        }
+
+    /* Main Card */
+
+    .qr-edit-card {
+        overflow: hidden;
+        border-radius: 28px;
+        background: rgba(255,255,255,.80);
+        border: 1px solid rgba(255,255,255,.92);
+        box-shadow: 0 20px 55px rgba(55,45,80,.08);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    .qr-edit-card-header {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 20px 25px;
+        border-bottom: 1px solid rgba(226,222,235,.65);
+    }
+
+    .qr-edit-card-header-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #7c3aed;
+        background: #f3e8ff;
+        font-size: 18px;
+    }
+
+    .qr-edit-card-title {
+        margin: 0;
+        color: #363243;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .qr-edit-card-subtitle {
+        margin: 3px 0 0;
+        color: #96919f;
+        font-size: 11px;
+    }
+
+    .qr-edit-card-body {
+        padding: 28px;
+    }
+
+    /* Validation */
+
+    .qr-edit-validation {
+        margin-bottom: 23px;
+        padding: 14px 17px;
+        border: 0;
+        border-radius: 15px;
+        background: #fee2e2;
+        color: #991b1b;
+        font-size: 12px;
+    }
+
+        .qr-edit-validation:empty {
+            display: none;
+        }
+
+        .qr-edit-validation ul {
+            margin: 0;
+            padding-right: 20px;
+        }
+
+    /* Form sections */
+
+    .qr-form-section {
+        margin-bottom: 27px;
+    }
+
+    .qr-form-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 15px;
+        color: #4a4556;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .qr-form-section-title-icon {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: #f5f0fb;
+        color: #8b5cf6;
+        font-size: 12px;
+    }
+
+    /* Readonly information */
+
+    .qr-readonly-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .qr-readonly-item {
+        min-width: 0;
+        padding: 15px;
+        border-radius: 15px;
+        background: linear-gradient( 135deg, rgba(248,247,251,.95), rgba(252,250,255,.9) );
+        border: 1px solid #eeeaf2;
+    }
+
+    .qr-readonly-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #96919f;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .qr-readonly-value {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #464151;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .qr-readonly-code {
+        display: inline-block;
+        max-width: 100%;
+        padding: 5px 8px;
+        direction: ltr;
+        border-radius: 7px;
+        background: #f0edf5;
+        color: #686272;
+        font-family: monospace;
+        font-size: 11px;
+    }
+
+    .qr-readonly-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        margin-top: 11px;
+        color: #918b9e;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .qr-readonly-note-icon {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: #f3e8ff;
+        color: #8b5cf6;
+        font-size: 9px;
+    }
+
+    /* Form fields */
+
+    .qr-edit-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .qr-form-group {
+        min-width: 0;
+    }
+
+    .qr-form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .qr-form-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px;
+        color: #4b4657;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .qr-label-icon {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        background: #f3e8ff;
+        color: #7c3aed;
+        font-size: 10px;
+    }
+
+    .qr-form-input,
+    .qr-form-textarea,
+    .qr-form-datetime {
+        width: 100%;
+        border: 1px solid #e4dfea;
+        border-radius: 13px;
+        background: rgba(255,255,255,.78);
+        color: #403b4b;
+        font-size: 13px;
+        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .qr-form-input,
+    .qr-form-datetime {
+        height: 45px;
+        padding: 0 13px;
+    }
+
+    .qr-form-textarea {
+        min-height: 120px;
+        padding: 12px 13px;
+        resize: vertical;
+        line-height: 1.9;
+    }
+
+        .qr-form-input::placeholder,
+        .qr-form-textarea::placeholder {
+            color: #b0abb8;
+        }
+
+        .qr-form-input:focus,
+        .qr-form-textarea:focus,
+        .qr-form-datetime:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(139,92,246,.09);
+        }
+
+    .qr-form-input[readonly] {
+        cursor: default;
+        background: #f7f5fa;
+        color: #777181;
+    }
+
+    .qr-field-help {
+        margin-top: 7px;
+        color: #96919f;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .qr-validation-message {
+        display: block;
+        margin-top: 6px;
+        color: #dc2626;
+        font-size: 10px;
+    }
+
+    /* Character counter */
+
+    .qr-textarea-wrapper {
+        position: relative;
+    }
+
+    .qr-character-counter {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 6px;
+        color: #a19ba9;
+        font-size: 10px;
+    }
+
+    /* Switch */
+
+    .qr-active-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        background: linear-gradient( 135deg, rgba(243,232,255,.55), rgba(252,231,243,.45) );
+        border: 1px solid #eee5f6;
+    }
+
+    .qr-active-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .qr-active-icon {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #ede9fe;
+        color: #7c3aed;
+        font-size: 18px;
+    }
+
+    .qr-active-title {
+        color: #403b4b;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .qr-active-description {
+        margin-top: 3px;
+        color: #938d9c;
+        font-size: 10px;
+    }
+
+    .qr-switch {
+        position: relative;
+        width: 48px;
+        height: 26px;
+        flex-shrink: 0;
+        appearance: none;
+        -webkit-appearance: none;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #d6d3db !important;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .qr-switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            right: 24px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,.18);
+            transition: right .2s ease;
+        }
+
+        .qr-switch:checked {
+            background: linear-gradient( 135deg, #a78bfa, #7c3aed ) !important;
+        }
+
+            .qr-switch:checked::after {
+                right: 24px;
+            }
+
+    /* Footer */
+
+    .qr-edit-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 28px;
+        padding-top: 23px;
+        border-top: 1px solid #eeeaf2;
+    }
+
+    .qr-cancel-button {
+        height: 43px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
+        border-radius: 12px;
+        color: #625d6f;
+        background: #f4f2f6;
+        border: 1px solid #e7e3eb;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+        .qr-cancel-button:hover {
+            color: #403b4b;
+            background: #ebe8ef;
+        }
+
+    .qr-save-button {
+        height: 43px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 22px;
+        border: 0;
+        border-radius: 12px;
+        color: #fff;
+        background: linear-gradient( 135deg, #8b5cf6, #7c3aed );
+        box-shadow: 0 9px 22px rgba(124,58,237,.18);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+        .qr-save-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(124,58,237,.25);
+        }
+
+        .qr-save-button:active {
+            transform: translateY(0);
+        }
+
+        .qr-save-button.loading {
+            pointer-events: none;
+            opacity: .75;
+        }
+
+    .qr-save-spinner {
+        display: none;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255,255,255,.45);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: qrEditSpin .7s linear infinite;
+    }
+
+    .qr-save-button.loading .qr-save-spinner {
+        display: inline-block;
+    }
+
+    .qr-save-button.loading .qr-save-icon {
+        display: none;
+    }
+
+    @@keyframes qrEditSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 800px) {
+
+        .qr-edit-page {
+            padding: 25px 12px 45px;
+        }
+
+        .qr-edit-header {
+            align-items: flex-start;
+        }
+
+        .qr-edit-header-main {
+            align-items: flex-start;
+        }
+
+        .qr-edit-header-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 17px;
+            font-size: 24px;
+        }
+
+        .qr-edit-title {
+            font-size: 22px;
+        }
+
+        .qr-edit-subtitle {
+            font-size: 12px;
+        }
+
+        .qr-edit-card {
+            border-radius: 21px;
+        }
+
+        .qr-edit-card-body {
+            padding: 19px;
+        }
+
+        .qr-readonly-grid,
+        .qr-edit-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .qr-form-group-full {
+            grid-column: auto;
+        }
+
+        .qr-edit-footer {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .qr-cancel-button,
+        .qr-save-button {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 500px) {
+
+        .qr-edit-header {
+            flex-direction: column;
+        }
+
+        .qr-edit-back {
+            width: 100%;
+        }
+
+        .qr-active-box {
+            align-items: flex-start;
+        }
+    }
+
+    /* =========================================================
+       Persian DatePicker - Always On Top
+    ========================================================= */
+
+    .qr-edit-page,
+    .qr-edit-wrapper,
+    .qr-edit-card,
+    .qr-edit-card-body,
+    .qr-form-group,
+    .qr-date-picker-wrapper {
+        overflow: visible !important;
+    }
+
+    .qr-date-picker-wrapper {
+        position: relative;
+        z-index: 9999;
+    }
+
+    .qr-date-input-wrapper {
+        position: relative;
+        z-index: 10000;
+    }
+
+    .persian-date-picker {
+        position: absolute !important;
+        top: calc(100% + 10px) !important;
+        right: 0 !important;
+        z-index: 999999 !important;
+        isolation: isolate;
+        overflow: visible !important;
+    }
+</style>
+
+<div class="qr-edit-page" dir="rtl">
+
+    <div class="qr-edit-bg-shape qr-edit-bg-1"></div>
+    <div class="qr-edit-bg-shape qr-edit-bg-2"></div>
+
+    <div class="qr-edit-wrapper">
+
+        <!-- Header -->
+
+        <div class="qr-edit-header">
+
+            <div class="qr-edit-header-main">
+
+                <div class="qr-edit-header-icon">
+                    ✎
+                </div>
+
+                <div>
+
+                    <div class="qr-edit-badge">
+
+                        <span>♡</span>
+
+                        مدیریت QR Code
+
+                    </div>
+
+                    <h1 class="qr-edit-title">
+                        ویرایش QR Code
+                    </h1>
+
+                    <p class="qr-edit-subtitle">
+                        اطلاعات و تنظیمات QR Code را ویرایش کنید.
+                    </p>
+
+                </div>
+
+            </div>
 
             <a asp-action="Details"
                asp-route-id="@qrCodeId"
-               class="btn btn-outline-secondary">
+               class="qr-edit-back">
 
-                بازگشت
+                <span>←</span>
+                بازگشت به جزئیات
 
             </a>
 
         </div>
 
-    </div>
 
+        <!-- Main Card -->
 
-    <div class="row justify-content-center">
+        <div class="qr-edit-card">
 
-        <div class="col-lg-8">
+            <div class="qr-edit-card-header">
 
-            <div class="card shadow-sm">
+                <span class="qr-edit-card-header-icon">
+                    ✦
+                </span>
 
-                <div class="card-header">
-                    <strong>
+                <div>
+
+                    <h2 class="qr-edit-card-title">
                         اطلاعات QR
-                    </strong>
+                    </h2>
+
+                    <p class="qr-edit-card-subtitle">
+                        بخش‌های قابل ویرایش را تغییر دهید.
+                    </p>
+
                 </div>
 
-                <div class="card-body">
+            </div>
 
-                    <form asp-action="Edit"
-                          asp-route-id="@qrCodeId"
-                          method="post">
 
-                        @Html.AntiForgeryToken()
+            <div class="qr-edit-card-body">
 
-                        <div asp-validation-summary="ModelOnly"
-                             class="alert alert-danger">
+                <form asp-action="Edit"
+                      asp-route-id="@qrCodeId"
+                      method="post"
+                      id="qrEditForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- Validation -->
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="qr-edit-validation">
+                    </div>
+
+
+                    <!-- ========================= -->
+                    <!-- Readonly Information -->
+                    <!-- ========================= -->
+
+                    <div class="qr-form-section">
+
+                        <div class="qr-form-section-title">
+
+                            <span class="qr-form-section-title-icon">
+                                ▦
+                            </span>
+
+                            اطلاعات ثابت QR
+
                         </div>
 
 
-                        <!-- QR Code -->
+                        <div class="qr-readonly-grid">
 
-                        <div class="mb-4">
+                            <!-- QR Code -->
 
-                            <label class="form-label">
-                                QR Code
-                            </label>
+                            <div class="qr-readonly-item">
 
-                            <div class="input-group">
+                                <span class="qr-readonly-label">
+                                    QR Code
+                                </span>
 
-                                <input type="text"
-                                       class="form-control"
-                                       value="@qrCode"
-                                       readonly />
+                                <span class="qr-readonly-value">
+
+                                    <span class="qr-readonly-code">
+                                        @qrCode
+                                    </span>
+
+                                </span>
 
                             </div>
 
-                            <div class="form-text">
-                                QR Code قابل ویرایش نیست تا QR چاپ‌شده
-                                همچنان معتبر باقی بماند.
+
+                            <!-- Media -->
+
+                            <div class="qr-readonly-item">
+
+                                <span class="qr-readonly-label">
+                                    رسانه مرتبط
+                                </span>
+
+                                <span class="qr-readonly-value"
+                                      title="@mediaTitle">
+
+                                    @mediaTitle
+
+                                </span>
+
                             </div>
 
                         </div>
 
 
-                        <!-- Media -->
+                        <div class="qr-readonly-note">
 
-                        <div class="mb-4">
+                            <span class="qr-readonly-note-icon">
+                                i
+                            </span>
 
-                            <label class="form-label">
-                                رسانه مرتبط
-                            </label>
-
-                            <input type="text"
-                                   class="form-control"
-                                   value="@mediaTitle"
-                                   readonly />
-
-                        </div>
-
-
-                        <!-- Title -->
-
-                        <div class="mb-4">
-
-                            <label asp-for="Title"
-                                   class="form-label">
-
-                                عنوان QR
-
-                            </label>
-
-                            <input asp-for="Title"
-                                   class="form-control"
-                                   maxlength="250"
-                                   placeholder="عنوان QR را وارد کنید..." />
-
-                            <span asp-validation-for="Title"
-                                  class="text-danger">
+                            <span>
+                                کد QR قابل ویرایش نیست؛ زیرا تغییر آن باعث
+                                بی‌اعتبار شدن QR Code چاپ‌شده خواهد شد.
                             </span>
 
                         </div>
 
+                    </div>
 
-                        <!-- Description -->
 
-                        <div class="mb-4">
+                    <!-- ========================= -->
+                    <!-- Editable Information -->
+                    <!-- ========================= -->
 
-                            <label asp-for="Description"
-                                   class="form-label">
+                    <div class="qr-form-section">
 
-                                توضیحات
+                        <div class="qr-form-section-title">
 
-                            </label>
-
-                            <textarea asp-for="Description"
-                                      class="form-control"
-                                      rows="4"
-                                      maxlength="1000"
-                                      placeholder="توضیحات QR را وارد کنید..."></textarea>
-
-                            <span asp-validation-for="Description"
-                                  class="text-danger">
+                            <span class="qr-form-section-title-icon">
+                                ✎
                             </span>
+
+                            اطلاعات قابل ویرایش
 
                         </div>
 
 
-                        <!-- Expiration -->
+                        <div class="qr-edit-form-grid">
 
-                        <div class="mb-4">
 
-                            <label asp-for="ExpiresAt"
-                                   class="form-label">
+                            <!-- Title -->
 
-                                تاریخ انقضا
+                            <div class="qr-form-group qr-form-group-full">
 
-                            </label>
+                                <label asp-for="Title"
+                                       class="qr-form-label">
 
-                            <input asp-for="ExpiresAt"
-                                   type="datetime-local"
-                                   class="form-control" />
+                                    <span class="qr-label-icon">
+                                        T
+                                    </span>
 
-                            <div class="form-text">
-                                در صورت خالی بودن، QR بدون تاریخ انقضا خواهد بود.
+                                    عنوان QR
+
+                                </label>
+
+                                <input asp-for="Title"
+                                       class="qr-form-input"
+                                       maxlength="250"
+                                       placeholder="عنوان QR را وارد کنید..." />
+
+                                <span asp-validation-for="Title"
+                                      class="qr-validation-message">
+                                </span>
+
                             </div>
 
-                            <span asp-validation-for="ExpiresAt"
-                                  class="text-danger">
+
+                            <!-- Description -->
+
+                            <div class="qr-form-group qr-form-group-full">
+
+                                <label asp-for="Description"
+                                       class="qr-form-label">
+
+                                    <span class="qr-label-icon">
+                                        ≡
+                                    </span>
+
+                                    توضیحات
+
+                                </label>
+
+                                <div class="qr-textarea-wrapper">
+
+                                    <textarea asp-for="Description"
+                                              id="qrDescription"
+                                              class="qr-form-textarea"
+                                              rows="4"
+                                              maxlength="1000"
+                                              placeholder="توضیحات QR را وارد کنید..."></textarea>
+
+                                    <div class="qr-character-counter">
+
+                                        <span id="descriptionCount">
+                                            0
+                                        </span>
+
+                                        <span>
+                                            / 1000
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <span asp-validation-for="Description"
+                                      class="qr-validation-message">
+                                </span>
+
+                            </div>
+
+
+                            <!-- Expiration -->
+
+                            <div class="qr-form-group">
+
+                                <label asp-for="ExpiresAt"
+                                       class="qr-form-label">
+
+                                    <span class="qr-label-icon">
+                                        ◷
+                                    </span>
+
+                                    تاریخ انقضا
+
+                                </label>
+
+                                <div class="qr-date-picker-wrapper">
+
+                                    <div class="qr-date-input-wrapper">
+                                        <span class="qr-date-icon">📅</span>
+
+                                        <input type="text"
+                                               id="persianExpiresAt"
+                                               class="qr-form-input qr-date-input"
+                                               placeholder="انتخاب تاریخ و ساعت انقضا"
+                                               autocomplete="off"
+                                               readonly />
+
+                                        <button type="button"
+                                                id="clearExpiresAt"
+                                                class="qr-date-clear"
+                                                title="حذف تاریخ">
+                                            ×
+                                        </button>
+                                    </div>
+
+                                    <div id="persianDatePicker" class="persian-date-picker">
+
+                                        <div class="datepicker-header">
+
+                                            <button type="button"
+                                                    id="prevMonth"
+                                                    class="datepicker-nav">
+                                                ‹
+                                            </button>
+
+                                            <div class="datepicker-month-title">
+                                                <span id="jalaliMonthName"></span>
+                                                <span id="jalaliYear"></span>
+                                            </div>
+
+                                            <button type="button"
+                                                    id="nextMonth"
+                                                    class="datepicker-nav">
+                                                ›
+                                            </button>
+
+                                        </div>
+
+                                        <div class="datepicker-weekdays">
+                                            <span>ش</span>
+                                            <span>ی</span>
+                                            <span>د</span>
+                                            <span>س</span>
+                                            <span>چ</span>
+                                            <span>پ</span>
+                                            <span>ج</span>
+                                        </div>
+
+                                        <div id="datepickerDays"
+                                             class="datepicker-days">
+                                        </div>
+
+                                        <div class="datepicker-time">
+
+                                            <div class="time-title">
+                                                ساعت انقضا
+                                            </div>
+
+                                            <div class="time-inputs">
+
+                                                <div class="time-field">
+                                                    <label>ساعت</label>
+                                                    <select id="expireHour">
+                                                        @for (var i = 0; i <= 23; i++)
+                                                        {
+                                                            <option value="@i">
+                                                                @i.ToString("00")
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+
+                                                <span class="time-separator">:</span>
+
+                                                <div class="time-field">
+                                                    <label>دقیقه</label>
+                                                    <select id="expireMinute">
+                                                        @for (var i = 0; i < 60; i += 5)
+                                                        {
+                                                            <option value="@i">
+                                                                @i.ToString("00")
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+
+                                            </div>
+
+                                            <button type="button"
+                                                    id="confirmExpireDate"
+                                                    class="datepicker-confirm">
+                                                تأیید تاریخ و ساعت
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- مقدار واقعی که ASP.NET دریافت می‌کند -->
+                                <input asp-for="ExpiresAt"
+                                       type="hidden"
+                                       id="expiresAtValue" />
+
+                                <div class="qr-field-help">
+
+                                    در صورت خالی بودن، QR بدون تاریخ انقضا خواهد بود.
+
+                                </div>
+
+                                <span asp-validation-for="ExpiresAt"
+                                      class="qr-validation-message">
+                                </span>
+
+                            </div>
+
+
+                            <!-- Active -->
+
+                            <div class="qr-form-group">
+
+                                <label class="qr-form-label">
+
+                                    <span class="qr-label-icon">
+                                        ●
+                                    </span>
+
+                                    وضعیت QR
+
+                                </label>
+
+
+                                <div class="qr-active-box">
+
+                                    <div class="qr-active-content">
+
+                                        <div class="qr-active-icon">
+                                            ✓
+                                        </div>
+
+                                        <div>
+
+                                            <div class="qr-active-title">
+                                                QR فعال باشد
+                                            </div>
+
+                                            <div class="qr-active-description">
+                                                در صورت فعال بودن، کاربران می‌توانند
+                                                محتوای QR را مشاهده کنند.
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <input asp-for="IsActive"
+                                           class="qr-switch"
+                                           type="checkbox"
+                                           role="switch" />
+
+                                </div>
+
+                                <span asp-validation-for="IsActive"
+                                      class="qr-validation-message">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Footer -->
+
+                    <div class="qr-edit-footer">
+
+                        <a asp-action="Details"
+                           asp-route-id="@qrCodeId"
+                           class="qr-cancel-button">
+
+                            انصراف
+
+                        </a>
+
+
+                        <button type="submit"
+                                id="qrSaveButton"
+                                class="qr-save-button">
+
+                            <span class="qr-save-spinner"></span>
+
+                            <span class="qr-save-icon">
+                                ✓
                             </span>
 
-                        </div>
-
-
-                        <!-- Active -->
-
-                        <div class="form-check form-switch mb-4">
-
-                            <input asp-for="IsActive"
-                                   class="form-check-input"
-                                   role="switch" />
-
-                            <label asp-for="IsActive"
-                                   class="form-check-label">
-
-                                QR فعال باشد
-
-                            </label>
-
-                        </div>
-
-
-                        <hr />
-
-
-                        <div class="d-flex justify-content-between">
-
-                            <a asp-action="Details"
-                               asp-route-id="@qrCodeId"
-                               class="btn btn-outline-secondary">
-
-                                انصراف
-
-                            </a>
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-
+                            <span>
                                 ذخیره تغییرات
+                            </span>
 
-                            </button>
+                        </button>
 
-                        </div>
+                    </div>
 
-                    </form>
-
-                </div>
+                </form>
 
             </div>
 
@@ -231,4 +1457,745 @@
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const description =
+                    document.getElementById(
+                        "qrDescription"
+                    );
+
+                const counter =
+                    document.getElementById(
+                        "descriptionCount"
+                    );
+
+                const form =
+                    document.getElementById(
+                        "qrEditForm"
+                    );
+
+                const saveButton =
+                    document.getElementById(
+                        "qrSaveButton"
+                    );
+
+
+                function updateDescriptionCounter() {
+
+                    if (!description || !counter)
+                        return;
+
+                    counter.textContent =
+                        description.value.length;
+
+                }
+
+
+                if (description) {
+
+                    updateDescriptionCounter();
+
+                    description.addEventListener(
+                        "input",
+                        updateDescriptionCounter
+                    );
+
+                }
+
+
+                if (form && saveButton) {
+
+                    form.addEventListener(
+                        "submit",
+                        function () {
+
+                            if (
+                                typeof $ !== "undefined" &&
+                                !$(form).valid()
+                            ) {
+                                return;
+                            }
+
+                            saveButton.classList.add(
+                                "loading"
+                            );
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dateInput = document.getElementById("persianExpiresAt");
+            const hiddenInput = document.getElementById("expiresAtValue");
+
+            const picker = document.getElementById("persianDatePicker");
+            const daysContainer = document.getElementById("datepickerDays");
+
+            const monthName = document.getElementById("jalaliMonthName");
+            const yearElement = document.getElementById("jalaliYear");
+
+            const prevMonth = document.getElementById("prevMonth");
+            const nextMonth = document.getElementById("nextMonth");
+
+            const hourSelect = document.getElementById("expireHour");
+            const minuteSelect = document.getElementById("expireMinute");
+
+            const confirmButton =
+                document.getElementById("confirmExpireDate");
+
+            const clearButton =
+                document.getElementById("clearExpiresAt");
+
+
+            const monthNames = [
+                "فروردین",
+                "اردیبهشت",
+                "خرداد",
+                "تیر",
+                "مرداد",
+                "شهریور",
+                "مهر",
+                "آبان",
+                "آذر",
+                "دی",
+                "بهمن",
+                "اسفند"
+            ];
+
+
+            let selectedDate = null;
+
+            let viewYear;
+            let viewMonth;
+
+
+            /* =========================
+               Gregorian → Jalali
+            ========================= */
+
+            function gregorianToJalali(gy, gm, gd) {
+
+                const g_d_m = [
+                    0, 31, 59, 90, 120, 151,
+                    181, 212, 243, 273, 304, 334
+                ];
+
+                let jy;
+
+                if (gy > 1600) {
+                    jy = 979;
+                    gy -= 1600;
+                }
+                else {
+                    jy = 0;
+                    gy -= 621;
+                }
+
+                const gy2 = gm > 2 ? gy + 1 : gy;
+
+                let days =
+                    365 * gy +
+                    Math.floor((gy2 + 3) / 4) -
+                    Math.floor((gy2 + 99) / 100) +
+                    Math.floor((gy2 + 399) / 400) -
+                    80 +
+                    gd +
+                    g_d_m[gm - 1];
+
+                jy += 33 * Math.floor(days / 12053);
+
+                days %= 12053;
+
+                jy += 4 * Math.floor(days / 1461);
+
+                days %= 1461;
+
+                if (days > 365) {
+                    jy += Math.floor((days - 1) / 365);
+                    days = (days - 1) % 365;
+                }
+
+                let jm;
+                let jd;
+
+                if (days < 186) {
+                    jm = 1 + Math.floor(days / 31);
+                    jd = 1 + (days % 31);
+                }
+                else {
+                    jm = 7 + Math.floor((days - 186) / 30);
+                    jd = 1 + ((days - 186) % 30);
+                }
+
+                return {
+                    year: jy,
+                    month: jm,
+                    day: jd
+                };
+            }
+
+
+            /* =========================
+               Jalali → Gregorian
+            ========================= */
+
+            function jalaliToGregorian(jy, jm, jd) {
+
+                jy = parseInt(jy);
+                jm = parseInt(jm);
+                jd = parseInt(jd);
+
+                let gy;
+
+                if (jy > 979) {
+                    gy = 1600;
+                    jy -= 979;
+                }
+                else {
+                    gy = 621;
+                }
+
+                let days =
+                    (365 * jy) +
+                    (Math.floor(jy / 33) * 8) +
+                    Math.floor(((jy % 33) + 3) / 4) +
+                    78 +
+                    jd +
+                    (jm < 7
+                        ? (jm - 1) * 31
+                        : ((jm - 7) * 30) + 186);
+
+                gy +=
+                    400 *
+                    Math.floor(days / 146097);
+
+                days %= 146097;
+
+                if (days > 36524) {
+
+                    gy +=
+                        100 *
+                        Math.floor(--days / 36524);
+
+                    days %= 36524;
+
+                    if (days >= 365)
+                        days++;
+                }
+
+                gy +=
+                    4 *
+                    Math.floor(days / 1461);
+
+                days %= 1461;
+
+                if (days > 365) {
+
+                    gy +=
+                        Math.floor((days - 1) / 365);
+
+                    days =
+                        (days - 1) % 365;
+                }
+
+                let gd = days + 1;
+
+                const leap =
+                    (gy % 4 === 0 && gy % 100 !== 0) ||
+                    (gy % 400 === 0);
+
+                const monthDays = [
+                    31,
+                    leap ? 29 : 28,
+                    31,
+                    30,
+                    31,
+                    30,
+                    31,
+                    31,
+                    30,
+                    31,
+                    30,
+                    31
+                ];
+
+                let gm = 0;
+
+                while (gd > monthDays[gm]) {
+                    gd -= monthDays[gm];
+                    gm++;
+                }
+
+                return {
+                    year: gy,
+                    month: gm + 1,
+                    day: gd
+                };
+            }
+
+
+            /* =========================
+               Persian Today
+            ========================= */
+
+            function getTodayJalali() {
+
+                const now = new Date();
+
+                return gregorianToJalali(
+                    now.getFullYear(),
+                    now.getMonth() + 1,
+                    now.getDate()
+                );
+            }
+
+
+            /* =========================
+               Days in Jalali Month
+            ========================= */
+
+            function getDaysInJalaliMonth(year, month) {
+
+                if (month <= 6)
+                    return 31;
+
+                if (month <= 11)
+                    return 30;
+
+                // محاسبه اسفند با استفاده از تبدیل سال بعد
+                const nextYear =
+                    jalaliToGregorian(
+                        year + 1,
+                        1,
+                        1
+                    );
+
+                const currentYear =
+                    jalaliToGregorian(
+                        year,
+                        12,
+                        1
+                    );
+
+                const currentDate =
+                    new Date(
+                        currentYear.year,
+                        currentYear.month - 1,
+                        currentYear.day
+                    );
+
+                const nextDate =
+                    new Date(
+                        nextYear.year,
+                        nextYear.month - 1,
+                        nextYear.day
+                    );
+
+                return Math.round(
+                    (
+                        nextDate - currentDate
+                    ) / 86400000
+                );
+            }
+
+
+            /* =========================
+               Open Picker
+            ========================= */
+
+            dateInput.addEventListener("click", function () {
+
+                if (selectedDate) {
+
+                    viewYear = selectedDate.year;
+                    viewMonth = selectedDate.month;
+
+                }
+                else {
+
+                    const today = getTodayJalali();
+
+                    viewYear = today.year;
+                    viewMonth = today.month;
+
+                    selectedDate = {
+                        year: today.year,
+                        month: today.month,
+                        day: today.day
+                    };
+
+                }
+
+                renderCalendar();
+
+                picker.classList.add("show");
+            });
+
+
+            /* =========================
+               Render Calendar
+            ========================= */
+
+            function renderCalendar() {
+
+                monthName.textContent =
+                    monthNames[viewMonth - 1];
+
+                yearElement.textContent =
+                    viewYear;
+
+                daysContainer.innerHTML = "";
+
+                const firstDayGregorian =
+                    jalaliToGregorian(
+                        viewYear,
+                        viewMonth,
+                        1
+                    );
+
+                const firstDate =
+                    new Date(
+                        firstDayGregorian.year,
+                        firstDayGregorian.month - 1,
+                        firstDayGregorian.day
+                    );
+
+                /*
+                    JS:
+                    Sunday = 0
+                    Saturday = 6
+
+                    Persian calendar:
+                    Saturday = 0
+                */
+
+                let startDay =
+                    (firstDate.getDay() + 1) % 7;
+
+                const daysInMonth =
+                    getDaysInJalaliMonth(
+                        viewYear,
+                        viewMonth
+                    );
+
+
+                for (let i = 0; i < startDay; i++) {
+
+                    const empty =
+                        document.createElement("div");
+
+                    empty.className =
+                        "datepicker-day empty";
+
+                    daysContainer.appendChild(empty);
+                }
+
+
+                const today =
+                    getTodayJalali();
+
+
+                for (let day = 1;
+                     day <= daysInMonth;
+                     day++) {
+
+                    const button =
+                        document.createElement("button");
+
+                    button.type = "button";
+
+                    button.className =
+                        "datepicker-day";
+
+                    button.textContent = day;
+
+
+                    if (
+                        today.year === viewYear &&
+                        today.month === viewMonth &&
+                        today.day === day
+                    ) {
+                        button.classList.add("today");
+                    }
+
+
+                    if (
+                        selectedDate &&
+                        selectedDate.year === viewYear &&
+                        selectedDate.month === viewMonth &&
+                        selectedDate.day === day
+                    ) {
+                        button.classList.add("selected");
+                    }
+
+
+                            button.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            selectedDate = {
+                year: viewYear,
+                month: viewMonth,
+                day: day
+            };
+
+            // فقط تقویم را مجدداً رسم کن
+            // DatePicker بسته نمی‌شود
+            renderCalendar();
+        });
+
+
+                    daysContainer.appendChild(button);
+                }
+            }
+
+
+            /* =========================
+               Previous Month
+            ========================= */
+
+            prevMonth.addEventListener(
+                "click",
+                function () {
+
+                    viewMonth--;
+
+                    if (viewMonth < 1) {
+                        viewMonth = 12;
+                        viewYear--;
+                    }
+
+                    renderCalendar();
+                }
+            );
+
+
+            /* =========================
+               Next Month
+            ========================= */
+
+            nextMonth.addEventListener(
+                "click",
+                function () {
+
+                    viewMonth++;
+
+                    if (viewMonth > 12) {
+                        viewMonth = 1;
+                        viewYear++;
+                    }
+
+                    renderCalendar();
+                }
+            );
+
+
+            /* =========================
+               Confirm
+            ========================= */
+
+                   confirmButton.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!selectedDate) {
+                alert("لطفاً ابتدا یک تاریخ انتخاب کنید.");
+                return;
+            }
+
+            const gregorian =
+                jalaliToGregorian(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day
+                );
+
+            const hour =
+                parseInt(hourSelect.value, 10);
+
+            const minute =
+                parseInt(minuteSelect.value, 10);
+
+
+            const yyyy =
+                gregorian.year
+                    .toString()
+                    .padStart(4, "0");
+
+            const mm =
+                gregorian.month
+                    .toString()
+                    .padStart(2, "0");
+
+            const dd =
+                gregorian.day
+                    .toString()
+                    .padStart(2, "0");
+
+            const hh =
+                hour
+                    .toString()
+                    .padStart(2, "0");
+
+            const min =
+                minute
+                    .toString()
+                    .padStart(2, "0");
+
+
+            /*
+                مقدار میلادی برای ASP.NET
+                مثال:
+                2026-11-16T23:55
+            */
+
+            const isoValue =
+                `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+
+            /*
+                مقدار واقعی فرم
+            */
+
+            hiddenInput.value = isoValue;
+
+
+            /*
+                مقدار قابل مشاهده برای کاربر
+                شمسی
+            */
+
+            dateInput.value =
+                `${selectedDate.year}/` +
+                `${selectedDate.month.toString().padStart(2, "0")}/` +
+                `${selectedDate.day.toString().padStart(2, "0")}` +
+                ` - ${hh}:${min}`;
+
+
+            clearButton.style.display = "flex";
+
+
+            /*
+                حالا DatePicker بسته شود
+            */
+
+            picker.classList.remove("show");
+        });
+
+
+            /* =========================
+               Clear
+            ========================= */
+
+            clearButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    selectedDate = null;
+
+                    hiddenInput.value = "";
+
+                    dateInput.value = "";
+
+                    clearButton.style.display =
+                        "none";
+                }
+            );
+
+
+            /* =========================
+               Close Outside
+            ========================= */
+
+                   document.addEventListener("click", function (event) {
+
+            const clickedInsidePicker =
+                picker.contains(event.target);
+
+            const clickedDateInput =
+                dateInput.contains(event.target);
+
+            const clickedClearButton =
+                clearButton.contains(event.target);
+
+            if (
+                clickedInsidePicker ||
+                clickedDateInput ||
+                clickedClearButton
+            ) {
+                return;
+            }
+
+            picker.classList.remove("show");
+        });
+
+
+            /* =========================
+               Load Existing Date
+            ========================= */
+
+            const existingValue =
+                hiddenInput.value;
+
+
+            if (existingValue) {
+
+                const existingDate =
+                    new Date(existingValue);
+
+
+                if (!isNaN(existingDate.getTime())) {
+
+                    const jalali =
+                        gregorianToJalali(
+                            existingDate.getFullYear(),
+                            existingDate.getMonth() + 1,
+                            existingDate.getDate()
+                        );
+
+
+                    selectedDate = jalali;
+
+                    viewYear =
+                        jalali.year;
+
+                    viewMonth =
+                        jalali.month;
+
+
+                    hourSelect.value =
+                        existingDate.getHours();
+
+
+                    minuteSelect.value =
+                        Math.floor(
+                            existingDate.getMinutes() / 5
+                        ) * 5;
+
+
+                    dateInput.value =
+                        `${jalali.year}/${jalali.month.toString().padStart(2, "0")}/${jalali.day.toString().padStart(2, "0")} - ${existingDate.getHours().toString().padStart(2, "0")}:${existingDate.getMinutes().toString().padStart(2, "0")}`;
+
+
+                    clearButton.style.display =
+                        "flex";
+                }
+            }
+
+        });
+
+    </script>
 }

@@ -2,101 +2,1576 @@
 
 @{
     ViewData["Title"] = Model.Title;
-
-    var mediaUrl = Url.Action(
-        "Content",
-        "Viewer",
-        new { code = Model.QrCode });
 }
 
-<div class="container mt-5" dir="rtl">
+<div class="media-viewer-page" dir="rtl">
 
-    <div class="row justify-content-center">
+    <!-- Decorative Background -->
+    <div class="floating-shape shape-one"></div>
+    <div class="floating-shape shape-two"></div>
+    <div class="floating-shape shape-three"></div>
 
-        <div class="col-lg-9">
 
-            <div class="card shadow-sm">
+    <div class="viewer-container">
 
-                <div class="card-body p-4">
+        <div class="media-card">
 
-                    <h1 class="h3 text-center mb-3">
-                        @Model.Title
-                    </h1>
+            <!-- =========================================
+                 TOP
+            ========================================== -->
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+            <div class="media-top">
+
+                <div class="media-badge">
+
+                    @if (Model.MediaType == "Audio")
                     {
-                        <p class="text-muted text-center mb-4">
-                            @Model.Description
-                        </p>
+                        <span>🎵</span>
+                        <span>پیام صوتی</span>
+                    }
+                    else if (Model.MediaType == "Video")
+                    {
+                        <span>🎬</span>
+                        <span>ویدئو</span>
+                    }
+                    else if (Model.MediaType == "Image")
+                    {
+                        <span>🖼️</span>
+                        <span>تصویر</span>
                     }
 
-                    <div class="text-center">
+                </div>
 
-                        @if (Model.MediaType == "Image")
-                        {
-                            <img src="@Model.ContentUrl"
-                                 alt="@Model.Title"
-                                 class="img-fluid rounded"
-                                 style="max-height:70vh;" />
-                        }
-                        else if (Model.MediaType == "Audio")
-                        {
-                            <audio controls
-                                   preload="metadata"
-                                   class="w-100"
-                                   data-qr-code-id="@Model.QrCodeId"
-                                   data-media-type="Audio">
+                <div class="sparkle">✦</div>
 
-                                <source src="@Model.ContentUrl"
-                                        type="@Model.ContentType" />
+            </div>
 
-                                مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند.
 
-                            </audio>
-                        }
-                        else if (Model.MediaType == "Video")
-                        {
-                            <video controls
-                                   preload="metadata"
-                                   class="w-100 rounded"
-                                   style="max-height:70vh;"
-                                   data-qr-code-id="@Model.QrCodeId"
-                                   data-media-type="Video">
+            <!-- =========================================
+                 TITLE
+            ========================================== -->
 
-                                <source src="@Model.ContentUrl"
-                                        type="@Model.ContentType" />
+            <div class="media-header">
 
-                                مرورگر شما از پخش این فایل ویدئویی پشتیبانی نمی‌کند.
+                @if (Model.MediaType == "Audio")
+                {
+                    <div class="main-media-icon audio-main-icon">
 
-                            </video>
-                        }
-                        else
-                        {
-                            <div class="alert alert-warning">
-                                نوع رسانه پشتیبانی نمی‌شود.
-                            </div>
-                        }
+                        <div class="icon-glow"></div>
+
+                        <span>♫</span>
 
                     </div>
+                }
+                else if (Model.MediaType == "Video")
+                {
+                    <div class="main-media-icon video-main-icon">
 
-                    <div class="text-center text-muted mt-4">
+                        <div class="icon-glow"></div>
+
+                        <span>▶</span>
+
+                    </div>
+                }
+                else if (Model.MediaType == "Image")
+                {
+                    <div class="main-media-icon image-main-icon">
+
+                        <div class="icon-glow"></div>
+
+                        <span>♡</span>
+
+                    </div>
+                }
+
+
+                <h1 class="media-title">
+                    @Model.Title
+                </h1>
+
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="media-description">
+                        @Model.Description
+                    </p>
+                }
+
+            </div>
+
+
+            <!-- =========================================
+                 MEDIA
+            ========================================== -->
+
+            <div class="media-content">
+
+                @if (Model.MediaType == "Image")
+                {
+                    <div class="image-viewer">
+
+                        <img src="@Model.ContentUrl"
+                             alt="@Model.Title"
+                             class="viewer-image" />
+
+                        <div class="image-overlay">
+                            <span>♡</span>
+                        </div>
+
+                    </div>
+                }
+
+                else if (Model.MediaType == "Audio")
+                {
+                    <div class="audio-player-container">
+
+
+                        <!-- Animated Sound -->
+                        <div class="sound-visualizer"
+                             id="soundVisualizer">
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                        </div>
+
+
+                        <div class="audio-player-content">
+
+                            <div class="audio-note">
+                                ♪
+                            </div>
+
+
+                            <div class="audio-text">
+
+                                <strong>
+                                    یک پیام برای شما
+                                </strong>
+
+                                <span>
+                                    برای شنیدن پیام، دکمه پخش را بزنید ❤️
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- REAL AUDIO -->
+                        <audio id="mediaPlayer"
+                               preload="metadata"
+                               class="audio-player"
+                               data-qr-code-id="@Model.QrCodeId"
+                               data-media-type="Audio">
+
+                            <source src="@Model.ContentUrl"
+                                    type="@Model.ContentType" />
+
+                            مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند.
+
+                        </audio>
+
+
+                        <!-- Custom Audio Controls -->
+
+                        <div class="custom-audio-controls">
+
+                            <button type="button"
+                                    id="audioPlayButton"
+                                    class="audio-play-button"
+                                    aria-label="پخش">
+
+                                <span id="playIcon">
+                                    ▶
+                                </span>
+
+                            </button>
+
+
+                            <div class="audio-timeline">
+
+                                <div class="audio-times">
+
+                                    <span id="currentTime">
+                                        00:00
+                                    </span>
+
+                                    <span id="duration">
+                                        00:00
+                                    </span>
+
+                                </div>
+
+
+                                <div class="progress-track"
+                                     id="progressTrack">
+
+                                    <div class="progress-fill"
+                                         id="progressFill">
+                                    </div>
+
+                                    <div class="progress-thumb"
+                                         id="progressThumb">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button"
+                                    id="volumeButton"
+                                    class="volume-button">
+
+                                🔊
+
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+
+                else if (Model.MediaType == "Video")
+                {
+                    <div class="video-container">
+
+                        <video id="mediaPlayer"
+                               preload="metadata"
+                               class="viewer-video"
+                               data-qr-code-id="@Model.QrCodeId"
+                               data-media-type="Video"
+                               playsinline
+                               controls>
+
+                            <source src="@Model.ContentUrl"
+                                    type="@Model.ContentType" />
+
+                            مرورگر شما از پخش این فایل ویدئویی پشتیبانی نمی‌کند.
+
+                        </video>
+
+                    </div>
+                }
+
+                else
+                {
+                    <div class="unsupported-media">
+
+                        <div>
+                            ⚠️
+                        </div>
+
+                        <strong>
+                            نوع رسانه پشتیبانی نمی‌شود
+                        </strong>
+
+                        <span>
+                            این نوع فایل قابل پخش نیست.
+                        </span>
+
+                    </div>
+                }
+
+            </div>
+
+
+            <!-- =========================================
+                 SHARE
+            ========================================== -->
+
+            <div class="share-section">
+
+                <div class="share-divider">
+
+                    <span></span>
+
+                    <small>
+                        اگر دوستش داشتی، به اشتراک بگذار
+                    </small>
+
+                    <span></span>
+
+                </div>
+
+
+                <button type="button"
+                        id="shareButton"
+                        class="share-button">
+
+                    <span class="share-icon">
+                        ↗
+                    </span>
+
+                    <span>
+                        اشتراک‌گذاری پیام
+                    </span>
+
+                </button>
+
+
+                <div id="shareStatus"
+                     class="share-status">
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 FOOTER
+            ========================================== -->
+
+            <div class="media-footer">
+
+                <div class="file-info">
+
+                    <span class="file-icon">
+                        ♫
+                    </span>
+
+                    <div>
 
                         <small>
-                            @Model.OriginalFileName
+                            فایل رسانه
                         </small>
+
+                        <strong>
+                            @Model.OriginalFileName
+                        </strong>
 
                     </div>
 
+                </div>
+
+
+                <div class="footer-heart">
+                    ♥
                 </div>
 
             </div>
 
         </div>
 
+
+        <!-- Bottom Branding -->
+
+        <div class="viewer-brand">
+
+            <span>ساخته شده با</span>
+            <span class="brand-heart">
+                ♥
+            </span>
+            <strong>
+                Padideh
+            </strong>
+        </div>
+
     </div>
 
 </div>
+
+
 @section Scripts
 {
-    <script src="~/js/media-analytics.js" asp-append-version="true"></script>
+
+    <script src="~/js/media-analytics.js"
+            asp-append-version="true"></script>
+
+
+    <script>
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+
+                /* =========================================
+                   AUDIO PLAYER
+                ========================================== */
+
+                const audio =
+                    document.getElementById("mediaPlayer");
+
+                const playButton =
+                    document.getElementById("audioPlayButton");
+
+                const playIcon =
+                    document.getElementById("playIcon");
+
+                const currentTime =
+                    document.getElementById("currentTime");
+
+                const duration =
+                    document.getElementById("duration");
+
+                const progressTrack =
+                    document.getElementById("progressTrack");
+
+                const progressFill =
+                    document.getElementById("progressFill");
+
+                const progressThumb =
+                    document.getElementById("progressThumb");
+
+                const volumeButton =
+                    document.getElementById("volumeButton");
+
+                const visualizer =
+                    document.getElementById("soundVisualizer");
+
+
+                function formatTime(seconds) {
+
+                    if (!isFinite(seconds)) {
+                        return "00:00";
+                    }
+
+                    const minutes =
+                        Math.floor(seconds / 60);
+
+                    const secs =
+                        Math.floor(seconds % 60);
+
+                    return String(minutes).padStart(2, "0")
+                        + ":"
+                        + String(secs).padStart(2, "0");
+                }
+
+
+                if (audio && playButton) {
+
+
+                    /* Play / Pause */
+
+                    playButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (audio.paused) {
+
+                                audio.play();
+
+                            } else {
+
+                                audio.pause();
+
+                            }
+
+                        }
+                    );
+
+
+                    /* Playing */
+
+                    audio.addEventListener(
+                        "play",
+                        function () {
+
+                            playIcon.textContent = "Ⅱ";
+
+                            playButton.classList.add(
+                                "playing"
+                            );
+
+                            if (visualizer) {
+
+                                visualizer.classList.add(
+                                    "active"
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    /* Paused */
+
+                    audio.addEventListener(
+                        "pause",
+                        function () {
+
+                            playIcon.textContent = "▶";
+
+                            playButton.classList.remove(
+                                "playing"
+                            );
+
+                            if (visualizer) {
+
+                                visualizer.classList.remove(
+                                    "active"
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    /* Duration */
+
+                    audio.addEventListener(
+                        "loadedmetadata",
+                        function () {
+
+                            duration.textContent =
+                                formatTime(audio.duration);
+
+                        }
+                    );
+
+
+                    /* Progress */
+
+                    audio.addEventListener(
+                        "timeupdate",
+                        function () {
+
+                            if (!audio.duration) {
+                                return;
+                            }
+
+                            const percent =
+                                (audio.currentTime /
+                                    audio.duration) * 100;
+
+
+                            progressFill.style.width =
+                                percent + "%";
+
+
+                                progressThumb.style.left =
+                                percent + "%";
+
+
+                            currentTime.textContent =
+                                formatTime(
+                                    audio.currentTime
+                                );
+
+                        }
+                    );
+
+
+                    /* Seek */
+
+                    if (progressTrack) {
+
+                        progressTrack.addEventListener(
+                            "click",
+                            function (event) {
+
+                                const rect =
+                                    progressTrack
+                                        .getBoundingClientRect();
+
+
+                                const clickPosition =
+                                    event.clientX -
+                                    rect.left;
+
+
+                                const percentage =
+                                    clickPosition /
+                                    rect.width;
+
+
+                                audio.currentTime =
+                                    percentage *
+                                    audio.duration;
+
+                            }
+                        );
+
+                    }
+
+
+                    /* Volume */
+
+                    if (volumeButton) {
+
+                        volumeButton.addEventListener(
+                            "click",
+                            function () {
+
+                                audio.muted =
+                                    !audio.muted;
+
+
+                                volumeButton.textContent =
+                                    audio.muted
+                                        ? "🔇"
+                                        : "🔊";
+
+                            }
+                        );
+
+                    }
+
+
+                    /* End */
+
+                    audio.addEventListener(
+                        "ended",
+                        function () {
+
+                            playIcon.textContent = "▶";
+
+                            playButton.classList.remove(
+                                "playing"
+                            );
+
+                            if (visualizer) {
+
+                                visualizer.classList.remove(
+                                    "active"
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* =========================================
+                   SHARE
+                ========================================== */
+
+                const shareButton =
+                    document.getElementById(
+                        "shareButton"
+                    );
+
+
+                const shareStatus =
+                    document.getElementById(
+                        "shareStatus"
+                    );
+
+
+                if (shareButton) {
+
+                    shareButton.addEventListener(
+                        "click",
+                        async function () {
+
+                            const shareData = {
+
+                                title:
+                                    @Html.Raw(
+                                        System.Text.Json.JsonSerializer.Serialize(
+                                                        Model.Title
+                                        )
+                                                                                                                ),
+
+                        text:
+                            "یک پیام برای شما ❤️",
+
+                        url:
+                            window.location.href
+
+                    };
+
+
+                    try {
+
+                        if (
+                            navigator.share
+                        ) {
+
+                            await navigator.share(
+                                shareData
+                            );
+
+                        }
+
+                        else {
+
+                            await navigator.clipboard
+                                .writeText(
+                                    window.location.href
+                                );
+
+
+                            shareStatus.textContent =
+                                "✓ لینک پیام کپی شد";
+
+
+                            shareButton.classList.add(
+                                "copied"
+                            );
+
+
+                            setTimeout(
+                                function () {
+
+                                    shareStatus.textContent =
+                                        "";
+
+                                    shareButton.classList.remove(
+                                        "copied"
+                                    );
+
+                                },
+                                2500
+                            );
+
+                        }
+
+                    }
+                    catch (error) {
+
+                        if (
+                            error.name ===
+                            "AbortError"
+                        ) {
+
+                            return;
+
+                        }
+
+                        console.error(
+                            "Share failed.",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+    });
+
+</script>
+
+
+<style>
+
+    /* =========================================
+                   PAGE
+                ========================================== */
+
+    .media-viewer-page {
+        position: relative;
+        min-height: calc(100vh - 150px);
+        overflow: hidden;
+        padding: 30px 15px 60px;
+        font-family: "Vazirmatn", Tahoma, sans-serif;
+        background: transparent;
+    }
+
+
+    .viewer-container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 720px;
+        margin: auto;
+    }
+
+
+    /* =========================================
+                   DECORATIONS
+                ========================================== */
+
+    .floating-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: .45;
+        filter: blur(1px);
+    }
+
+
+    .shape-one {
+        width: 180px;
+        height: 180px;
+        right: -70px;
+        top: 100px;
+        background: linear-gradient( 135deg, #ffb1d0, #c7a8ff );
+    }
+
+
+    .shape-two {
+        width: 140px;
+        height: 140px;
+        left: -60px;
+        bottom: 130px;
+        background: linear-gradient( 135deg, #a7e7ff, #d9b5ff );
+    }
+
+
+    .shape-three {
+        width: 60px;
+        height: 60px;
+        right: 10%;
+        top: 30px;
+        background: #ffd978;
+        opacity: .25;
+    }
+
+
+    /* =========================================
+                   CARD
+                ========================================== */
+
+    .media-card {
+        position: relative;
+        overflow: hidden;
+        padding: 30px;
+        border-radius: 34px;
+        background: rgba(255,255,255,.90);
+        border: 1px solid rgba(255,255,255,.95);
+        box-shadow: 0 25px 70px rgba(150, 95, 155, .16);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+
+        .media-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient( 90deg, #ff66a8, #a86cff, #6fcfff );
+        }
+
+
+    /* =========================================
+                   TOP
+                ========================================== */
+
+    .media-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+
+    .media-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border-radius: 30px;
+        color: #a05081;
+        background: #fff1f8;
+        border: 1px solid #ffe0ed;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    .sparkle {
+        color: #c29cff;
+        font-size: 22px;
+        animation: sparkle 2s infinite ease-in-out;
+    }
+
+
+    @@keyframes sparkle {
+        0%, 100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 0.6;
+        }
+
+        50% {
+            transform: scale(1.25) rotate(20deg);
+            opacity: 1;
+        }
+    }
+
+
+    /* =========================================
+                   HEADER
+                ========================================== */
+
+    .media-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+
+    .main-media-icon {
+        position: relative;
+        width: 86px;
+        height: 86px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 28px;
+        color: white;
+        font-size: 34px;
+        box-shadow: 0 15px 30px rgba(150,90,160,.20);
+    }
+
+
+    .audio-main-icon {
+        background: linear-gradient( 135deg, #ff69aa, #a268ff );
+    }
+
+
+    .video-main-icon {
+        background: linear-gradient( 135deg, #6e9cff, #9c68ff );
+    }
+
+
+    .image-main-icon {
+        background: linear-gradient( 135deg, #ff9b9b, #ff67b3 );
+    }
+
+
+    .icon-glow {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background: inherit;
+        filter: blur(20px);
+        opacity: .3;
+        z-index: -1;
+    }
+
+
+    .media-title {
+        margin: 0;
+        color: #44394a;
+        font-size: 25px;
+        line-height: 1.8;
+        font-weight: 800;
+    }
+
+
+    .media-description {
+        max-width: 550px;
+        margin: 10px auto 0;
+        color: #918595;
+        font-size: 14px;
+        line-height: 2;
+    }
+
+
+    /* =========================================
+                   AUDIO
+                ========================================== */
+
+    .audio-player-container {
+        padding: 28px 25px 24px;
+        border-radius: 26px;
+        background: linear-gradient( 145deg, #fff4fa, #f7f2ff );
+        border: 1px solid #f4e5f1;
+        box-shadow: inset 0 1px 0 white;
+    }
+
+
+    .sound-visualizer {
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+
+        .sound-visualizer span {
+            display: block;
+            width: 5px;
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient( to top, #ff6baa, #a879ff );
+            opacity: .5;
+        }
+
+
+        .sound-visualizer.active span {
+            animation: soundWave .8s infinite ease-in-out;
+        }
+
+
+        .sound-visualizer span:nth-child(2) {
+            animation-delay: .1s;
+        }
+
+        .sound-visualizer span:nth-child(3) {
+            animation-delay: .2s;
+        }
+
+        .sound-visualizer span:nth-child(4) {
+            animation-delay: .3s;
+        }
+
+        .sound-visualizer span:nth-child(5) {
+            animation-delay: .4s;
+        }
+
+        .sound-visualizer span:nth-child(6) {
+            animation-delay: .3s;
+        }
+
+        .sound-visualizer span:nth-child(7) {
+            animation-delay: .2s;
+        }
+
+        .sound-visualizer span:nth-child(8) {
+            animation-delay: .1s;
+        }
+
+
+    @@keyframes soundWave {
+        0%, 100% {
+            height: 18px;
+        }
+
+        50% {
+            height: 55px;
+        }
+    }
+
+
+    .audio-player-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        text-align: right;
+    }
+
+
+    .audio-note {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        color: white;
+        background: linear-gradient( 135deg, #ff70ac, #9f70ff );
+        font-size: 20px;
+    }
+
+
+    .audio-text {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+
+        .audio-text strong {
+            color: #554658;
+            font-size: 14px;
+        }
+
+
+        .audio-text span {
+            color: #9a8e9e;
+            font-size: 11px;
+        }
+
+
+    /* Hide Native Audio */
+
+    .audio-player {
+        display: none;
+    }
+
+
+    /* =========================================
+                   CUSTOM AUDIO CONTROLS
+                ========================================== */
+
+    .custom-audio-controls {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+
+    .audio-play-button {
+        width: 54px;
+        height: 54px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: linear-gradient( 135deg, #ff63a6, #a36aff );
+        box-shadow: 0 8px 20px rgba(181, 94, 170, .28);
+        cursor: pointer;
+        font-size: 18px;
+        transition: all .25s ease;
+    }
+
+
+        .audio-play-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 25px rgba(181, 94, 170, .38);
+        }
+
+
+        .audio-play-button.playing {
+            transform: scale(1.04);
+        }
+
+
+    .audio-timeline {
+        flex: 1;
+    }
+
+
+    .audio-times {
+        display: flex;
+        justify-content: space-between;
+        direction: ltr;
+        color: #968a9b;
+        font-size: 10px;
+        margin-bottom: 7px;
+    }
+
+
+    .progress-track {
+        position: relative;
+        height: 7px;
+        border-radius: 20px;
+        background: #eadfea;
+        cursor: pointer;
+    }
+
+
+    .progress-fill {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient( 90deg, #ff67a9, #9e6aff );
+    }
+
+
+    .progress-thumb {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: 14px;
+        height: 14px;
+        transform: translate(50%, -50%);
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #a56bff;
+        box-shadow: 0 3px 8px rgba(120,80,150,.2);
+    }
+
+
+    .volume-button {
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+
+        .volume-button:hover {
+            background: #fff0f7;
+            transform: scale(1.05);
+        }
+
+
+    /* =========================================
+                   IMAGE
+                ========================================== */
+
+    .image-viewer {
+        position: relative;
+        overflow: hidden;
+        border-radius: 25px;
+        background: #faf6fa;
+        box-shadow: 0 10px 30px rgba(100,70,110,.12);
+    }
+
+
+    .viewer-image {
+        display: block;
+        width: 100%;
+        max-height: 650px;
+        object-fit: contain;
+        margin: auto;
+    }
+
+
+    .image-overlay {
+        position: absolute;
+        left: 15px;
+        bottom: 15px;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        background: rgba(255,90,160,.85);
+        backdrop-filter: blur(5px);
+    }
+
+
+    /* =========================================
+                   VIDEO
+                ========================================== */
+
+    .video-container {
+        overflow: hidden;
+        border-radius: 25px;
+        background: #19151d;
+        box-shadow: 0 15px 40px rgba(60,40,70,.2);
+    }
+
+
+    .viewer-video {
+        display: block;
+        width: 100%;
+        max-height: 600px;
+    }
+
+
+    /* =========================================
+                   SHARE
+                ========================================== */
+
+    .share-section {
+        margin-top: 28px;
+        text-align: center;
+    }
+
+
+    .share-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #a095a5;
+        font-size: 11px;
+    }
+
+
+        .share-divider span {
+            flex: 1;
+            height: 1px;
+            background: #f0e6ef;
+        }
+
+
+    .share-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 11px 20px;
+        border: 1px solid #eadcf2;
+        border-radius: 15px;
+        color: #7952a2;
+        background: white;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .25s ease;
+    }
+
+
+        .share-button:hover {
+            color: white;
+            border-color: transparent;
+            background: linear-gradient( 135deg, #ff68a9, #996aff );
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(160,90,160,.22);
+        }
+
+
+        .share-button.copied {
+            color: #fff;
+            background: linear-gradient( 135deg, #60c9a4, #5cb8d6 );
+        }
+
+
+    .share-icon {
+        font-size: 17px;
+    }
+
+
+    .share-status {
+        min-height: 20px;
+        margin-top: 8px;
+        color: #5cb89a;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+                   FOOTER
+                ========================================== */
+
+    .media-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 25px;
+        padding-top: 18px;
+        border-top: 1px solid #f2eaf1;
+    }
+
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+
+    .file-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #9969d5;
+        background: #f4efff;
+    }
+
+
+    .file-info div {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+
+    .file-info small {
+        color: #a79aa9;
+        font-size: 9px;
+        margin-bottom: 2px;
+    }
+
+
+    .file-info strong {
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #665a69;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+
+    .footer-heart {
+        color: #ff73aa;
+        font-size: 21px;
+        animation: heartbeat 1.5s infinite;
+    }
+
+
+    @@keyframes heartbeat {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.2);
+        }
+    }
+
+
+    /* =========================================
+                   BRAND
+                ========================================== */
+
+    .viewer-brand {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        margin-top: 20px;
+        color: #a99dab;
+        font-size: 10px;
+    }
+
+
+        .viewer-brand strong {
+            color: #9b6cff;
+            font-weight: 700;
+        }
+
+
+    .brand-heart {
+        color: #ff6ca8;
+    }
+
+
+    /* =========================================
+                   UNSUPPORTED
+                ========================================== */
+
+    .unsupported-media {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 180px;
+        border-radius: 25px;
+        background: #fff7f0;
+        color: #a17d66;
+        border: 1px solid #ffe5d3;
+    }
+
+        .unsupported-media div {
+            font-size: 35px;
+        }
+
+
+        .unsupported-media strong {
+            font-size: 14px;
+        }
+
+
+        .unsupported-media span {
+            font-size: 11px;
+            color: #b49d8e;
+        }
+
+
+    /* =========================================
+                   MOBILE
+                ========================================== */
+
+    @@media (max-width: 600px) {
+        .media-viewer-page {
+            padding: 15px 8px 35px;
+        }
+
+
+        .media-card {
+            padding: 22px 16px;
+            border-radius: 27px;
+        }
+
+
+        .media-title {
+            font-size: 21px;
+        }
+
+
+        .main-media-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 23px;
+            font-size: 28px;
+        }
+
+
+        .audio-player-container {
+            padding: 22px 15px;
+        }
+
+
+        .audio-player-content {
+            margin-bottom: 15px;
+        }
+
+
+        .audio-text span {
+            font-size: 10px;
+        }
+
+
+        .audio-play-button {
+            width: 48px;
+            height: 48px;
+        }
+
+
+        .volume-button {
+            display: none;
+        }
+
+
+        .media-footer {
+            align-items: flex-start;
+        }
+
+
+        .file-info strong {
+            max-width: 230px;
+        }
+    }
+
+    /* =========================================
+       AUDIO PLAYER - ALWAYS LTR
+    ========================================= */
+
+    .audio-player-container {
+        direction: ltr;
+    }
+
+    /* محتوای متنی همچنان فارسی و RTL */
+    .audio-player-content {
+        direction: rtl;
+    }
+
+    /* کنترل‌های پلیر از چپ به راست */
+    .custom-audio-controls {
+        direction: ltr;
+    }
+
+    /* زمان‌ها */
+    .audio-times {
+        direction: ltr;
+    }
+
+    /* نوار پیشرفت */
+    .progress-track {
+        direction: ltr;
+    }
+
+    /* مقدار پیشرفت از چپ به راست */
+    .progress-fill {
+        left: 0;
+        right: auto;
+    }
+
+    /* نشانگر Progress */
+    .progress-thumb {
+        left: 0;
+        right: auto;
+        transform: translate(-50%, -50%);
+    }
+</style>
 }

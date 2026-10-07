@@ -4,189 +4,477 @@
     ViewData["Title"] = "افزودن رسانه";
 }
 
-<div class="container mt-4 mb-5" dir="rtl">
+<div class="media-create-page" dir="rtl">
 
-    <div class="row justify-content-center">
+    <!-- Background -->
+    <div class="media-create-bg media-create-bg-1"></div>
+    <div class="media-create-bg media-create-bg-2"></div>
+    <div class="media-create-bg media-create-bg-3"></div>
 
-        <div class="col-lg-8">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="media-create-wrapper">
 
-                <div>
-                    <h1 class="h3 mb-1">
-                        افزودن رسانه
-                    </h1>
+        <!-- Header -->
+        <div class="media-create-header">
 
-                    <div class="text-muted">
-                        آپلود تصویر، فایل صوتی یا ویدئویی و ایجاد QR Code
-                    </div>
+            <div class="media-create-header-main">
+
+                <div class="media-create-icon">
+                    <span>+</span>
                 </div>
 
-                <a asp-action="Index"
-                   class="btn btn-outline-secondary">
-                    بازگشت
-                </a>
+                <div>
+
+                    <div class="media-create-badge">
+                        <span>✦</span>
+                        مدیریت رسانه
+                    </div>
+
+                    <h1>
+                        افزودن <span>رسانه</span>
+                    </h1>
+
+                    <p>
+                        تصویر، فایل صوتی یا ویدئویی خود را آپلود کنید
+                        و یک QR Code اختصاصی بسازید.
+                    </p>
+
+                </div>
 
             </div>
 
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger">
+            <a asp-action="Index"
+               class="back-button">
 
-                    <div class="fw-semibold mb-2">
-                        امکان ثبت رسانه وجود ندارد:
+                <span>→</span>
+
+                بازگشت
+
+            </a>
+
+        </div>
+
+
+        <!-- Error -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="media-create-error">
+
+                <div class="error-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <strong>
+                        امکان ثبت رسانه وجود ندارد
+                    </strong>
+
+                    <div class="error-validation">
+
+                        <div asp-validation-summary="ModelOnly"></div>
+
                     </div>
 
-                    <div asp-validation-summary="ModelOnly"></div>
-
                 </div>
-            }
+
+            </div>
+        }
 
 
-            <div class="card shadow-sm">
+        <!-- Main Card -->
+        <div class="media-create-card">
 
-                <div class="card-header bg-white">
+            <div class="media-create-card-header">
+
+                <div class="card-header-icon">
+                    ✦
+                </div>
+
+                <div>
 
                     <strong>
                         اطلاعات رسانه
                     </strong>
 
-                </div>
-
-
-                <div class="card-body p-4">
-
-                    <form asp-action="Create"
-                          method="post"
-                          enctype="multipart/form-data">
-
-                        @Html.AntiForgeryToken()
-
-
-                        <!-- عنوان -->
-
-                        <div class="mb-4">
-
-                            <label asp-for="Title"
-                                   class="form-label">
-                                عنوان رسانه
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <input asp-for="Title"
-                                   class="form-control"
-                                   placeholder="مثلاً ویدئوی معرفی محصول" />
-
-                            <span asp-validation-for="Title"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-
-                        <!-- توضیحات -->
-
-                        <div class="mb-4">
-
-                            <label asp-for="Description"
-                                   class="form-label">
-                                توضیحات
-                            </label>
-
-                            <textarea asp-for="Description"
-                                      class="form-control"
-                                      rows="4"
-                                      placeholder="توضیحات اختیاری درباره این رسانه"></textarea>
-
-                            <span asp-validation-for="Description"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-
-                        <!-- فایل -->
-
-                        <div class="mb-4">
-
-                            <label asp-for="File"
-                                   class="form-label">
-                                فایل رسانه
-                                <span class="text-danger">*</span>
-                            </label>
-
-                            <input asp-for="File"
-                                   type="file"
-                                   class="form-control"
-                                   accept="image/jpeg,image/png,image/webp,image/gif,audio/mpeg,audio/wav,audio/ogg,audio/mp4,video/mp4,video/webm,video/quicktime" />
-
-                            <div class="form-text">
-
-                                فرمت‌های مجاز:
-                                JPG، JPEG، PNG، WebP، GIF،
-                                MP3، WAV، OGG، M4A،
-                                MP4، WebM، MOV
-
-                            </div>
-
-                            <span asp-validation-for="File"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-
-                        <!-- راهنمای حجم -->
-
-                        <div class="alert alert-light border mb-4">
-
-                            <div class="fw-semibold mb-2">
-                                محدودیت حجم فایل
-                            </div>
-
-                            <ul class="mb-0">
-
-                                <li>
-                                    تصویر: حداکثر 20 MB
-                                </li>
-
-                                <li>
-                                    صوت: حداکثر 100 MB
-                                </li>
-
-                                <li>
-                                    ویدئو: حداکثر 1 GB
-                                </li>
-
-                            </ul>
-
-                        </div>
-
-
-                        <!-- دکمه -->
-
-                        <div class="d-flex justify-content-end gap-2">
-
-                            <a asp-action="Index"
-                               class="btn btn-outline-secondary">
-                                انصراف
-                            </a>
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-
-                                ایجاد رسانه و QR
-
-                            </button>
-
-                        </div>
-
-                    </form>
+                    <span>
+                        اطلاعات زیر را برای ایجاد رسانه تکمیل کنید.
+                    </span>
 
                 </div>
 
             </div>
+
+
+            <div class="media-create-card-body">
+
+                <form asp-action="Create"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="mediaCreateForm">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- Title -->
+                    <div class="media-field">
+
+                        <label asp-for="Title">
+
+                            <span class="field-icon">
+                                ♡
+                            </span>
+
+                            عنوان رسانه
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <div class="field-wrapper">
+
+                            <span class="field-inside-icon">
+                                ✦
+                            </span>
+
+                            <input asp-for="Title"
+                                   class="media-input"
+                                   placeholder="مثلاً ویدئوی معرفی محصول"
+                                   autocomplete="off" />
+
+                        </div>
+
+                        <span asp-validation-for="Title"
+                              class="field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="media-field">
+
+                        <label asp-for="Description">
+
+                            <span class="field-icon">
+                                ✎
+                            </span>
+
+                            توضیحات
+
+                            <span class="optional">
+                                اختیاری
+                            </span>
+
+                        </label>
+
+                        <div class="textarea-wrapper">
+
+                            <textarea asp-for="Description"
+                                      class="media-textarea"
+                                      rows="4"
+                                      maxlength="1000"
+                                      placeholder="توضیحات اختیاری درباره این رسانه"></textarea>
+
+                            <div class="textarea-footer">
+
+                                <span>
+                                    توضیحات رسانه
+                                </span>
+
+                                <span>
+                                    <span id="descriptionCount">0</span>
+                                    / 1000
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <span asp-validation-for="Description"
+                              class="field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- File -->
+                    <div class="media-field">
+
+                        <label asp-for="File">
+
+                            <span class="field-icon">
+                                ↑
+                            </span>
+
+                            فایل رسانه
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <div class="media-file-upload"
+                             id="uploadBox">
+
+                            <input asp-for="File"
+                                   type="file"
+                                   id="mediaFile"
+                                   class="media-file-input"
+                                   accept="image/jpeg,image/png,image/webp,image/gif,audio/mpeg,audio/wav,audio/ogg,audio/mp4,video/mp4,video/webm,video/quicktime" />
+
+
+                            <!-- Empty -->
+                            <div class="upload-empty"
+                                 id="uploadEmpty">
+
+                                <div class="upload-icon">
+                                    ↑
+                                </div>
+
+                                <strong>
+                                    فایل خود را اینجا رها کنید
+                                </strong>
+
+                                <span>
+                                    یا برای انتخاب فایل کلیک کنید
+                                </span>
+
+                                <div class="file-formats">
+
+                                    JPG
+                                    <i>•</i>
+                                    PNG
+                                    <i>•</i>
+                                    WebP
+                                    <i>•</i>
+                                    GIF
+
+                                    <b>│</b>
+
+                                    MP3
+                                    <i>•</i>
+                                    WAV
+                                    <i>•</i>
+                                    OGG
+                                    <i>•</i>
+                                    M4A
+
+                                    <b>│</b>
+
+                                    MP4
+                                    <i>•</i>
+                                    WebM
+                                    <i>•</i>
+                                    MOV
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Selected -->
+                            <div class="selected-file"
+                                 id="selectedFile"
+                                 style="display:none;">
+
+                                <div class="selected-file-icon"
+                                     id="selectedFileIcon">
+                                    ✦
+                                </div>
+
+                                <div class="selected-file-info">
+
+                                    <span>
+                                        فایل انتخاب‌شده
+                                    </span>
+
+                                    <strong id="selectedFileName">
+                                    </strong>
+
+                                    <small id="selectedFileSize">
+                                    </small>
+
+                                </div>
+
+                                <button type="button"
+                                        id="removeFile"
+                                        class="remove-file">
+
+                                    ×
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="file-help">
+
+                            <span class="help-circle">
+                                i
+                            </span>
+
+                            فرمت‌های مجاز:
+                            JPG، JPEG، PNG، WebP، GIF،
+                            MP3، WAV، OGG، M4A،
+                            MP4، WebM، MOV
+
+                        </div>
+
+                        <span asp-validation-for="File"
+                              class="field-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- File Limits -->
+                    <div class="file-limits">
+
+                        <div class="limits-header">
+
+                            <span class="limits-icon">
+                                i
+                            </span>
+
+                            <strong>
+                                محدودیت حجم فایل
+                            </strong>
+
+                        </div>
+
+
+                        <div class="limits-grid">
+
+                            <div class="limit-item">
+
+                                <div class="limit-icon image">
+                                    ▧
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        تصویر
+                                    </span>
+
+                                    <strong>
+                                        حداکثر 20 MB
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="limit-item">
+
+                                <div class="limit-icon audio">
+                                    ♫
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        صوت
+                                    </span>
+
+                                    <strong>
+                                        حداکثر 100 MB
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="limit-item">
+
+                                <div class="limit-icon video">
+                                    ▶
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        ویدئو
+                                    </span>
+
+                                    <strong>
+                                        حداکثر 1 GB
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Bottom -->
+                    <div class="form-bottom">
+
+                        <a asp-action="Index"
+                           class="cancel-button">
+
+                            انصراف
+
+                        </a>
+
+
+                        <button type="submit"
+                                class="create-media-button"
+                                id="submitButton">
+
+                            <span class="button-icon">
+                                ✦
+                            </span>
+
+                            <span id="submitText">
+                                ایجاد رسانه و QR
+                            </span>
+
+                            <span class="button-arrow">
+                                ←
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="media-create-footer">
+
+            <span>
+                <i></i>
+                امن و خصوصی
+            </span>
+
+            <span>
+                <i></i>
+                ایجاد QR اختصاصی
+            </span>
+
+            <span>
+                <b>♡</b>
+                ساخته شده با عشق
+            </span>
 
         </div>
 
@@ -195,7 +483,1291 @@
 </div>
 
 
+<style>
+
+    /* =====================================
+           Page
+        ====================================== */
+
+    .media-create-page {
+        position: relative;
+        min-height: calc(100vh - 70px);
+        padding: 45px 20px 65px;
+        overflow: hidden;
+        background: radial-gradient( circle at 8% 10%, rgba(255, 184, 215, .25), transparent 28% ), radial-gradient( circle at 92% 15%, rgba(190, 178, 255, .24), transparent 30% ), linear-gradient( 145deg, #fff8fc, #faf8ff 50%, #f5faff );
+    }
+
+
+    /* =====================================
+           Background
+        ====================================== */
+
+    .media-create-bg {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .media-create-bg-1 {
+        width: 350px;
+        height: 350px;
+        top: -150px;
+        right: -120px;
+        background: rgba(242, 166, 207, .15);
+    }
+
+    .media-create-bg-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -130px;
+        left: -100px;
+        background: rgba(167, 153, 244, .14);
+    }
+
+    .media-create-bg-3 {
+        width: 120px;
+        height: 120px;
+        top: 48%;
+        left: 5%;
+        background: rgba(116, 190, 250, .09);
+    }
+
+
+    /* =====================================
+           Wrapper
+        ====================================== */
+
+    .media-create-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+
+    /* =====================================
+           Header
+        ====================================== */
+
+    .media-create-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .media-create-header-main {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .media-create-icon {
+        flex: 0 0 65px;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 21px;
+        background: linear-gradient( 135deg, #e879ac, #a47ee1 );
+        color: white;
+        font-size: 31px;
+        box-shadow: 0 15px 35px rgba(181, 105, 171, .22);
+        transform: rotate(-3deg);
+    }
+
+    .media-create-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+        color: #a35f92;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+        .media-create-badge span {
+            color: #df76a8;
+            font-size: 15px;
+        }
+
+    .media-create-header h1 {
+        margin: 0;
+        color: #382d45;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+        .media-create-header h1 span {
+            background: linear-gradient( 90deg, #e16fa8, #8d78dd );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+    .media-create-header p {
+        margin: 6px 0 0;
+        color: #8d8295;
+        font-size: 12px;
+    }
+
+
+    /* =====================================
+           Back
+        ====================================== */
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 43px;
+        padding: 0 15px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, .75);
+        border: 1px solid #e7dfea;
+        color: #75687e;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all .2s ease;
+    }
+
+        .back-button:hover {
+            color: #6b5d73;
+            background: white;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(70, 50, 90, .07);
+        }
+
+        .back-button span {
+            font-size: 17px;
+        }
+
+
+    /* =====================================
+           Error
+        ====================================== */
+
+    .media-create-error {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding: 15px 17px;
+        border-radius: 17px;
+        background: rgba(255, 240, 244, .92);
+        border: 1px solid #ffd5df;
+        color: #c34e6b;
+    }
+
+    .error-icon {
+        flex: 0 0 32px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #ffe0e8;
+        color: #c84f6e;
+        font-weight: 800;
+    }
+
+    .media-create-error strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .error-validation {
+        font-size: 11px;
+    }
+
+
+    /* =====================================
+           Card
+        ====================================== */
+
+    .media-create-card {
+        overflow: hidden;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, .79);
+        border: 1px solid rgba(255, 255, 255, .9);
+        box-shadow: 0 25px 70px rgba(70, 45, 95, .10), inset 0 1px 0 rgba(255, 255, 255, .9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+
+    /* =====================================
+           Card Header
+        ====================================== */
+
+    .media-create-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 25px;
+        border-bottom: 1px solid #eee7f0;
+        background: rgba(255, 255, 255, .45);
+    }
+
+    .card-header-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: linear-gradient( 135deg, #f8d7e8, #e2dbfa );
+        color: #9a76ae;
+        font-size: 18px;
+    }
+
+    .media-create-card-header strong {
+        display: block;
+        color: #51445c;
+        font-size: 13px;
+    }
+
+    .media-create-card-header span {
+        display: block;
+        margin-top: 3px;
+        color: #aaa0ad;
+        font-size: 10px;
+    }
+
+
+    /* =====================================
+           Body
+        ====================================== */
+
+    .media-create-card-body {
+        padding: 30px;
+    }
+
+
+    /* =====================================
+           Fields
+        ====================================== */
+
+    .media-field {
+        margin-bottom: 24px;
+    }
+
+        .media-field > label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: #51445c;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+    .field-icon {
+        color: #d36ca0;
+        font-size: 16px;
+    }
+
+    .required {
+        color: #df607d;
+    }
+
+    .optional {
+        margin-right: auto;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background: #f5f0f8;
+        color: #aaa0ad;
+        font-size: 9px;
+        font-weight: 500;
+    }
+
+
+    /* =====================================
+           Input
+        ====================================== */
+
+    .field-wrapper {
+        position: relative;
+    }
+
+    .field-inside-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #c997b8;
+        pointer-events: none;
+    }
+
+    .media-input {
+        width: 100%;
+        height: 51px;
+        box-sizing: border-box;
+        padding: 0 43px 0 15px;
+        border: 1px solid #e6dfe9;
+        border-radius: 15px;
+        outline: none;
+        background: rgba(255, 255, 255, .78);
+        color: #443849;
+        font-family: inherit;
+        font-size: 13px;
+        transition: all .2s ease;
+    }
+
+        .media-input::placeholder,
+        .media-textarea::placeholder {
+            color: #b4aab9;
+        }
+
+        .media-input:focus {
+            border-color: #d79abb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(215, 154, 187, .10);
+        }
+
+
+    /* =====================================
+           Textarea
+        ====================================== */
+
+    .textarea-wrapper {
+        overflow: hidden;
+        border: 1px solid #e6dfe9;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .78);
+        transition: all .2s ease;
+    }
+
+        .textarea-wrapper:focus-within {
+            border-color: #d79abb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(215, 154, 187, .10);
+        }
+
+    .media-textarea {
+        display: block;
+        width: 100%;
+        min-height: 115px;
+        padding: 14px 16px;
+        box-sizing: border-box;
+        border: 0;
+        outline: 0;
+        resize: vertical;
+        background: transparent;
+        color: #443849;
+        font-family: inherit;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    .textarea-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 13px 9px;
+        border-top: 1px solid #f0eaf2;
+        color: #aaa0ad;
+        font-size: 9px;
+    }
+
+
+    /* =====================================
+           File Upload
+        ====================================== */
+
+    .media-file-upload {
+        position: relative;
+        min-height: 220px;
+        overflow: hidden;
+        border: 2px dashed #dfc6dc;
+        border-radius: 21px;
+        background: linear-gradient( 135deg, rgba(255, 244, 250, .76), rgba(246, 243, 255, .76) );
+        transition: all .2s ease;
+    }
+
+        .media-file-upload:hover,
+        .media-file-upload.drag-over {
+            border-color: #c990bd;
+            background: linear-gradient( 135deg, rgba(255, 238, 248, .95), rgba(243, 239, 255, .95) );
+        }
+
+    .media-file-input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 5;
+    }
+
+    .upload-empty {
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 25px;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .upload-icon {
+        width: 62px;
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        border-radius: 19px;
+        background: linear-gradient( 135deg, #f7d3e6, #dfd7fa );
+        color: #a16eaa;
+        font-size: 27px;
+        box-shadow: 0 10px 25px rgba(160, 110, 170, .12);
+    }
+
+    .upload-empty strong {
+        color: #51445c;
+        font-size: 14px;
+    }
+
+    .upload-empty > span {
+        margin-top: 5px;
+        color: #aaa0ad;
+        font-size: 11px;
+    }
+
+    .file-formats {
+        margin-top: 13px;
+        padding: 7px 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .7);
+        color: #a39aa8;
+        font-size: 9px;
+        line-height: 1.8;
+    }
+
+        .file-formats i {
+            margin: 0 3px;
+            color: #d38aaf;
+            font-style: normal;
+        }
+
+        .file-formats b {
+            margin: 0 4px;
+            color: #d2c8d5;
+        }
+
+
+    /* =====================================
+           Selected File
+        ====================================== */
+
+    .selected-file {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 25px;
+        background: linear-gradient( 135deg, rgba(255, 247, 251, .98), rgba(246, 243, 255, .98) );
+    }
+
+    .selected-file-icon {
+        flex: 0 0 58px;
+        width: 58px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 17px;
+        background: linear-gradient( 135deg, #eaa4c7, #a999e7 );
+        color: white;
+        font-size: 24px;
+    }
+
+    .selected-file-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+        .selected-file-info span {
+            display: block;
+            margin-bottom: 3px;
+            color: #a79ba9;
+            font-size: 9px;
+        }
+
+        .selected-file-info strong {
+            display: block;
+            overflow: hidden;
+            color: #50425a;
+            font-size: 13px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .selected-file-info small {
+            display: block;
+            margin-top: 4px;
+            color: #aaa0ad;
+            font-size: 9px;
+        }
+
+    .remove-file {
+        flex: 0 0 37px;
+        width: 37px;
+        height: 37px;
+        border: 0;
+        border-radius: 11px;
+        background: #fff0f3;
+        color: #d45f7c;
+        font-size: 21px;
+        cursor: pointer;
+    }
+
+
+    /* =====================================
+           Help
+        ====================================== */
+
+    .file-help {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        color: #a39aa8;
+        font-size: 9px;
+        line-height: 1.8;
+    }
+
+    .help-circle {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #eee8f4;
+        color: #8e7e99;
+        font-size: 9px;
+        font-weight: 800;
+    }
+
+    .field-error {
+        display: block;
+        margin-top: 5px;
+        color: #d35f79;
+        font-size: 10px;
+    }
+
+
+    /* =====================================
+           Limits
+        ====================================== */
+
+    .file-limits {
+        margin-top: 4px;
+        margin-bottom: 25px;
+        padding: 16px;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, rgba(249, 246, 251, .9), rgba(247, 245, 253, .9) );
+        border: 1px solid #ece6ef;
+    }
+
+    .limits-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 13px;
+        color: #64576c;
+        font-size: 11px;
+    }
+
+    .limits-icon {
+        width: 23px;
+        height: 23px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: white;
+        color: #917fa0;
+        font-size: 10px;
+    }
+
+    .limits-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .limit-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 11px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, .7);
+        border: 1px solid #eee8f0;
+    }
+
+    .limit-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+        .limit-icon.image {
+            background: #fff0f7;
+            color: #d271a2;
+        }
+
+        .limit-icon.audio {
+            background: #f1edff;
+            color: #8872cf;
+        }
+
+        .limit-icon.video {
+            background: #ecf9f4;
+            color: #55a687;
+        }
+
+    .limit-item span {
+        display: block;
+        margin-bottom: 3px;
+        color: #a69daa;
+        font-size: 9px;
+    }
+
+    .limit-item strong {
+        display: block;
+        color: #5b4e63;
+        font-size: 10px;
+    }
+
+
+    /* =====================================
+           Bottom
+        ====================================== */
+
+    .form-bottom {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 4px;
+    }
+
+    .cancel-button {
+        height: 52px;
+        padding: 0 23px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        border: 1px solid #e4dce8;
+        background: white;
+        color: #75687e;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .create-media-button {
+        min-width: 220px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 15px;
+        background: linear-gradient( 100deg, #e879ac, #a47ee1 );
+        color: white;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(181, 105, 171, .20);
+        transition: all .2s ease;
+    }
+
+        .create-media-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(181, 105, 171, .27);
+        }
+
+    .button-icon {
+        font-size: 17px;
+    }
+
+    .button-arrow {
+        margin-right: auto;
+        margin-left: 13px;
+        opacity: .75;
+        font-size: 17px;
+    }
+
+
+    /* =====================================
+           Loading
+        ====================================== */
+
+    .create-media-button.loading {
+        pointer-events: none;
+        opacity: .75;
+    }
+
+        .create-media-button.loading .button-icon {
+            animation: mediaCreateSpin .8s linear infinite;
+        }
+
+    @@keyframes mediaCreateSpin {
+
+        from {
+            transform: rotate(0);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    /* =====================================
+           Footer
+        ====================================== */
+
+    .media-create-footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+        color: #a39aa8;
+        font-size: 9px;
+    }
+
+        .media-create-footer span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .media-create-footer i {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d59bc0;
+        }
+
+        .media-create-footer b {
+            color: #df78a9;
+            font-size: 14px;
+        }
+
+
+    /* =====================================
+           Responsive
+        ====================================== */
+
+    @@media (max-width: 700px) {
+
+        .media-create-page {
+            padding: 30px 14px 50px;
+        }
+
+        .media-create-header {
+            align-items: flex-start;
+        }
+
+        .media-create-header-main {
+            align-items: flex-start;
+        }
+
+        .media-create-icon {
+            flex-basis: 55px;
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+        }
+
+        .media-create-header h1 {
+            font-size: 25px;
+        }
+
+        .media-create-header p {
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .media-create-card-body {
+            padding: 22px 18px;
+        }
+
+        .limits-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    @@media (max-width: 520px) {
+
+        .media-create-page {
+            padding: 22px 10px 40px;
+        }
+
+        .media-create-header {
+            flex-direction: column;
+        }
+
+        .back-button {
+            align-self: flex-start;
+        }
+
+        .media-create-header-main {
+            width: 100%;
+        }
+
+        .media-create-card {
+            border-radius: 22px;
+        }
+
+        .media-create-card-header {
+            padding: 16px 18px;
+        }
+
+        .media-create-card-body {
+            padding: 20px 14px;
+        }
+
+        .media-file-upload,
+        .upload-empty {
+            min-height: 195px;
+        }
+
+        .file-formats {
+            max-width: 95%;
+            font-size: 8px;
+        }
+
+        .form-bottom {
+            flex-direction: column-reverse;
+        }
+
+        .cancel-button,
+        .create-media-button {
+            width: 100%;
+        }
+
+        .create-media-button {
+            min-width: 0;
+        }
+    }
+
+</style>
+
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const fileInput =
+                document.getElementById("mediaFile");
+
+            const uploadBox =
+                document.getElementById("uploadBox");
+
+            const uploadEmpty =
+                document.getElementById("uploadEmpty");
+
+            const selectedFile =
+                document.getElementById("selectedFile");
+
+            const selectedFileName =
+                document.getElementById("selectedFileName");
+
+            const selectedFileSize =
+                document.getElementById("selectedFileSize");
+
+            const selectedFileIcon =
+                document.getElementById("selectedFileIcon");
+
+            const removeFile =
+                document.getElementById("removeFile");
+
+            const description =
+                document.getElementById("Description");
+
+            const descriptionCount =
+                document.getElementById("descriptionCount");
+
+            const form =
+                document.getElementById("mediaCreateForm");
+
+            const submitButton =
+                document.getElementById("submitButton");
+
+            const submitText =
+                document.getElementById("submitText");
+
+
+            /* =====================================
+               Description Counter
+            ====================================== */
+
+            if (description && descriptionCount) {
+
+                function updateDescriptionCount() {
+
+                    descriptionCount.textContent =
+                        description.value.length;
+
+                }
+
+                description.addEventListener(
+                    "input",
+                    updateDescriptionCount
+                );
+
+                updateDescriptionCount();
+            }
+
+
+            /* =====================================
+               File Size
+            ====================================== */
+
+            function formatFileSize(bytes) {
+
+                if (!bytes)
+                    return "0 Bytes";
+
+                const units = [
+                    "Bytes",
+                    "KB",
+                    "MB",
+                    "GB"
+                ];
+
+                const index =
+                    Math.floor(
+                        Math.log(bytes) /
+                        Math.log(1024)
+                    );
+
+                return (
+                    bytes /
+                    Math.pow(1024, index)
+                ).toFixed(
+                    index === 0 ? 0 : 2
+                )
+                + " "
+                + units[index];
+
+            }
+
+
+            /* =====================================
+               File Icon
+            ====================================== */
+
+            function getFileIcon(file) {
+
+                const type =
+                    (file.type || "").toLowerCase();
+
+                const name =
+                    file.name.toLowerCase();
+
+
+                if (type.startsWith("image/"))
+                    return "▧";
+
+                if (type.startsWith("audio/"))
+                    return "♫";
+
+                if (type.startsWith("video/"))
+                    return "▶";
+
+
+                if (
+                    name.endsWith(".jpg") ||
+                    name.endsWith(".jpeg") ||
+                    name.endsWith(".png") ||
+                    name.endsWith(".webp") ||
+                    name.endsWith(".gif")
+                )
+                    return "▧";
+
+
+                if (
+                    name.endsWith(".mp3") ||
+                    name.endsWith(".wav") ||
+                    name.endsWith(".ogg") ||
+                    name.endsWith(".m4a")
+                )
+                    return "♫";
+
+
+                if (
+                    name.endsWith(".mp4") ||
+                    name.endsWith(".webm") ||
+                    name.endsWith(".mov")
+                )
+                    return "▶";
+
+
+                return "✦";
+            }
+
+
+            /* =====================================
+               Show File
+            ====================================== */
+
+            function showFile(file) {
+
+                if (!file)
+                    return;
+
+
+                selectedFileName.textContent =
+                    file.name;
+
+                selectedFileSize.textContent =
+                    formatFileSize(file.size);
+
+                selectedFileIcon.textContent =
+                    getFileIcon(file);
+
+
+                uploadEmpty.style.display =
+                    "none";
+
+                selectedFile.style.display =
+                    "flex";
+
+            }
+
+
+            /* =====================================
+               Clear File
+            ====================================== */
+
+            function clearFile() {
+
+                fileInput.value = "";
+
+                selectedFile.style.display =
+                    "none";
+
+                uploadEmpty.style.display =
+                    "flex";
+
+            }
+
+
+            /* =====================================
+               File Change
+            ====================================== */
+
+            if (fileInput) {
+
+                fileInput.addEventListener(
+                    "change",
+                    function () {
+
+                        if (
+                            this.files &&
+                            this.files.length > 0
+                        ) {
+
+                            showFile(
+                                this.files[0]
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================
+               Remove
+            ====================================== */
+
+            if (removeFile) {
+
+                removeFile.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        clearFile();
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================
+               Drag Enter
+            ====================================== */
+
+            [
+                "dragenter",
+                "dragover"
+            ].forEach(function (eventName) {
+
+                uploadBox.addEventListener(
+                    eventName,
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        uploadBox.classList.add(
+                            "drag-over"
+                        );
+
+                    }
+                );
+
+            });
+
+
+            /* =====================================
+               Drag Leave
+            ====================================== */
+
+            [
+                "dragleave",
+                "drop"
+            ].forEach(function (eventName) {
+
+                uploadBox.addEventListener(
+                    eventName,
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        uploadBox.classList.remove(
+                            "drag-over"
+                        );
+
+                    }
+                );
+
+            });
+
+
+            /* =====================================
+               Drop
+            ====================================== */
+
+            uploadBox.addEventListener(
+                "drop",
+                function (event) {
+
+                    const files =
+                        event.dataTransfer.files;
+
+                    if (
+                        !files ||
+                        files.length === 0
+                    )
+                        return;
+
+
+                    try {
+
+                        const dataTransfer =
+                            new DataTransfer();
+
+                        dataTransfer.items.add(
+                            files[0]
+                        );
+
+                        fileInput.files =
+                            dataTransfer.files;
+
+                        showFile(files[0]);
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "Drop file error:",
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /* =====================================
+               Submit
+            ====================================== */
+
+            if (form) {
+
+                form.addEventListener(
+                    "submit",
+                    function () {
+
+                        if (
+                            submitButton &&
+                            !submitButton.classList.contains(
+                                "loading"
+                            )
+                        ) {
+
+                            submitButton.classList.add(
+                                "loading"
+                            );
+
+                            if (submitText) {
+
+                                submitText.textContent =
+                                    "در حال ایجاد رسانه...";
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+
+        });
+
+    </script>
 }

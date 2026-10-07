@@ -1,0 +1,1041 @@
+﻿@model MediaQR.Application.DTOs.Media.CreateMediaResultDto
+
+@{
+    ViewData["Title"] = "پیام صوتی آماده است";
+
+    var qrImageSrc =
+        $"data:image/png;base64,{Model.QrImageBase64}";
+}
+
+<style>
+    /* =========================================
+       MEDIA RESULT PAGE
+    ========================================= */
+
+    .media-result-page {
+        position: relative;
+        min-height: calc(100vh - 90px);
+        padding: 60px 0 80px;
+        overflow: hidden;
+        background: radial-gradient(circle at 10% 20%, rgba(255, 182, 213, .18), transparent 28%), radial-gradient(circle at 90% 80%, rgba(188, 180, 255, .18), transparent 30%), linear-gradient(135deg, #fff8fc 0%, #f8f5ff 50%, #f7fbff 100%);
+    }
+
+
+    /* Background shapes */
+
+    .result-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .55;
+    }
+
+    .result-bg-shape-1 {
+        width: 280px;
+        height: 280px;
+        top: 40px;
+        right: -130px;
+        background: linear-gradient( 135deg, rgba(255, 159, 198, .32), rgba(205, 180, 255, .22) );
+    }
+
+    .result-bg-shape-2 {
+        width: 360px;
+        height: 360px;
+        bottom: -180px;
+        left: -160px;
+        background: linear-gradient( 135deg, rgba(180, 210, 255, .28), rgba(239, 182, 255, .24) );
+    }
+
+
+    /* Wrapper */
+
+    .result-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .result-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 25px;
+        padding: 0 8px;
+    }
+
+    .success-icon {
+        width: 64px;
+        height: 64px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        background: linear-gradient( 135deg, #ff8fbd, #b99cff );
+        color: white;
+        font-size: 30px;
+        font-weight: 800;
+        box-shadow: 0 15px 30px rgba(214, 130, 191, .25);
+    }
+
+    .result-header-content {
+        flex: 1;
+    }
+
+    .result-badge {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 7px;
+        padding: 5px 13px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, .72);
+        border: 1px solid rgba(255, 170, 210, .25);
+        color: #a66c91;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .result-header h1 {
+        margin: 0 0 7px;
+        color: #45374e;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .result-header p {
+        margin: 0;
+        color: #8a7d91;
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+
+    /* =========================================
+       MAIN CARD
+    ========================================= */
+
+    .result-card {
+        position: relative;
+        padding: 32px;
+        border-radius: 32px;
+        background: rgba(255, 255, 255, .78);
+        border: 1px solid rgba(255, 255, 255, .85);
+        box-shadow: 0 25px 70px rgba(113, 83, 128, .12), inset 0 1px 0 rgba(255, 255, 255, .9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+
+    /* =========================================
+       MESSAGE TITLE
+    ========================================= */
+
+    .result-message-title {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 15px 17px;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, rgba(255, 235, 246, .75), rgba(244, 238, 255, .75) );
+        border: 1px solid rgba(226, 203, 226, .4);
+        margin-bottom: 28px;
+    }
+
+    .title-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: white;
+        font-size: 20px;
+        box-shadow: 0 7px 18px rgba(200, 140, 185, .12);
+    }
+
+    .result-message-title > div {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .title-label {
+        color: #a395a8;
+        font-size: 11px;
+    }
+
+    .result-message-title strong {
+        color: #53435a;
+        font-size: 15px;
+    }
+
+
+    /* =========================================
+       QR SECTION
+    ========================================= */
+
+    .qr-section {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px 0 25px;
+    }
+
+    .qr-card {
+        position: relative;
+        width: 300px;
+        padding: 17px 17px 15px;
+        border-radius: 27px;
+        background: white;
+        box-shadow: 0 20px 50px rgba(100, 75, 110, .14);
+        border: 1px solid rgba(230, 220, 232, .75);
+        text-align: center;
+    }
+
+    .qr-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-bottom: 14px;
+        color: #725d77;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .qr-mini-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: linear-gradient( 135deg, #ff94be, #b59aff );
+        color: white;
+        font-size: 11px;
+    }
+
+    .qr-image-wrapper {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        border-radius: 19px;
+        background: #fff;
+        border: 1px solid #f0eaf2;
+    }
+
+    .qr-image {
+        display: block;
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        border-radius: 5px;
+    }
+
+    .qr-card-footer {
+        margin-top: 13px;
+        color: #a398a7;
+        font-size: 11px;
+    }
+
+    .qr-decoration {
+        position: absolute;
+        color: #e8a9cb;
+        font-size: 27px;
+        opacity: .7;
+    }
+
+    .qr-decoration-top {
+        top: 15px;
+        right: 80px;
+        transform: rotate(-15deg);
+    }
+
+    .qr-decoration-bottom {
+        bottom: 10px;
+        left: 80px;
+        color: #b9a7ef;
+        transform: rotate(15deg);
+    }
+
+
+    /* =========================================
+       DESCRIPTION
+    ========================================= */
+
+    .qr-description {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 25px;
+        border-radius: 18px;
+        background: rgba(249, 246, 251, .9);
+        border: 1px solid rgba(230, 220, 235, .65);
+    }
+
+    .qr-description-icon {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: white;
+        font-size: 18px;
+    }
+
+    .qr-description > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .qr-description strong {
+        color: #625468;
+        font-size: 13px;
+    }
+
+    .qr-description span {
+        color: #a197a6;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       ACTIONS
+    ========================================= */
+
+    .result-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+    }
+
+    .result-primary-button,
+    .result-secondary-button {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        border-radius: 16px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .result-primary-button {
+        grid-column: 1 / -1;
+        color: white;
+        background: linear-gradient( 135deg, #ff8ebc, #b495f4 );
+        box-shadow: 0 12px 25px rgba(194, 126, 190, .22);
+    }
+
+        .result-primary-button:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(194, 126, 190, .30);
+        }
+
+    .result-secondary-button {
+        border: 1px solid #e7dfe9;
+        background: rgba(255, 255, 255, .8);
+        color: #76677b;
+        cursor: pointer;
+    }
+
+        .result-secondary-button:hover {
+            color: #64546a;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px rgba(100, 80, 110, .08);
+        }
+
+        .result-secondary-button.copied {
+            background: #f1fff8;
+            border-color: #bce8d2;
+            color: #4b9870;
+        }
+
+    .button-icon {
+        font-size: 17px;
+    }
+
+    .button-arrow {
+        margin-right: 5px;
+        font-size: 17px;
+    }
+
+
+    /* =========================================
+       LINK
+    ========================================= */
+
+    .result-link-section {
+        margin-top: 25px;
+    }
+
+        .result-link-section > label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: #75677a;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+    .result-url-box {
+        display: flex;
+        align-items: stretch;
+        overflow: hidden;
+        border-radius: 15px;
+        background: #faf8fb;
+        border: 1px solid #e6dfe8;
+        direction: ltr;
+    }
+
+        .result-url-box input {
+            min-width: 0;
+            flex: 1;
+            height: 50px;
+            padding: 0 14px;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: #7d7181;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .result-url-box button {
+            width: 52px;
+            flex-shrink: 0;
+            border: 0;
+            border-right: 1px solid #e6dfe8;
+            background: white;
+            color: #8c7792;
+            font-size: 18px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+            .result-url-box button:hover {
+                background: #f9eef8;
+                color: #b26d9b;
+            }
+
+
+    /* Copy success */
+
+    .copy-success {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        max-height: 0;
+        margin-top: 0;
+        overflow: hidden;
+        opacity: 0;
+        color: #4d9a72;
+        font-size: 12px;
+        font-weight: 700;
+        transition: max-height .25s ease, margin .25s ease, opacity .25s ease;
+    }
+
+        .copy-success.show {
+            max-height: 40px;
+            margin-top: 11px;
+            opacity: 1;
+        }
+
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+
+    .result-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 17px;
+        margin-top: 22px;
+        color: #998e9e;
+        font-size: 11px;
+    }
+
+    .result-footer-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .result-footer-item span {
+            font-size: 14px;
+        }
+
+    .result-footer-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #d4c9d8;
+    }
+
+
+    /* =========================================
+       HINT
+    ========================================= */
+
+    .result-hint {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 20px;
+        color: #a49aa7;
+        font-size: 11px;
+    }
+
+        .result-hint span {
+            color: #ed9fc2;
+            font-size: 14px;
+        }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @@media (max-width: 767px) {
+        .media-result-page
+
+    {
+        padding: 35px 0 55px;
+    }
+
+    .result-wrapper {
+        padding: 0 10px;
+    }
+
+    .result-header {
+        align-items: flex-start;
+        gap: 13px;
+    }
+
+    .success-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 17px;
+        font-size: 24px;
+    }
+
+    .result-header h1 {
+        font-size: 23px;
+    }
+
+    .result-header p {
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .result-card {
+        padding: 20px 16px;
+        border-radius: 25px;
+    }
+
+    .result-message-title {
+        padding: 12px;
+        margin-bottom: 22px;
+    }
+
+    .qr-card {
+        width: min(100%, 280px);
+    }
+
+    .qr-decoration {
+        display: none;
+    }
+
+    .result-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .result-primary-button {
+        grid-column: auto;
+    }
+
+    .result-secondary-button {
+        width: 100%;
+    }
+
+    .result-footer {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .result-footer-dot {
+        display: none;
+    }
+
+    .result-footer-item {
+        padding: 5px 9px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.5);
+    }
+
+    }
+
+
+    @@media (max-width: 420px) {
+        .result-header
+
+    {
+        flex-direction: column;
+    }
+
+    .result-header-content {
+        width: 100%;
+    }
+
+    .result-card {
+        padding: 17px 13px;
+    }
+
+    .qr-image-wrapper {
+        padding: 10px;
+    }
+
+    .qr-card {
+        padding: 13px;
+    }
+
+    .result-url-box input {
+        font-size: 10px;
+    }
+
+    }
+</style>
+
+<div class="media-result-page" dir="rtl">
+
+    <div class="result-bg-shape result-bg-shape-1"></div>
+    <div class="result-bg-shape result-bg-shape-2"></div>
+
+    <div class="container">
+
+        <div class="result-wrapper">
+
+            <!-- Header -->
+            <div class="result-header">
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <div class="result-header-content">
+
+                    <div class="result-badge">
+                        ✨ پیام شما آماده است
+                    </div>
+
+                    <h1>
+                        پیام صوتی آماده است
+                    </h1>
+
+                    <p>
+                        پیام صوتی شما با موفقیت ساخته شد.
+                        حالا می‌توانید QR Code یا لینک آن را با عزیزانتان به اشتراک بگذارید.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Main Card -->
+            <div class="result-card">
+
+                <!-- Message Title -->
+                <div class="result-message-title">
+
+                    <span class="title-icon">
+                        💌
+                    </span>
+
+                    <div>
+                        <span class="title-label">
+                            عنوان پیام
+                        </span>
+
+                        <strong>
+                            «@Model.Title»
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <!-- QR Section -->
+                <div class="qr-section">
+
+                    <div class="qr-decoration qr-decoration-top">
+                        ♡
+                    </div>
+
+                    <div class="qr-card">
+
+                        <div class="qr-card-header">
+                            <span class="qr-mini-icon">
+                                ♥
+                            </span>
+
+                            <span>
+                                MediaQR
+                            </span>
+                        </div>
+
+                        <div class="qr-image-wrapper">
+
+                            <img src="@qrImageSrc"
+                                 alt="QR Code پیام صوتی"
+                                 class="qr-image" />
+
+                        </div>
+
+                        <div class="qr-card-footer">
+                            دوربین گوشی را روی QR بگیرید
+                        </div>
+
+                    </div>
+
+                    <div class="qr-decoration qr-decoration-bottom">
+                        ✦
+                    </div>
+
+                </div>
+
+
+                <!-- QR Description -->
+                <div class="qr-description">
+
+                    <div class="qr-description-icon">
+                        📱
+                    </div>
+
+                    <div>
+                        <strong>
+                            QR Code اختصاصی شما
+                        </strong>
+
+                        <span>
+                            این کد را ذخیره کنید یا برای شخص موردنظر بفرستید.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- Actions -->
+                <div class="result-actions">
+
+                    <a href="@Model.QrUrl"
+                       class="result-primary-button"
+                       target="_blank"
+                       rel="noopener">
+
+                        <span class="button-icon">
+                            ▶
+                        </span>
+
+                        <span>
+                            مشاهده پیام
+                        </span>
+
+                        <span class="button-arrow">
+                            ←
+                        </span>
+
+                    </a>
+
+
+                    <a href="@qrImageSrc"
+                       download="@($"mediaqr-{Model.QrCode}.png")"
+                       class="result-secondary-button">
+
+                        <span class="button-icon">
+                            ↓
+                        </span>
+
+                        <span>
+                            دانلود QR Code
+                        </span>
+
+                    </a>
+
+
+                    <button type="button"
+                            class="result-secondary-button"
+                            id="copyQrButton">
+
+                        <span class="button-icon" id="copyIcon">
+                            ⧉
+                        </span>
+
+                        <span id="copyButtonText">
+                            کپی لینک پیام
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- URL -->
+                <div class="result-link-section">
+
+                    <label for="qrUrl">
+                        <span>🔗</span>
+                        لینک پیام شما
+                    </label>
+
+                    <div class="result-url-box">
+
+                        <input id="qrUrl"
+                               type="text"
+                               value="@Model.QrUrl"
+                               readonly />
+
+                        <button type="button"
+                                id="copyUrlButton"
+                                aria-label="کپی لینک">
+
+                            ⧉
+
+                        </button>
+
+                    </div>
+
+                    <div id="copyMessage"
+                         class="copy-success">
+
+                        <span>✓</span>
+                        لینک با موفقیت کپی شد.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Bottom Info -->
+            <div class="result-footer">
+
+                <div class="result-footer-item">
+                    <span>🎧</span>
+                    پیام صوتی
+                </div>
+
+                <div class="result-footer-dot"></div>
+
+                <div class="result-footer-item">
+                    <span>▦</span>
+                    QR اختصاصی
+                </div>
+
+                <div class="result-footer-dot"></div>
+
+                <div class="result-footer-item">
+                    <span>💌</span>
+                    اشتراک‌گذاری آسان
+                </div>
+
+            </div>
+
+
+            <!-- Hint -->
+            <div class="result-hint">
+
+                <span>💗</span>
+
+                پیام‌های قشنگ،
+                ماندگار می‌شوند.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const qrUrlInput =
+                document.getElementById("qrUrl");
+
+            const copyButton =
+                document.getElementById("copyQrButton");
+
+            const copyUrlButton =
+                document.getElementById("copyUrlButton");
+
+            const copyButtonText =
+                document.getElementById("copyButtonText");
+
+            const copyIcon =
+                document.getElementById("copyIcon");
+
+            const copyMessage =
+                document.getElementById("copyMessage");
+
+
+            async function copyQrUrl() {
+
+                if (!qrUrlInput) {
+                    return;
+                }
+
+                const url = qrUrlInput.value;
+
+                try {
+
+                    if (navigator.clipboard &&
+                        window.isSecureContext) {
+
+                        await navigator.clipboard.writeText(url);
+
+                    }
+                    else {
+
+                        qrUrlInput.focus();
+                        qrUrlInput.select();
+
+                        document.execCommand("copy");
+
+                    }
+
+                    showCopySuccess();
+
+                }
+                catch (error) {
+
+                    try {
+
+                        qrUrlInput.focus();
+                        qrUrlInput.select();
+
+                        document.execCommand("copy");
+
+                        showCopySuccess();
+
+                    }
+                    catch (fallbackError) {
+
+                        console.error(
+                            "Copy failed:",
+                            fallbackError
+                        );
+
+                    }
+
+                }
+
+            }
+
+
+            function showCopySuccess() {
+
+                if (copyMessage) {
+
+                    copyMessage.classList.add("show");
+
+                    setTimeout(function () {
+
+                        copyMessage.classList.remove("show");
+
+                    }, 2500);
+
+                }
+
+
+                if (copyButtonText) {
+
+                    const originalText =
+                        "کپی لینک پیام";
+
+                    copyButtonText.textContent =
+                        "لینک کپی شد ✓";
+
+                    if (copyIcon) {
+                        copyIcon.textContent = "✓";
+                    }
+
+                    if (copyButton) {
+                        copyButton.classList.add("copied");
+                    }
+
+                    setTimeout(function () {
+
+                        copyButtonText.textContent =
+                            originalText;
+
+                        if (copyIcon) {
+                            copyIcon.textContent = "⧉";
+                        }
+
+                        if (copyButton) {
+                            copyButton.classList.remove("copied");
+                        }
+
+                    }, 2500);
+
+                }
+
+            }
+
+
+            if (copyButton) {
+
+                copyButton.addEventListener(
+                    "click",
+                    copyQrUrl
+                );
+
+            }
+
+
+            if (copyUrlButton) {
+
+                copyUrlButton.addEventListener(
+                    "click",
+                    copyQrUrl
+                );
+
+            }
+
+        });
+
+    </script>
+}

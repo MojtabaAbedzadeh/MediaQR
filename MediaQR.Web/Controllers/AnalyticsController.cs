@@ -25,6 +25,7 @@ public class AnalyticsController : ControllerBase
     }
 
     [HttpPost("track")]
+    [AllowAnonymous]
     public async Task<IActionResult> Track(
         [FromBody] TrackAnalyticsEventDto dto,
         CancellationToken cancellationToken)

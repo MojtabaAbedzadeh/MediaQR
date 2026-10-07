@@ -3,73 +3,239 @@
 }
 
 <style>
+    <style >
+    /* =========================================
+                   ANALYTICS PAGE
+                ========================================== */
+    .analytics-page {
+        position: relative;
+        min-height: calc(100vh - 80px);
+        padding: 35px 0 70px;
+        overflow: hidden;
+        background: radial-gradient( circle at 5% 10%, rgba(255, 178, 211, .18), transparent 25% ), radial-gradient( circle at 95% 90%, rgba(190, 176, 255, .18), transparent 28% ), linear-gradient( 135deg, #fff9fc 0%, #f8f6ff 50%, #f7fbff 100% );
+    }
+
+
+    .analytics-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+    }
+
+    .analytics-bg-shape-1 {
+        width: 360px;
+        height: 360px;
+        top: -180px;
+        right: -120px;
+        background: linear-gradient( 135deg, rgba(255, 157, 199, .22), rgba(194, 174, 255, .18) );
+    }
+
+    .analytics-bg-shape-2 {
+        width: 400px;
+        height: 400px;
+        bottom: -220px;
+        left: -170px;
+        background: linear-gradient( 135deg, rgba(180, 213, 255, .18), rgba(237, 180, 255, .18) );
+    }
+
+
+    /* =========================================
+                   DASHBOARD
+                ========================================== */
+
+    .analytics-dashboard {
+        position: relative;
+        z-index: 2;
+        width: calc(100% - 40px);
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================
+                   HEADER
+                ========================================== */
+
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .analytics-title-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .analytics-title-icon {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #ff91bc, #b396f3 );
+        color: white;
+        font-size: 26px;
+        box-shadow: 0 15px 30px rgba(198, 128, 189, .22);
+    }
+
+    .analytics-badge {
+        display: inline-flex;
+        margin-bottom: 5px;
+        padding: 4px 11px;
+        border-radius: 50px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(231,207,228,.5);
+        color: #a06e93;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .analytics-header h1 {
+        margin: 0 0 5px;
+        color: #47394f;
+        font-size: 27px;
+        font-weight: 800;
+    }
+
+    .analytics-header p {
+        margin: 0;
+        color: #8e8194;
+        font-size: 12px;
+    }
+
+
+    /* =========================================
+                   FILTERS
+                ========================================== */
+
+    .analytics-filters {
+        display: flex;
+        align-items: flex-end;
+        gap: 9px;
+        padding: 11px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 10px 30px rgba(100,80,110,.07);
+        backdrop-filter: blur(15px);
+    }
+
+    .qr-filter,
+    .analytics-date-field {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
 
     .qr-filter {
-        position: relative;
-        min-width: 320px;
+        min-width: 260px;
     }
+
+        .analytics-date-field label,
+        .qr-filter > label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #75677b;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+
+    /* Search */
 
     .qr-search-wrapper {
         position: relative;
     }
 
+    .qr-search-icon {
+        position: absolute;
+        right: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ad9eaf;
+        font-size: 13px;
+        pointer-events: none;
+    }
+
     .qr-search-input {
         width: 100%;
-        height: 42px;
-        padding: 0 42px 0 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        background: #fff;
-        font-size: 14px;
+        height: 43px;
+        padding: 0 37px 0 40px;
+        border: 1px solid #e3dce6;
+        border-radius: 12px;
+        background: rgba(255,255,255,.82);
+        color: #5d5062;
+        font-family: inherit;
+        font-size: 11px;
         outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition: border-color .2s ease, box-shadow .2s ease;
     }
 
         .qr-search-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+            border-color: #d4a7c8;
+            box-shadow: 0 0 0 4px rgba(218,162,199,.10);
+        }
+
+        .qr-search-input::placeholder {
+            color: #afa5b1;
         }
 
     .qr-clear-button {
         position: absolute;
-        left: 10px;
+        left: 9px;
         top: 50%;
         transform: translateY(-50%);
-        width: 24px;
-        height: 24px;
-        border: 0;
-        background: transparent;
-        font-size: 20px;
-        line-height: 20px;
-        cursor: pointer;
-        color: #6b7280;
+        width: 27px;
+        height: 27px;
         display: none;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 8px;
+        background: #f8eff7;
+        color: #9e7695;
+        font-size: 17px;
+        line-height: 1;
+        cursor: pointer;
     }
 
         .qr-clear-button:hover {
-            color: #111827;
+            background: #f4e3f1;
         }
+
+
+    /* Search Results */
 
     .qr-search-results {
         position: absolute;
         z-index: 1000;
-        top: calc(100% + 6px);
+        top: calc(100% + 7px);
         right: 0;
         left: 0;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        display: none;
         max-height: 320px;
         overflow-y: auto;
-        display: none;
+        border: 1px solid #e8e0ea;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 18px 45px rgba(75,55,85,.15);
     }
 
     .qr-search-item {
         padding: 12px 14px;
         cursor: pointer;
-        border-bottom: 1px solid #f3f4f6;
-        transition: background 0.15s ease;
+        border-bottom: 1px solid #f3eef4;
+        transition: background .15s ease;
     }
 
         .qr-search-item:last-child {
@@ -77,597 +243,1150 @@
         }
 
         .qr-search-item:hover {
-            background: #f9fafb;
+            background: linear-gradient( 135deg, #fff7fb, #faf7ff );
         }
 
     .qr-search-item-title {
-        font-weight: 600;
-        color: #111827;
-        font-size: 14px;
+        color: #55465c;
+        font-size: 12px;
+        font-weight: 700;
     }
 
     .qr-search-item-code {
         margin-top: 4px;
-        font-size: 12px;
-        color: #6b7280;
+        color: #9b8e9f;
+        font-size: 10px;
         direction: ltr;
         text-align: right;
     }
 
     .qr-search-item-media {
         margin-top: 3px;
-        font-size: 12px;
-        color: #9ca3af;
+        color: #b0a6b2;
+        font-size: 10px;
     }
 
     .qr-search-message {
-        padding: 14px;
+        padding: 17px;
+        color: #9a909e;
         text-align: center;
-        color: #6b7280;
-        font-size: 13px;
+        font-size: 11px;
     }
 
+
+    /* Selected */
+
     .selected-qr {
-        margin-top: 8px;
-        padding: 8px 12px;
-        background: #f3f4f6;
-        border-radius: 6px;
-        font-size: 13px;
-        color: #374151;
+        margin-top: 6px;
+        padding: 6px 9px;
+        border-radius: 9px;
+        background: #faf2f8;
+        color: #806b7e;
+        font-size: 9px;
     }
 
         .selected-qr strong {
-            color: #111827;
+            color: #665365;
         }
 
-    .analytics-dashboard {
-        padding: 24px;
-        max-width: 1600px;
-        margin: 0 auto;
-        color: #1f2937;
-    }
 
-    .analytics-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 20px;
-        margin-bottom: 24px;
-    }
+    /* Date */
 
-        .analytics-header h1 {
-            margin: 0 0 8px;
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .analytics-header p {
-            margin: 0;
-            color: #6b7280;
-        }
-
-    .analytics-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .analytics-select,
     .analytics-date {
-        height: 42px;
-        padding: 0 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        background: #fff;
-        min-width: 150px;
+        width: 135px;
+        height: 43px;
+        padding: 0 10px;
+        border: 1px solid #e3dce6;
+        border-radius: 12px;
+        background: rgba(255,255,255,.82);
+        color: #6e6073;
         font-family: inherit;
+        font-size: 11px;
+        outline: none;
     }
+
+        .analytics-date:focus {
+            border-color: #d4a7c8;
+            box-shadow: 0 0 0 4px rgba(218,162,199,.10);
+        }
+
+
+    /* Button */
 
     .analytics-button {
-        height: 42px;
-        padding: 0 20px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 17px;
         border: 0;
-        border-radius: 10px;
-        cursor: pointer;
-        background: #2563eb;
-        color: #fff;
+        border-radius: 12px;
+        background: linear-gradient( 135deg, #ff8fbb, #ae91ef );
+        color: white;
         font-family: inherit;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 9px 20px rgba(194,125,188,.20);
+        transition: .2s ease;
     }
 
         .analytics-button:hover {
-            opacity: .9;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 25px rgba(194,125,188,.27);
         }
 
+
+    /* =========================================
+                   LOADING / ERROR
+                ========================================== */
+
     .analytics-loading {
-        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 17px;
         margin-bottom: 20px;
-        background: #eff6ff;
-        border-radius: 10px;
-        color: #1d4ed8;
+        border-radius: 14px;
+        background: rgba(238,235,255,.75);
+        border: 1px solid rgba(211,202,245,.5);
+        color: #7564a4;
+        font-size: 11px;
+    }
+
+    .loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #d9d0ee;
+        border-top-color: #9b85d5;
+        border-radius: 50%;
+        animation: analyticsSpin .8s linear infinite;
     }
 
     .analytics-error {
-        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 17px;
         margin-bottom: 20px;
-        background: #fef2f2;
-        border-radius: 10px;
-        color: #b91c1c;
+        border-radius: 14px;
+        background: #fff3f5;
+        border: 1px solid #f3d4db;
+        color: #b35e70;
     }
+
+    .error-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: #ffe1e7;
+        color: #b94d65;
+        font-weight: 800;
+    }
+
+    .analytics-error div {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .analytics-error strong {
+        font-size: 11px;
+    }
+
+    .analytics-error span {
+        font-size: 10px;
+    }
+
+
+    /* =========================================
+                   SUMMARY
+                ========================================== */
 
     .analytics-summary-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 16px;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 14px;
         margin-bottom: 20px;
     }
 
     .analytics-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 20px;
-        min-height: 120px;
-        box-shadow: 0 4px 18px rgba(0,0,0,.04);
+        position: relative;
+        min-height: 145px;
+        padding: 17px;
+        overflow: hidden;
+        border-radius: 21px;
+        background: rgba(255,255,255,.78);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 12px 30px rgba(100,80,110,.07);
+        backdrop-filter: blur(14px);
+        transition: transform .2s ease, box-shadow .2s ease;
     }
 
-    .analytics-card-title {
-        color: #6b7280;
-        font-size: 14px;
-        margin-bottom: 14px;
+        .analytics-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 17px 35px rgba(100,80,110,.10);
+        }
+
+        .analytics-card::after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            left: -40px;
+            bottom: -45px;
+            opacity: .16;
+        }
+
+    .analytics-card-pink::after {
+        background: #ff8fbd;
+    }
+
+    .analytics-card-purple::after {
+        background: #a991ef;
+    }
+
+    .analytics-card-blue::after {
+        background: #83b8f4;
+    }
+
+    .analytics-card-orange::after {
+        background: #f2b37e;
+    }
+
+    .analytics-card-green::after {
+        background: #7bcaa2;
+    }
+
+    .analytics-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .analytics-card-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #faf6fb;
+        font-size: 16px;
+    }
+
+    .analytics-card-label {
+        color: #b0a5b3;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
     }
 
     .analytics-card-value {
-        font-size: 30px;
-        font-weight: 700;
-        color: #111827;
+        color: #4d4054;
+        font-size: 25px;
+        font-weight: 800;
+        line-height: 1.3;
     }
 
+    .analytics-duration-value {
+        font-size: 17px;
+    }
+
+    .analytics-card-description {
+        margin-top: 4px;
+        color: #a097a3;
+        font-size: 9px;
+    }
+
+
+    /* =========================================
+                   PANELS
+                ========================================== */
+
     .analytics-panel {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 4px 18px rgba(0,0,0,.04);
+        padding: 21px;
+        border-radius: 23px;
+        background: rgba(255,255,255,.79);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 14px 35px rgba(100,80,110,.07);
+        backdrop-filter: blur(15px);
     }
 
     .analytics-panel-wide {
         margin-bottom: 20px;
     }
 
-    .analytics-panel-header {
-        margin-bottom: 20px;
-    }
-
-        .analytics-panel-header h2 {
-            margin: 0 0 5px;
-            font-size: 18px;
-        }
-
-        .analytics-panel-header span {
-            color: #6b7280;
-            font-size: 13px;
-        }
-
     .analytics-grid-2 {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 20px;
         margin-bottom: 20px;
     }
 
+    .analytics-panel-header {
+        margin-bottom: 18px;
+    }
+
+    .analytics-panel-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .panel-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: linear-gradient( 135deg, #fff0f7, #f1edff );
+        font-size: 17px;
+    }
+
+    .analytics-panel-title h2 {
+        margin: 0 0 3px;
+        color: #57485e;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .analytics-panel-title span {
+        color: #aaa0ad;
+        font-size: 9px;
+    }
+
+
+    /* =========================================
+                   CHARTS
+                ========================================== */
+
     .analytics-chart-container {
-        height: 360px;
         position: relative;
+        height: 350px;
     }
 
         .analytics-chart-container.small {
-            height: 300px;
+            height: 285px;
         }
 
-    @@media (max-width: 1200px) {
+    .timeline-chart {
+        height: 370px;
+    }
 
-        .analytics-summary-grid {
-            grid-template-columns: repeat(3, 1fr);
+
+    /* =========================================
+                   ANIMATIONS
+                ========================================== */
+
+    @@keyframes analyticsSpin {
+
+        to {
+            transform: rotate(360deg);
         }
     }
 
-    @@media (max-width: 800px) {
 
-        .qr-filter {
-            min-width: 100%;
-            width: 100%;
+    /* =========================================
+                   RESPONSIVE
+                ========================================== */
+
+    @@media (max-width: 1300px) {
+
+        .analytics-summary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .analytics-header {
+            align-items: flex-start;
             flex-direction: column;
         }
 
-        .analytics-actions {
+        .analytics-filters {
             width: 100%;
         }
 
-        .analytics-select,
-        .analytics-date {
+        .qr-filter {
             flex: 1;
         }
+    }
 
-        .analytics-summary-grid {
-            grid-template-columns: repeat(2, 1fr);
+
+    @@media (max-width: 900px) {
+
+        .analytics-dashboard {
+            width: calc(100% - 24px);
         }
 
         .analytics-grid-2 {
             grid-template-columns: 1fr;
         }
+
+        .analytics-filters {
+            flex-wrap: wrap;
+        }
+
+        .qr-filter {
+            min-width: 100%;
+        }
+
+        .analytics-date-field {
+            flex: 1;
+        }
+
+        .analytics-date {
+            width: 100%;
+        }
+
+        .analytics-button {
+            flex: 1;
+        }
     }
 
-    @@media (max-width: 500px) {
+
+    @@media (max-width: 600px) {
+
+        .analytics-page {
+            padding: 20px 0 50px;
+        }
 
         .analytics-dashboard {
-            padding: 12px;
+            width: calc(100% - 20px);
         }
+
+        .analytics-title-area {
+            align-items: flex-start;
+        }
+
+        .analytics-title-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 17px;
+            font-size: 22px;
+        }
+
+        .analytics-header h1 {
+            font-size: 22px;
+        }
+
+        .analytics-header p {
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .analytics-filters {
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .analytics-date-field {
+            width: 100%;
+        }
+
+        .analytics-button {
+            width: 100%;
+        }
+
+        .analytics-summary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .analytics-card {
+            min-height: 135px;
+        }
+
+        .analytics-card-value {
+            font-size: 22px;
+        }
+
+        .analytics-panel {
+            padding: 16px;
+            border-radius: 20px;
+        }
+
+        .analytics-chart-container.small {
+            height: 250px;
+        }
+
+        .timeline-chart {
+            height: 300px;
+        }
+    }
+
+
+    @@media (max-width: 400px) {
 
         .analytics-summary-grid {
             grid-template-columns: 1fr;
         }
 
-        .analytics-actions {
-            flex-direction: column;
-            align-items: stretch;
+        .analytics-card {
+            min-height: 125px;
         }
 
-        .analytics-select,
-        .analytics-date,
-        .analytics-button {
-            width: 100%;
+        .analytics-title-area {
+            gap: 10px;
         }
     }
 
 </style>
 
-<div class="analytics-dashboard" dir="rtl">
+<div class="analytics-page" dir="rtl">
 
-    <!-- Header -->
-    <div class="analytics-header">
+    <!-- Background -->
+    <div class="analytics-bg-shape analytics-bg-shape-1"></div>
+    <div class="analytics-bg-shape analytics-bg-shape-2"></div>
 
-        <div>
-            <h1>داشبورد Analytics</h1>
-            <p>
-                آمار و رفتار کاربران در QR Code ها و فایل‌های رسانه‌ای
-            </p>
-        </div>
 
-        <div class="analytics-actions">
+    <div class="analytics-dashboard">
 
-            <div class="qr-filter">
-                <label for="qrCodeSearch">QR Code</label>
+        <!-- =========================================
+             HEADER
+        ========================================== -->
 
-                <div class="qr-search-wrapper">
-                    <input type="text"
-                           id="qrCodeSearch"
-                           class="qr-search-input"
-                           placeholder="جستجوی QR یا نام رسانه..."
-                           autocomplete="off" />
+        <div class="analytics-header">
 
-                    <button type="button"
-                            id="clearQrFilter"
-                            class="qr-clear-button"
-                            title="حذف فیلتر">
-                        ×
-                    </button>
+            <div class="analytics-title-area">
 
-                    <div id="qrSearchResults"
-                         class="qr-search-results">
+                <div class="analytics-title-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <div class="analytics-badge">
+                        ✨ MediaQR Analytics
                     </div>
+
+                    <h1>
+                        داشبورد تحلیل و آمار
+                    </h1>
+
+                    <p>
+                        رفتار کاربران، اسکن QR Code ها و عملکرد فایل‌های رسانه‌ای
+                    </p>
+
                 </div>
 
-                <div id="selectedQr"
-                     class="selected-qr"
-                     style="display:none;">
+            </div>
+
+
+            <!-- Filters -->
+
+            <div class="analytics-filters">
+
+                <!-- QR Search -->
+
+                <div class="qr-filter">
+
+                    <label for="qrCodeSearch">
+                        <span>▦</span>
+                        QR Code
+                    </label>
+
+                    <div class="qr-search-wrapper">
+
+                        <span class="qr-search-icon">
+                            🔍
+                        </span>
+
+                        <input type="text"
+                               id="qrCodeSearch"
+                               class="qr-search-input"
+                               placeholder="جستجوی QR یا نام رسانه..."
+                               autocomplete="off" />
+
+                        <button type="button"
+                                id="clearQrFilter"
+                                class="qr-clear-button"
+                                title="حذف فیلتر">
+
+                            ×
+
+                        </button>
+
+                        <div id="qrSearchResults"
+                             class="qr-search-results">
+                        </div>
+
+                    </div>
+
+                    <div id="selectedQr"
+                         class="selected-qr"
+                         style="display:none;">
+                    </div>
+
                 </div>
-            </div>
-
-            <input type="date"
-                   id="fromDate"
-                   class="analytics-date" />
-
-            <input type="date"
-                   id="toDate"
-                   class="analytics-date" />
-
-            <button type="button"
-                    id="applyFilters"
-                    class="analytics-button">
-
-                اعمال فیلتر
-
-            </button>
-
-        </div>
-
-    </div>
 
 
-    <!-- Loading -->
-    <div id="analyticsLoading"
-         class="analytics-loading">
+                <!-- From -->
 
-        در حال دریافت اطلاعات...
+                <div class="analytics-date-field">
 
-    </div>
+                    <label for="fromDate">
+                        از تاریخ
+                    </label>
 
+                    <input type="date"
+                           id="fromDate"
+                           class="analytics-date" />
 
-    <!-- Error -->
-    <div id="analyticsError"
-         class="analytics-error"
-         style="display:none;">
-
-        خطا هنگام دریافت اطلاعات Analytics.
-
-    </div>
+                </div>
 
 
-    <!-- Summary Cards -->
-    <section id="summarySection"
-             class="analytics-summary-grid">
+                <!-- To -->
 
-        <div class="analytics-card">
+                <div class="analytics-date-field">
 
-            <div class="analytics-card-title">
-                کل Scan
-            </div>
+                    <label for="toDate">
+                        تا تاریخ
+                    </label>
 
-            <div id="totalScans"
-                 class="analytics-card-value">
+                    <input type="date"
+                           id="toDate"
+                           class="analytics-date" />
 
-                0
+                </div>
+
+
+                <button type="button"
+                        id="applyFilters"
+                        class="analytics-button">
+
+                    <span>
+                        ↻
+                    </span>
+
+                    اعمال فیلتر
+
+                </button>
 
             </div>
 
         </div>
 
 
-        <div class="analytics-card">
+        <!-- =========================================
+             LOADING
+        ========================================== -->
 
-            <div class="analytics-card-title">
-                بازدیدکننده یکتا
-            </div>
+        <div id="analyticsLoading"
+             class="analytics-loading">
 
-            <div id="uniqueVisitors"
-                 class="analytics-card-value">
+            <span class="loading-spinner"></span>
 
-                0
-
-            </div>
-
-        </div>
-
-
-        <div class="analytics-card">
-
-            <div class="analytics-card-title">
-                Play
-            </div>
-
-            <div id="totalPlays"
-                 class="analytics-card-value">
-
-                0
-
-            </div>
+            <span>
+                در حال دریافت اطلاعات...
+            </span>
 
         </div>
 
 
-        <div class="analytics-card">
+        <!-- =========================================
+             ERROR
+        ========================================== -->
 
-            <div class="analytics-card-title">
-                Pause
-            </div>
+        <div id="analyticsError"
+             class="analytics-error"
+             style="display:none;">
 
-            <div id="totalPauses"
-                 class="analytics-card-value">
-
-                0
-
-            </div>
-
-        </div>
-
-
-        <div class="analytics-card">
-
-            <div class="analytics-card-title">
-                Completion Rate
-            </div>
-
-            <div id="completionRate"
-                 class="analytics-card-value">
-
-                0%
-
-            </div>
-
-        </div>
-
-
-        <div class="analytics-card">
-
-            <div class="analytics-card-title">
-                میانگین مدت
-            </div>
-
-            <div id="averageDuration"
-                 class="analytics-card-value">
-
-                -
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- Timeline -->
-    <section class="analytics-panel analytics-panel-wide">
-
-        <div class="analytics-panel-header">
+            <span class="error-icon">
+                !
+            </span>
 
             <div>
-                <h2>روند Analytics</h2>
+
+                <strong>
+                    دریافت اطلاعات با خطا مواجه شد
+                </strong>
 
                 <span>
-                    آمار روزانه Scan و Play
+                    لطفاً دوباره تلاش کنید.
                 </span>
+
             </div>
 
         </div>
 
-        <div class="analytics-chart-container">
 
-            <canvas id="timelineChart"></canvas>
+        <!-- =========================================
+             SUMMARY
+        ========================================== -->
 
-        </div>
+        <section id="summarySection"
+                 class="analytics-summary-grid">
 
-    </section>
 
+            <!-- Total Scans -->
 
-    <!-- Device -->
-    <section class="analytics-grid-2">
+            <div class="analytics-card analytics-card-pink">
 
-        <div class="analytics-panel">
+                <div class="analytics-card-top">
 
-            <div class="analytics-panel-header">
+                    <div class="analytics-card-icon">
+                        📱
+                    </div>
 
-                <div>
-                    <h2>نوع دستگاه</h2>
-                    <span>Device</span>
+                    <span class="analytics-card-label">
+                        Scan
+                    </span>
+
+                </div>
+
+                <div id="totalScans"
+                     class="analytics-card-value">
+                    0
+                </div>
+
+                <div class="analytics-card-description">
+                    کل اسکن‌های ثبت‌شده
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
 
-                <canvas id="deviceChart"></canvas>
+            <!-- Unique Visitors -->
 
-            </div>
+            <div class="analytics-card analytics-card-purple">
 
-        </div>
+                <div class="analytics-card-top">
 
+                    <div class="analytics-card-icon">
+                        👥
+                    </div>
 
-        <!-- OS -->
-        <div class="analytics-panel">
+                    <span class="analytics-card-label">
+                        Visitors
+                    </span>
 
-            <div class="analytics-panel-header">
+                </div>
 
-                <div>
-                    <h2>سیستم عامل</h2>
-                    <span>Operating System</span>
+                <div id="uniqueVisitors"
+                     class="analytics-card-value">
+                    0
+                </div>
+
+                <div class="analytics-card-description">
+                    بازدیدکننده یکتا
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
 
-                <canvas id="osChart"></canvas>
+            <!-- Plays -->
 
-            </div>
+            <div class="analytics-card analytics-card-blue">
 
-        </div>
+                <div class="analytics-card-top">
 
-    </section>
+                    <div class="analytics-card-icon">
+                        ▶
+                    </div>
 
+                    <span class="analytics-card-label">
+                        Play
+                    </span>
 
-    <!-- Browser / Referrer -->
-    <section class="analytics-grid-2">
+                </div>
 
-        <div class="analytics-panel">
+                <div id="totalPlays"
+                     class="analytics-card-value">
+                    0
+                </div>
 
-            <div class="analytics-panel-header">
-
-                <div>
-                    <h2>مرورگر</h2>
-                    <span>Browser</span>
+                <div class="analytics-card-description">
+                    تعداد پخش رسانه
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
 
-                <canvas id="browserChart"></canvas>
+            <!-- Pauses -->
 
-            </div>
+            <div class="analytics-card analytics-card-orange">
 
-        </div>
+                <div class="analytics-card-top">
 
+                    <div class="analytics-card-icon">
+                        ⏸
+                    </div>
 
-        <div class="analytics-panel">
+                    <span class="analytics-card-label">
+                        Pause
+                    </span>
 
-            <div class="analytics-panel-header">
+                </div>
 
-                <div>
-                    <h2>منبع ورود</h2>
-                    <span>Referrer</span>
+                <div id="totalPauses"
+                     class="analytics-card-value">
+                    0
+                </div>
+
+                <div class="analytics-card-description">
+                    تعداد توقف پخش
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
 
-                <canvas id="referrerChart"></canvas>
+            <!-- Completion -->
 
-            </div>
+            <div class="analytics-card analytics-card-green">
 
-        </div>
+                <div class="analytics-card-top">
 
-    </section>
+                    <div class="analytics-card-icon">
+                        ✓
+                    </div>
 
+                    <span class="analytics-card-label">
+                        Completion
+                    </span>
 
-    <!-- Country / City -->
-    <section class="analytics-grid-2">
+                </div>
 
-        <div class="analytics-panel">
+                <div id="completionRate"
+                     class="analytics-card-value">
+                    0%
+                </div>
 
-            <div class="analytics-panel-header">
-
-                <div>
-                    <h2>کشورها</h2>
-                    <span>Country</span>
+                <div class="analytics-card-description">
+                    نرخ تکمیل پخش
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
 
-                <canvas id="countryChart"></canvas>
+            <!-- Average Duration -->
 
-            </div>
+            <div class="analytics-card analytics-card-pink">
 
-        </div>
+                <div class="analytics-card-top">
 
+                    <div class="analytics-card-icon">
+                        ⏱
+                    </div>
 
-        <div class="analytics-panel">
+                    <span class="analytics-card-label">
+                        Duration
+                    </span>
 
-            <div class="analytics-panel-header">
+                </div>
 
-                <div>
-                    <h2>شهرها</h2>
-                    <span>City</span>
+                <div id="averageDuration"
+                     class="analytics-card-value analytics-duration-value">
+                    -
+                </div>
+
+                <div class="analytics-card-description">
+                    میانگین مدت پخش
                 </div>
 
             </div>
 
-            <div class="analytics-chart-container small">
+        </section>
 
-                <canvas id="cityChart"></canvas>
+
+        <!-- =========================================
+             TIMELINE
+        ========================================== -->
+
+        <section class="analytics-panel analytics-panel-wide">
+
+            <div class="analytics-panel-header">
+
+                <div class="analytics-panel-title">
+
+                    <div class="panel-icon">
+                        📈
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            روند Analytics
+                        </h2>
+
+                        <span>
+                            آمار روزانه Scan و Play
+                        </span>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </div>
+            <div class="analytics-chart-container timeline-chart">
 
-    </section>
+                <canvas id="timelineChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             DEVICE / OS
+        ========================================== -->
+
+        <section class="analytics-grid-2">
+
+
+            <!-- Device -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            📱
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                نوع دستگاه
+                            </h2>
+
+                            <span>
+                                Device
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="deviceChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- OS -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            💻
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                سیستم عامل
+                            </h2>
+
+                            <span>
+                                Operating System
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="osChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             BROWSER / REFERRER
+        ========================================== -->
+
+        <section class="analytics-grid-2">
+
+
+            <!-- Browser -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            🌐
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                مرورگر
+                            </h2>
+
+                            <span>
+                                Browser
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="browserChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- Referrer -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            🔗
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                منبع ورود
+                            </h2>
+
+                            <span>
+                                Referrer
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="referrerChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             COUNTRY / CITY
+        ========================================== -->
+
+        <section class="analytics-grid-2">
+
+
+            <!-- Country -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            🌍
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                کشورها
+                            </h2>
+
+                            <span>
+                                Country
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="countryChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- City -->
+
+            <div class="analytics-panel">
+
+                <div class="analytics-panel-header">
+
+                    <div class="analytics-panel-title">
+
+                        <div class="panel-icon">
+                            📍
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                شهرها
+                            </h2>
+
+                            <span>
+                                City
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="analytics-chart-container small">
+
+                    <canvas id="cityChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </div>
 
 </div>
 

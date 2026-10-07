@@ -4,16 +4,665 @@
     ViewData["Title"] = "ورود";
 }
 
-<div class="container py-5" dir="rtl">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
+<style>
+    /* =========================================
+       LOGIN PAGE
+    ========================================= */
 
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
+    .login-page {
+        position: relative;
+        min-height: calc(100vh - 90px);
+        padding: 55px 0 70px;
+        overflow: hidden;
+        background: radial-gradient( circle at 10% 15%, rgba(255, 183, 215, .20), transparent 28% ), radial-gradient( circle at 90% 85%, rgba(190, 176, 255, .20), transparent 30% ), linear-gradient( 135deg, #fff8fc 0%, #f8f5ff 50%, #f6fbff 100% );
+    }
 
-                    <h2 class="text-center mb-4">
-                        ورود به MediaQR
-                    </h2>
+
+    /* =========================================
+       BACKGROUND
+    ========================================= */
+
+    .login-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .55;
+    }
+
+    .login-bg-shape-1 {
+        width: 300px;
+        height: 300px;
+        top: -130px;
+        right: -110px;
+        background: linear-gradient( 135deg, rgba(255, 151, 195, .32), rgba(206, 181, 255, .24) );
+    }
+
+    .login-bg-shape-2 {
+        width: 360px;
+        height: 360px;
+        bottom: -180px;
+        left: -170px;
+        background: linear-gradient( 135deg, rgba(183, 211, 255, .27), rgba(239, 181, 255, .23) );
+    }
+
+    .login-bg-shape-3 {
+        width: 120px;
+        height: 120px;
+        top: 35%;
+        left: 10%;
+        background: rgba(255, 185, 215, .15);
+    }
+
+
+    /* =========================================
+       WRAPPER
+    ========================================= */
+
+    .login-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 470px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .login-logo {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 13px;
+        border-radius: 23px;
+        background: linear-gradient( 135deg, #ff8fbc, #b596f5 );
+        color: white;
+        font-size: 30px;
+        box-shadow: 0 16px 35px rgba(205, 127, 187, .25);
+    }
+
+        .login-logo span {
+            animation: loginHeart 2.5s ease-in-out infinite;
+        }
+
+    .login-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 14px;
+        margin-bottom: 8px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, .75);
+        border: 1px solid rgba(255, 174, 210, .28);
+        color: #a66b91;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .login-header h1 {
+        margin: 0 0 7px;
+        color: #47384f;
+        font-size: 29px;
+        font-weight: 800;
+    }
+
+    .login-header p {
+        max-width: 370px;
+        margin: 0 auto;
+        color: #8c7f92;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+
+    /* =========================================
+       CARD
+    ========================================= */
+
+    .login-card {
+        position: relative;
+        padding: 30px;
+        overflow: hidden;
+        border-radius: 31px;
+        background: rgba(255, 255, 255, .79);
+        border: 1px solid rgba(255, 255, 255, .9);
+        box-shadow: 0 28px 75px rgba(105, 79, 119, .13), inset 0 1px 0 rgba(255, 255, 255, .95);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+    }
+
+    .login-card-inner {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    /* Decorations */
+
+    .login-card-decoration {
+        position: absolute;
+        pointer-events: none;
+        opacity: .55;
+        font-size: 30px;
+    }
+
+    .login-decoration-1 {
+        top: 18px;
+        right: 22px;
+        color: #e9aac8;
+        transform: rotate(-15deg);
+    }
+
+    .login-decoration-2 {
+        bottom: 20px;
+        left: 23px;
+        color: #b8a5ed;
+        font-size: 20px;
+        transform: rotate(12deg);
+    }
+
+
+    /* =========================================
+       CARD TITLE
+    ========================================= */
+
+    .login-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 23px;
+        margin-bottom: 23px;
+        border-bottom: 1px solid rgba(225, 216, 229, .7);
+    }
+
+    .login-card-icon {
+        width: 45px;
+        height: 45px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient( 135deg, #fff0f7, #f0ebff );
+        font-size: 19px;
+    }
+
+    .login-card-title > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .login-card-title strong {
+        color: #5a4a61;
+        font-size: 15px;
+    }
+
+    .login-card-title span {
+        color: #a097a5;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       VALIDATION
+    ========================================= */
+
+    .login-validation {
+        padding: 11px 13px;
+        margin-bottom: 18px;
+        border-radius: 13px;
+        background: #fff1f4;
+        border: 1px solid #f5cbd5;
+        color: #b64f6b;
+        font-size: 12px;
+    }
+
+        .login-validation:empty {
+            display: none;
+        }
+
+
+    /* =========================================
+       FORM
+    ========================================= */
+
+    .login-form-group {
+        margin-bottom: 19px;
+    }
+
+        .login-form-group > label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: #695b6f;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+    .login-label-icon {
+        font-size: 14px;
+    }
+
+
+    /* Input */
+
+    .login-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 54px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .78);
+        border: 1px solid #e7dfe9;
+        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+        .login-input-wrapper:focus-within {
+            background: white;
+            border-color: #d9a8ca;
+            box-shadow: 0 0 0 4px rgba(226, 164, 202, .10);
+        }
+
+    .login-input-icon {
+        width: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #b293b0;
+        font-family: Arial, sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .login-input {
+        min-width: 0;
+        flex: 1;
+        height: 100%;
+        padding: 0 10px 0 12px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #5b4d61;
+        font-family: inherit;
+        font-size: 13px;
+    }
+
+        .login-input::placeholder {
+            color: #b7adb9;
+        }
+
+        .login-input:-webkit-autofill,
+        .login-input:-webkit-autofill:hover,
+        .login-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #5b4d61;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+
+    /* Password */
+
+    .login-password-input {
+        padding-left: 52px;
+    }
+
+    .login-password-toggle {
+        position: absolute;
+        left: 10px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 11px;
+        background: transparent;
+        color: #9c8ba1;
+        font-size: 16px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .login-password-toggle:hover {
+            background: #faf1f8;
+            color: #a86f98;
+        }
+
+
+    /* Error */
+
+    .login-error {
+        display: block;
+        margin-top: 6px;
+        color: #c05b76;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       OPTIONS
+    ========================================= */
+
+    .login-options {
+        display: flex;
+        align-items: center;
+        margin: 2px 0 22px;
+    }
+
+    .remember-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .remember-checkbox {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .remember-custom {
+        width: 19px;
+        height: 19px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: white;
+        border: 1px solid #ddd2df;
+        transition: .2s ease;
+    }
+
+    .remember-checkbox:checked + .remember-custom {
+        background: linear-gradient( 135deg, #ff91bb, #b698f2 );
+        border-color: transparent;
+    }
+
+        .remember-checkbox:checked + .remember-custom::after {
+            content: "✓";
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+    .remember-checkbox:focus-visible + .remember-custom {
+        box-shadow: 0 0 0 4px rgba(210, 158, 198, .14);
+    }
+
+    .remember-text {
+        color: #827686;
+        font-size: 12px;
+    }
+
+
+    /* =========================================
+       SUBMIT
+    ========================================= */
+
+    .login-submit-button {
+        width: 100%;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 17px;
+        background: linear-gradient( 135deg, #ff8fbc, #b393f3 );
+        color: white;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 14px 28px rgba(195, 125, 189, .24);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .login-submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 35px rgba(195, 125, 189, .31);
+        }
+
+        .login-submit-button:active {
+            transform: translateY(0);
+        }
+
+    .login-submit-icon {
+        font-size: 16px;
+    }
+
+    .login-submit-arrow {
+        margin-right: 5px;
+        font-size: 18px;
+    }
+
+
+    /* =========================================
+       SECURITY
+    ========================================= */
+
+    .login-security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 17px;
+        color: #a197a5;
+        font-size: 10px;
+    }
+
+        .login-security-note span:first-child {
+            font-size: 13px;
+        }
+
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+
+    .login-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 21px;
+        color: #9b909f;
+        font-size: 10px;
+    }
+
+    .login-footer-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .login-footer-item span {
+            font-size: 13px;
+        }
+
+    .login-footer-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #d4c9d8;
+    }
+
+    .login-footer-message {
+        margin-top: 15px;
+        text-align: center;
+        color: #aa9eaa;
+        font-size: 10px;
+    }
+
+
+    /* =========================================
+       ANIMATION
+    ========================================= */
+
+    @@keyframes loginHeart {
+        0%, 100%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @@media (max-width: 576px) {
+        .login-page
+
+    {
+        padding: 35px 0 55px;
+    }
+
+    .login-wrapper {
+        padding: 0 10px;
+    }
+
+    .login-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 20px;
+        font-size: 27px;
+    }
+
+    .login-header h1 {
+        font-size: 24px;
+    }
+
+    .login-header p {
+        font-size: 12px;
+    }
+
+    .login-card {
+        padding: 22px 17px;
+        border-radius: 26px;
+    }
+
+    .login-card-title {
+        padding-bottom: 19px;
+        margin-bottom: 19px;
+    }
+
+    .login-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .login-footer-dot {
+        display: none;
+    }
+
+    .login-footer-item {
+        padding: 5px 9px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, .5);
+    }
+
+    }
+
+    @@media (max-width: 380px) {
+        .login-card
+
+    {
+        padding: 19px 14px;
+    }
+
+    .login-header h1 {
+        font-size: 22px;
+    }
+
+    }
+</style>
+
+<div class="login-page" dir="rtl">
+
+    <div class="login-bg-shape login-bg-shape-1"></div>
+    <div class="login-bg-shape login-bg-shape-2"></div>
+    <div class="login-bg-shape login-bg-shape-3"></div>
+
+    <div class="container">
+
+        <div class="login-wrapper">
+
+            <!-- Header -->
+            <div class="login-header">
+
+                <div class="login-logo">
+                    <span>♥</span>
+                </div>
+
+                <div class="login-badge">
+                    ✨ خوش آمدی
+                </div>
+
+                <h1>
+                    ورود به MediaQR
+                </h1>
+
+                <p>
+                    وارد حساب خودت شو و پیام‌های دوست‌داشتنی‌ات را مدیریت کن.
+                </p>
+
+            </div>
+
+
+            <!-- Login Card -->
+            <div class="login-card">
+
+                <div class="login-card-decoration login-decoration-1">
+                    ♡
+                </div>
+
+                <div class="login-card-decoration login-decoration-2">
+                    ✦
+                </div>
+
+
+                <div class="login-card-inner">
+
+                    <div class="login-card-title">
+
+                        <div class="login-card-icon">
+                            🔐
+                        </div>
+
+                        <div>
+                            <strong>
+                                ورود به حساب
+                            </strong>
+
+                            <span>
+                                اطلاعات حساب خود را وارد کنید
+                            </span>
+                        </div>
+
+                    </div>
+
 
                     <form asp-action="Login"
                           asp-controller="Account"
@@ -24,63 +673,234 @@
                         <input type="hidden"
                                asp-for="ReturnUrl" />
 
+
+                        <!-- Validation -->
                         <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3">
+                             class="login-validation">
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="UserName"
-                                   class="form-label">
+
+                        <!-- Username -->
+                        <div class="login-form-group">
+
+                            <label asp-for="UserName">
+                                <span class="login-label-icon">
+                                    👤
+                                </span>
+
+                                نام کاربری
                             </label>
 
-                            <input asp-for="UserName"
-                                   class="form-control"
-                                   autocomplete="username"
-                                   autofocus />
+                            <div class="login-input-wrapper">
+
+                                <span class="login-input-icon">
+                                    @@
+                                </span>
+
+                                <input asp-for="UserName"
+                                       class="login-input"
+                                       autocomplete="username"
+                                       autofocus
+                                       placeholder="نام کاربری خود را وارد کنید" />
+
+                            </div>
 
                             <span asp-validation-for="UserName"
-                                  class="text-danger">
+                                  class="login-error">
                             </span>
+
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Password"
-                                   class="form-label">
+
+                        <!-- Password -->
+                        <div class="login-form-group">
+
+                            <label asp-for="Password">
+
+                                <span class="login-label-icon">
+                                    🔑
+                                </span>
+
+                                رمز عبور
+
                             </label>
 
-                            <input asp-for="Password"
-                                   class="form-control"
-                                   autocomplete="current-password" />
+                            <div class="login-input-wrapper">
+
+                                <span class="login-input-icon">
+                                    •••
+                                </span>
+
+                                <input asp-for="Password"
+                                       id="loginPassword"
+                                       class="login-input login-password-input"
+                                       autocomplete="current-password"
+                                       placeholder="رمز عبور خود را وارد کنید" />
+
+                                <button type="button"
+                                        class="login-password-toggle"
+                                        id="togglePassword"
+                                        aria-label="نمایش رمز عبور">
+
+                                    👁
+
+                                </button>
+
+                            </div>
 
                             <span asp-validation-for="Password"
-                                  class="text-danger">
+                                  class="login-error">
                             </span>
+
                         </div>
 
-                        <div class="form-check mb-3">
-                            <input asp-for="RememberMe"
-                                   class="form-check-input" />
 
-                            <label asp-for="RememberMe"
-                                   class="form-check-label">
+                        <!-- Remember Me -->
+                        <div class="login-options">
+
+                            <label class="remember-wrapper">
+
+                                <input asp-for="RememberMe"
+                                       class="remember-checkbox" />
+
+                                <span class="remember-custom"></span>
+
+                                <span class="remember-text">
+                                    مرا به خاطر بسپار
+                                </span>
+
                             </label>
+
                         </div>
 
+
+                        <!-- Submit -->
                         <button type="submit"
-                                class="btn btn-primary w-100">
-                            ورود
+                                class="login-submit-button">
+
+                            <span class="login-submit-icon">
+                                ✨
+                            </span>
+
+                            <span>
+                                ورود به حساب
+                            </span>
+
+                            <span class="login-submit-arrow">
+                                ←
+                            </span>
+
                         </button>
+
+
+                        <!-- Security -->
+                        <div class="login-security-note">
+
+                            <span>
+                                🔒
+                            </span>
+
+                            <span>
+                                اطلاعات ورود شما به صورت امن ارسال می‌شود.
+                            </span>
+
+                        </div>
 
                     </form>
 
                 </div>
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="login-footer">
+
+                <div class="login-footer-item">
+                    <span>💌</span>
+                    پیام‌های خاص
+                </div>
+
+                <div class="login-footer-dot"></div>
+
+                <div class="login-footer-item">
+                    <span>▦</span>
+                    QR Code
+                </div>
+
+                <div class="login-footer-dot"></div>
+
+                <div class="login-footer-item">
+                    <span>♥</span>
+                    MediaQR
+                </div>
+
+            </div>
+
+
+            <div class="login-footer-message">
+                لحظه‌های قشنگت را ماندگار کن ♥
             </div>
 
         </div>
+
     </div>
+
 </div>
+
 
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const togglePassword =
+                document.getElementById("togglePassword");
+
+            const passwordInput =
+                document.getElementById("loginPassword");
+
+
+            if (togglePassword && passwordInput) {
+
+                togglePassword.addEventListener(
+                    "click",
+                    function () {
+
+                        if (passwordInput.type === "password") {
+
+                            passwordInput.type = "text";
+
+                            togglePassword.textContent = "🙈";
+
+                            togglePassword.setAttribute(
+                                "aria-label",
+                                "مخفی کردن رمز عبور"
+                            );
+
+                        }
+                        else {
+
+                            passwordInput.type = "password";
+
+                            togglePassword.textContent = "👁";
+
+                            togglePassword.setAttribute(
+                                "aria-label",
+                                "نمایش رمز عبور"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+        });
+
+    </script>
 }

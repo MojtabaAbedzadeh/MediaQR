@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -168,11 +169,29 @@ builder.Services.AddRateLimiter(options =>
                         ?? "unknown";
 
                     return RateLimitPartition.GetFixedWindowLimiter(
-                        ipAddress,
+                        $"viewer:{ipAddress}",
                         _ => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 120,
                             Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            AutoReplenishment = true
+                        });
+                }
+
+                if (path.StartsWithSegments("/audio/create"))
+                {
+                    var ipAddress =
+                        httpContext.Connection.RemoteIpAddress?
+                            .ToString()
+                        ?? "unknown";
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        $"audio-create:{ipAddress}",
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(10),
                             QueueLimit = 0,
                             AutoReplenishment = true
                         });
@@ -185,6 +204,14 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.Configure<AnalyticsPrivacyOptions>(builder.Configuration.GetSection("AnalyticsPrivacy"));
 builder.Services.AddHostedService<AnalyticsCleanupService>();
+
+builder.Services.Configure<ForwardedHeadersOptions>(
+    options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor |
+            ForwardedHeaders.XForwardedProto;
+    });
 
 var app = builder.Build();
 
@@ -207,6 +234,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseForwardedHeaders();
 
 app.UseHttpsRedirection();
 

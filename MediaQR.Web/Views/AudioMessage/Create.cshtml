@@ -1,0 +1,1141 @@
+﻿@model MediaQR.Web.Models.Media.CreateAudioMessageViewModel
+
+@{
+    ViewData["Title"] = "ساخت پیام صوتی";
+}
+<style>
+    /* =========================================================
+       CREATE AUDIO PAGE
+    ========================================================= */
+
+    .create-audio-page {
+        position: relative;
+        min-height: calc(100vh - 110px);
+        padding: 55px 0 70px;
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+       BACKGROUND
+    ========================================================= */
+
+    .audio-bg-shape {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+        filter: blur(3px);
+    }
+
+
+    .audio-bg-shape-1 {
+        width: 320px;
+        height: 320px;
+        right: -160px;
+        top: 160px;
+        background: rgba(255, 190, 220, .20);
+    }
+
+
+    .audio-bg-shape-2 {
+        width: 280px;
+        height: 280px;
+        left: -140px;
+        bottom: 30px;
+        background: rgba(196, 181, 255, .20);
+    }
+
+
+    /* =========================================================
+       WRAPPER
+    ========================================================= */
+
+    .create-audio-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 720px;
+        margin: auto;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .create-audio-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 25px;
+        padding: 0 8px;
+    }
+
+
+    .audio-main-icon {
+        width: 68px;
+        height: 68px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        font-size: 30px;
+        background: linear-gradient( 135deg, #ffe0ee, #e8ddff );
+        box-shadow: 0 12px 30px rgba(180, 95, 160, .13);
+    }
+
+
+    .audio-page-badge {
+        width: fit-content;
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        border-radius: 50px;
+        background: #fff0f7;
+        color: #c05c91;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+
+    .create-audio-header h1 {
+        margin: 0 0 5px;
+        color: #513a56;
+        font-size: 25px;
+        font-weight: 900;
+    }
+
+
+    .create-audio-header p {
+        margin: 0;
+        color: #98889a;
+        font-size: 12px;
+        line-height: 1.9;
+    }
+
+
+    /* =========================================================
+       FORM CARD
+    ========================================================= */
+
+    .audio-form-card {
+        padding: 32px;
+        border-radius: 30px;
+        background: rgba(255,255,255,.90);
+        border: 1px solid rgba(255,255,255,.95);
+        box-shadow: 0 25px 70px rgba(120, 75, 130, .11);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+
+    /* =========================================================
+       VALIDATION
+    ========================================================= */
+
+    .audio-validation {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: 14px;
+        background: #fff0f3;
+        color: #c74d70;
+        font-size: 12px;
+    }
+
+
+        .audio-validation:empty {
+            display: none;
+        }
+
+
+    /* =========================================================
+       FORM GROUP
+    ========================================================= */
+
+    .audio-form-group {
+        margin-bottom: 23px;
+    }
+
+
+        .audio-form-group > label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 9px;
+            color: #624b66;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+
+            .audio-form-group > label small {
+                padding: 3px 7px;
+                border-radius: 20px;
+                background: #f8f3f8;
+                color: #ad9eaf;
+                font-size: 9px;
+                font-weight: 600;
+            }
+
+
+    .label-icon {
+        font-size: 15px;
+    }
+
+
+    /* =========================================================
+       INPUT
+    ========================================================= */
+
+    .audio-input-wrapper {
+        position: relative;
+    }
+
+
+    .audio-input {
+        width: 100%;
+        height: 54px;
+        padding: 0 17px;
+        border: 1px solid #eadfeb;
+        border-radius: 16px;
+        outline: none;
+        background: rgba(255,255,255,.85);
+        color: #513b56;
+        font-family: inherit;
+        font-size: 13px;
+        transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+
+        .audio-input::placeholder {
+            color: #b7a8b8;
+        }
+
+
+        .audio-input:focus {
+            border-color: #d789b1;
+            box-shadow: 0 0 0 4px rgba(215,137,177,.10);
+        }
+
+
+    /* =========================================================
+       TEXTAREA
+    ========================================================= */
+
+    .audio-textarea-wrapper {
+        position: relative;
+        border: 1px solid #eadfeb;
+        border-radius: 17px;
+        background: rgba(255,255,255,.85);
+        overflow: hidden;
+        transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+
+        .audio-textarea-wrapper:focus-within {
+            border-color: #d789b1;
+            box-shadow: 0 0 0 4px rgba(215,137,177,.10);
+        }
+
+
+    .audio-textarea {
+        width: 100%;
+        min-height: 115px;
+        padding: 15px 17px;
+        border: none;
+        outline: none;
+        resize: vertical;
+        background: transparent;
+        color: #513b56;
+        font-family: inherit;
+        font-size: 12px;
+        line-height: 2;
+    }
+
+
+        .audio-textarea::placeholder {
+            color: #b7a8b8;
+        }
+
+
+    .textarea-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 13px;
+        border-top: 1px solid #f2e9f1;
+        color: #ad9eaf;
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       UPLOAD
+    ========================================================= */
+
+    .audio-upload-box {
+        position: relative;
+        border: 2px dashed #ead6e5;
+        border-radius: 22px;
+        background: linear-gradient( 135deg, #fff9fc, #faf7ff );
+        transition: border-color .25s ease, background .25s ease, transform .25s ease;
+    }
+
+
+        .audio-upload-box:hover {
+            border-color: #d99abb;
+            background: linear-gradient( 135deg, #fff5fa, #f8f3ff );
+        }
+
+
+        .audio-upload-box.dragging {
+            border-color: #b16ce9;
+            background: #f8f1ff;
+            transform: scale(1.01);
+        }
+
+
+    .audio-file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+
+    .audio-upload-content {
+        min-height: 205px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 25px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+
+    .upload-icon {
+        width: 62px;
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+        border-radius: 20px;
+        background: linear-gradient( 135deg, #ffe1ef, #e9ddff );
+        font-size: 27px;
+        box-shadow: 0 8px 22px rgba(170, 90, 150, .10);
+    }
+
+
+    .audio-upload-content strong {
+        color: #624964;
+        font-size: 13px;
+    }
+
+
+    .audio-upload-content > span {
+        color: #a596a6;
+        font-size: 10px;
+    }
+
+
+    .upload-formats {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+
+        .upload-formats span {
+            padding: 4px 9px;
+            border-radius: 7px;
+            background: white;
+            border: 1px solid #f0e6ef;
+            color: #9a879b;
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+
+    /* =========================================================
+       FILE INFO
+    ========================================================= */
+
+    .audio-file-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 13px;
+        background: #faf7fb;
+    }
+
+
+    .file-info-icon {
+        font-size: 15px;
+    }
+
+
+    .audio-file-info div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+
+    .audio-file-info strong {
+        color: #76627a;
+        font-size: 10px;
+    }
+
+
+    .audio-file-info span {
+        color: #a99aaa;
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       SELECTED FILE
+    ========================================================= */
+
+    .selected-file {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: linear-gradient( 135deg, #fff1f7, #f5f0ff );
+        border: 1px solid #f1e1ed;
+    }
+
+
+        .selected-file.show {
+            display: flex;
+        }
+
+
+    .selected-file-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: white;
+    }
+
+
+    #selectedFileName {
+        flex: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: #684f6c;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+
+    .remove-file {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 9px;
+        background: #fff;
+        color: #c75b7e;
+        font-size: 19px;
+        line-height: 1;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+
+        .remove-file:hover {
+            background: #ffe8ef;
+            transform: rotate(90deg);
+        }
+
+
+    /* =========================================================
+       ERROR
+    ========================================================= */
+
+    .audio-error {
+        display: block;
+        margin-top: 6px;
+        padding-right: 3px;
+        color: #d35476;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+       SUBMIT
+    ========================================================= */
+
+    .create-audio-button {
+        width: 100%;
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 7px;
+        border: none;
+        border-radius: 17px;
+        background: linear-gradient( 135deg, #ff68a8, #a66cff );
+        color: white;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(178, 91, 166, .21);
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+
+        .create-audio-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 17px 35px rgba(178, 91, 166, .29);
+        }
+
+
+    .create-button-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: rgba(255,255,255,.17);
+        font-size: 16px;
+    }
+
+
+    .create-button-arrow {
+        font-size: 19px;
+        transition: .25s ease;
+    }
+
+
+    .create-audio-button:hover .create-button-arrow {
+        transform: translateX(-4px);
+    }
+
+
+    /* =========================================================
+       SECURITY
+    ========================================================= */
+
+    .form-security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 13px;
+        color: #ab9aaa;
+        font-size: 9px;
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    .create-audio-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 22px;
+        color: #a696a8;
+        font-size: 9px;
+    }
+
+
+    .footer-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+
+    .footer-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: #d5c7d6;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @@media (max-width: 767px) {
+        .create-audio-page
+
+    {
+        padding: 35px 15px 50px;
+    }
+
+
+    .create-audio-header {
+        gap: 13px;
+        padding: 0 3px;
+    }
+
+
+    .audio-main-icon {
+        width: 57px;
+        height: 57px;
+        border-radius: 18px;
+        font-size: 25px;
+    }
+
+
+    .create-audio-header h1 {
+        font-size: 21px;
+    }
+
+
+    .create-audio-header p {
+        font-size: 10px;
+    }
+
+
+    .audio-form-card {
+        padding: 22px 17px;
+        border-radius: 25px;
+    }
+
+
+    .audio-upload-content {
+        min-height: 185px;
+        padding: 20px;
+    }
+
+
+    .create-audio-footer {
+        flex-wrap: wrap;
+    }
+
+    }
+
+
+    @@media (max-width: 450px) {
+        .create-audio-header
+
+    {
+        align-items: flex-start;
+    }
+
+
+    .audio-page-badge {
+        font-size: 8px;
+    }
+
+
+    .create-audio-header h1 {
+        font-size: 19px;
+    }
+
+
+    .create-audio-header p {
+        line-height: 1.8;
+    }
+
+
+    .textarea-bottom {
+        font-size: 8px;
+    }
+
+
+    .upload-formats span {
+        padding: 4px 7px;
+    }
+
+    }
+</style>
+<div class="create-audio-page" dir="rtl">
+
+    <!-- Decorative background -->
+    <div class="audio-bg-shape audio-bg-shape-1"></div>
+    <div class="audio-bg-shape audio-bg-shape-2"></div>
+
+
+    <div class="container">
+
+        <div class="create-audio-wrapper">
+
+            <!-- =========================
+                 HEADER
+            ========================== -->
+
+            <div class="create-audio-header">
+
+                <div class="audio-main-icon">
+                    🎙️
+                </div>
+
+                <div>
+
+                    <div class="audio-page-badge">
+                        ✨ یک پیام خاص بساز
+                    </div>
+
+                    <h1>
+                        پیام صوتی من
+                    </h1>
+
+                    <p>
+                        حرف دلت را ضبط یا آپلود کن و آن را
+                        به یک QR Code دوست‌داشتنی تبدیل کن.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 CARD
+            ========================== -->
+
+            <div class="audio-form-card">
+
+                <form asp-action="Create"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- Validation -->
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="audio-validation">
+                    </div>
+
+
+                    <!-- =========================
+                         TITLE
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="Title">
+
+                            <span class="label-icon">
+                                💌
+                            </span>
+
+                            عنوان پیام
+
+                        </label>
+
+
+                        <div class="audio-input-wrapper">
+
+                            <input asp-for="Title"
+                                   class="audio-input"
+                                   placeholder="مثلاً: برای تو ❤️"
+                                   maxlength="200" />
+
+                            <span class="input-counter">
+                                عنوان
+                            </span>
+
+                        </div>
+
+
+                        <span asp-validation-for="Title"
+                              class="audio-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- =========================
+                         DESCRIPTION
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="Description">
+
+                            <span class="label-icon">
+                                📝
+                            </span>
+
+                            توضیحات
+
+                            <small>
+                                اختیاری
+                            </small>
+
+                        </label>
+
+
+                        <div class="audio-textarea-wrapper">
+
+                            <textarea asp-for="Description"
+                                      class="audio-textarea"
+                                      rows="4"
+                                      maxlength="2000"
+                                      placeholder="اگر دوست داری توضیح کوتاهی برای این پیام بنویس..."></textarea>
+
+                            <div class="textarea-bottom">
+
+                                <span>
+                                    ✨
+                                    یک جمله کوتاه و دوست‌داشتنی
+                                </span>
+
+                                <span>
+                                    ۲۰۰۰ کاراکتر
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <span asp-validation-for="Description"
+                              class="audio-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- =========================
+                         AUDIO FILE
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="AudioFile">
+
+                            <span class="label-icon">
+                                🎧
+                            </span>
+
+                            فایل صوتی
+
+                        </label>
+
+
+                        <div class="audio-upload-box">
+
+                            <input asp-for="AudioFile"
+                                   type="file"
+                                   id="AudioFile"
+                                   class="audio-file-input"
+                                   accept=".mp3,.wav,.ogg,.m4a,audio/mpeg,audio/wav,audio/ogg,audio/mp4" />
+
+
+                            <label for="AudioFile"
+                                   class="audio-upload-content">
+
+                                <div class="upload-icon">
+                                    🎙️
+                                </div>
+
+                                <strong>
+                                    فایل صوتی خودت را انتخاب کن
+                                </strong>
+
+                                <span>
+                                    برای انتخاب فایل کلیک کن
+                                    یا آن را اینجا رها کن
+                                </span>
+
+                                <div class="upload-formats">
+
+                                    <span>MP3</span>
+                                    <span>WAV</span>
+                                    <span>OGG</span>
+                                    <span>M4A</span>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="audio-file-info">
+
+                            <div class="file-info-icon">
+                                ℹ️
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    شرایط فایل صوتی
+                                </strong>
+
+                                <span>
+                                    حداکثر حجم فایل: ۱۰۰ مگابایت
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div id="selectedFile"
+                             class="selected-file">
+
+                            <span class="selected-file-icon">
+                                🎵
+                            </span>
+
+                            <span id="selectedFileName">
+                                فایل انتخاب نشده
+                            </span>
+
+                            <button type="button"
+                                    id="removeFile"
+                                    class="remove-file"
+                                    aria-label="حذف فایل">
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+
+                        <span asp-validation-for="AudioFile"
+                              class="audio-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- =========================
+                         SUBMIT
+                    ========================== -->
+
+                    <button type="submit"
+                            class="create-audio-button">
+
+                        <span class="create-button-icon">
+                            ▦
+                        </span>
+
+                        <span>
+                            ساخت QR پیام صوتی
+                        </span>
+
+                        <span class="create-button-arrow">
+                            ←
+                        </span>
+
+                    </button>
+
+
+                    <div class="form-security-note">
+
+                        <span>
+                            🔒
+                        </span>
+
+                        فایل و پیام شما با امنیت ذخیره می‌شود.
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =========================
+                 BOTTOM INFO
+            ========================== -->
+
+            <div class="create-audio-footer">
+
+                <div class="footer-item">
+
+                    <span>
+                        🎧
+                    </span>
+
+                    پیام صوتی
+
+                </div>
+
+                <div class="footer-dot"></div>
+
+                <div class="footer-item">
+
+                    <span>
+                        ▦
+                    </span>
+
+                    QR اختصاصی
+
+                </div>
+
+                <div class="footer-dot"></div>
+
+                <div class="footer-item">
+
+                    <span>
+                        💌
+                    </span>
+
+                    اشتراک‌گذاری
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const fileInput =
+                document.getElementById("AudioFile");
+
+            const selectedFile =
+                document.getElementById("selectedFile");
+
+            const selectedFileName =
+                document.getElementById("selectedFileName");
+
+            const removeFile =
+                document.getElementById("removeFile");
+
+
+            if (!fileInput) {
+                return;
+            }
+
+
+            fileInput.addEventListener("change", function () {
+
+                if (this.files && this.files.length > 0) {
+
+                    const file = this.files[0];
+
+                    selectedFileName.textContent =
+                        file.name;
+
+                    selectedFile.classList.add("show");
+
+                }
+                else {
+
+                    selectedFile.classList.remove("show");
+
+                }
+
+            });
+
+
+            if (removeFile) {
+
+                removeFile.addEventListener("click", function () {
+
+                    fileInput.value = "";
+
+                    selectedFile.classList.remove("show");
+
+                });
+
+            }
+
+
+            /* Drag & Drop */
+
+            const uploadBox =
+                document.querySelector(".audio-upload-box");
+
+
+            if (uploadBox) {
+
+                ["dragenter", "dragover"].forEach(function (eventName) {
+
+                    uploadBox.addEventListener(
+                        eventName,
+                        function (event) {
+
+                            event.preventDefault();
+
+                            uploadBox.classList.add("dragging");
+
+                        }
+                    );
+
+                });
+
+
+                ["dragleave", "drop"].forEach(function (eventName) {
+
+                    uploadBox.addEventListener(
+                        eventName,
+                        function (event) {
+
+                            event.preventDefault();
+
+                            uploadBox.classList.remove("dragging");
+
+                        }
+                    );
+
+                });
+
+
+                uploadBox.addEventListener(
+                    "drop",
+                    function (event) {
+
+                        if (
+                            event.dataTransfer &&
+                            event.dataTransfer.files &&
+                            event.dataTransfer.files.length > 0
+                        ) {
+
+                            fileInput.files =
+                                event.dataTransfer.files;
+
+                            fileInput.dispatchEvent(
+                                new Event("change")
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+        });
+
+    </script>
+}

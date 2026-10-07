@@ -1,5 +1,7 @@
 ﻿@model MediaQR.Application.DTOs.Media.MediaDetailsDto
 
+@using MediaQR.Web.Helpers
+
 @{
     ViewData["Title"] = "جزئیات رسانه";
 
@@ -10,291 +12,1211 @@
         "Video" => "ویدئو",
         _ => Model.MediaType
     };
+
+    var qrCount = Model.QrCodes?.Count ?? 0;
+
+    var activeQrCount = Model.QrCodes?.Count(x =>
+        x.IsActive &&
+        (!x.ExpiresAt.HasValue || x.ExpiresAt.Value > DateTime.UtcNow)
+    ) ?? 0;
+
+    var expiredQrCount = Model.QrCodes?.Count(x =>
+        x.ExpiresAt.HasValue &&
+        x.ExpiresAt.Value <= DateTime.UtcNow
+    ) ?? 0;
 }
 
-<div class="container-fluid mt-4" dir="rtl">
+<style>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show"
-             role="alert">
-
-            @TempData["SuccessMessage"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-
-        </div>
+    .media-details-page {
+        min-height: calc(100vh - 70px);
+        padding: 30px 20px 55px;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient( circle at 8% 8%, rgba(244,114,182,.10), transparent 30% ), radial-gradient( circle at 92% 12%, rgba(139,92,246,.10), transparent 30% ), linear-gradient( 135deg, #fff7fb 0%, #f8f5ff 50%, #f4f8ff 100% );
     }
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show"
-             role="alert">
 
-            @TempData["ErrorMessage"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-
-        </div>
+    .media-details-wrapper {
+        max-width: 1500px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
     }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div>
-            <h1 class="h3 mb-1">
-                @Model.Title
-            </h1>
+    /* =========================
+           Decorative shapes
+           ========================= */
 
-            <div class="text-muted">
-                جزئیات رسانه
+    .details-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .details-shape-1 {
+        width: 300px;
+        height: 300px;
+        right: -120px;
+        top: -130px;
+        background: rgba(236,72,153,.07);
+    }
+
+    .details-shape-2 {
+        width: 350px;
+        height: 350px;
+        left: -150px;
+        bottom: -180px;
+        background: rgba(139,92,246,.07);
+    }
+
+
+    /* =========================
+           Header
+           ========================= */
+
+    .media-details-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+
+    .media-details-header-main {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+    }
+
+
+    .media-details-icon {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        color: #fff;
+        background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+        box-shadow: 0 12px 28px rgba(139,92,246,.20);
+        font-size: 25px;
+    }
+
+
+    .media-details-title {
+        margin: 0 0 5px;
+        color: #30283b;
+        font-size: 27px;
+        font-weight: 850;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .media-details-subtitle {
+        margin: 0;
+        color: #918799;
+        font-size: 13px;
+    }
+
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 0 17px;
+        border: 1px solid rgba(100,80,120,.12);
+        border-radius: 13px;
+        color: #62596d !important;
+        background: rgba(255,255,255,.75);
+        text-decoration: none !important;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+
+        .back-button:hover {
+            color: #7c3aed !important;
+            background: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(60,40,90,.07);
+        }
+
+
+    /* =========================
+           Alerts
+           ========================= */
+
+    .details-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding: 14px 16px;
+        border: 0;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(50,35,70,.05);
+    }
+
+
+    .details-alert-success {
+        color: #166534;
+        background: rgba(34,197,94,.09);
+    }
+
+
+    .details-alert-danger {
+        color: #991b1b;
+        background: rgba(239,68,68,.09);
+    }
+
+
+    .details-alert-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(255,255,255,.65);
+    }
+
+
+    .details-alert-content {
+        flex: 1;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    .details-alert-close {
+        border: 0;
+        background: transparent;
+        opacity: .6;
+    }
+
+
+    /* =========================
+           Cards
+           ========================= */
+
+    .details-card {
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,.80);
+        border-radius: 22px;
+        background: rgba(255,255,255,.82);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 14px 40px rgba(55,40,80,.07);
+    }
+
+
+    .details-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 17px 20px;
+        border-bottom: 1px solid rgba(100,80,120,.07);
+    }
+
+
+    .details-card-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #372f41;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+
+    .details-card-title-icon {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: #7c3aed;
+        background: rgba(139,92,246,.09);
+    }
+
+
+    .details-card-body {
+        padding: 20px;
+    }
+
+
+    /* =========================
+           Main information
+           ========================= */
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+
+    .info-item {
+        min-height: 78px;
+        padding: 13px 15px;
+        border: 1px solid rgba(100,80,120,.055);
+        border-radius: 14px;
+        background: rgba(249,247,252,.72);
+    }
+
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        color: #9990a1;
+        font-size: 10px;
+        font-weight: 650;
+    }
+
+
+        .info-label i {
+            color: #a78bfa;
+        }
+
+
+    .info-value {
+        color: #433a4b;
+        font-size: 13px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+
+    .info-code {
+        direction: ltr;
+        text-align: right;
+        color: #7c3aed;
+        font-family: monospace;
+        font-size: 12px;
+    }
+
+
+    .description-box {
+        padding: 15px;
+        border: 1px solid rgba(139,92,246,.08);
+        border-radius: 14px;
+        color: #62596b;
+        background: linear-gradient( 135deg, rgba(249,247,252,.90), rgba(246,243,251,.65) );
+        font-size: 13px;
+        line-height: 2;
+    }
+
+
+    /* =========================
+           Badges
+           ========================= */
+
+    .media-type-badge,
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 11px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+
+    .media-type-image {
+        color: #0891b2;
+        background: rgba(6,182,212,.10);
+    }
+
+
+    .media-type-audio {
+        color: #b45309;
+        background: rgba(245,158,11,.11);
+    }
+
+
+    .media-type-video {
+        color: #6d28d9;
+        background: rgba(139,92,246,.10);
+    }
+
+
+    .media-type-default {
+        color: #64748b;
+        background: rgba(100,116,139,.10);
+    }
+
+
+    .status-active {
+        color: #047857;
+        background: rgba(16,185,129,.10);
+    }
+
+
+    .status-inactive {
+        color: #64748b;
+        background: rgba(100,116,139,.10);
+    }
+
+
+    .status-expired {
+        color: #b91c1c;
+        background: rgba(239,68,68,.10);
+    }
+
+
+    /* =========================
+           QR table
+           ========================= */
+
+    .qr-count-badge {
+        min-width: 32px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 9px;
+        border-radius: 20px;
+        color: #7c3aed;
+        background: rgba(139,92,246,.09);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+
+    .qr-table-wrapper {
+        overflow-x: auto;
+    }
+
+
+    .qr-table {
+        width: 100%;
+        min-width: 780px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+
+        .qr-table thead th {
+            padding: 14px 17px;
+            color: #8e8596;
+            background: rgba(248,246,251,.72);
+            border-bottom: 1px solid rgba(100,80,120,.07);
+            font-size: 11px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+
+        .qr-table tbody td {
+            padding: 16px 17px;
+            color: #514858;
+            border-bottom: 1px solid rgba(100,80,120,.055);
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+
+        .qr-table tbody tr {
+            transition: background .18s ease;
+        }
+
+
+            .qr-table tbody tr:hover {
+                background: rgba(250,247,253,.75);
+            }
+
+
+            .qr-table tbody tr:last-child td {
+                border-bottom: 0;
+            }
+
+
+    .qr-code {
+        direction: ltr;
+        display: inline-block;
+        padding: 6px 8px;
+        border-radius: 8px;
+        color: #7c3aed;
+        background: rgba(139,92,246,.07);
+        font-family: monospace;
+        font-size: 11px;
+    }
+
+
+    .qr-title {
+        color: #403747;
+        font-weight: 700;
+    }
+
+
+    .qr-expiry {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        color: #716878;
+    }
+
+
+        .qr-expiry i {
+            color: #a78bfa;
+        }
+
+
+    .qr-no-expiry {
+        color: #aaa2af;
+        font-size: 11px;
+    }
+
+
+    .qr-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 34px;
+        padding: 0 11px;
+        border: 1px solid rgba(139,92,246,.13);
+        border-radius: 10px;
+        color: #6d28d9 !important;
+        background: rgba(255,255,255,.75);
+        text-decoration: none !important;
+        font-size: 11px;
+        font-weight: 700;
+        transition: all .18s ease;
+    }
+
+
+        .qr-action:hover {
+            color: #fff !important;
+            border-color: transparent;
+            background: linear-gradient( 135deg, #ec4899, #8b5cf6 );
+            transform: translateY(-1px);
+        }
+
+
+    /* =========================
+           Sidebar
+           ========================= */
+
+    .sidebar-status {
+        text-align: center;
+        padding: 10px 0 20px;
+    }
+
+
+    .large-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 22px;
+        border-radius: 14px;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+
+    .large-status-active {
+        color: #047857;
+        background: rgba(16,185,129,.10);
+    }
+
+
+    .large-status-inactive {
+        color: #64748b;
+        background: rgba(100,116,139,.10);
+    }
+
+
+    .sidebar-button {
+        width: 100%;
+        min-height: 45px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 750;
+        transition: all .2s ease;
+    }
+
+
+        .sidebar-button:hover {
+            transform: translateY(-1px);
+        }
+
+
+    .sidebar-button-warning {
+        color: #92400e;
+        background: rgba(245,158,11,.11);
+    }
+
+
+    .sidebar-button-success {
+        color: #047857;
+        background: rgba(16,185,129,.10);
+    }
+
+
+    .sidebar-button-danger {
+        color: #b91c1c;
+        background: rgba(239,68,68,.09);
+    }
+
+
+        .sidebar-button-danger:disabled {
+            cursor: not-allowed;
+            opacity: .45;
+            transform: none;
+        }
+
+
+    .delete-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin-bottom: 15px;
+        padding: 12px;
+        border: 0;
+        border-radius: 12px;
+        color: #92400e;
+        background: rgba(245,158,11,.09);
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+
+        .delete-warning i {
+            margin-top: 2px;
+            flex: 0 0 auto;
+        }
+
+
+    /* =========================
+           Summary
+           ========================= */
+
+    .summary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+
+    .summary-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(100,80,120,.065);
+    }
+
+
+        .summary-item:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+
+    .summary-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #918899;
+        font-size: 11px;
+    }
+
+
+        .summary-label i {
+            color: #a78bfa;
+        }
+
+
+    .summary-value {
+        color: #413849;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+
+    .summary-value-purple {
+        color: #7c3aed;
+    }
+
+
+    .summary-value-green {
+        color: #059669;
+    }
+
+
+    .summary-value-red {
+        color: #dc2626;
+    }
+
+
+    /* =========================
+           Empty QR
+           ========================= */
+
+    .qr-empty {
+        padding: 55px 20px;
+        text-align: center;
+        color: #978e9e;
+    }
+
+
+    .qr-empty-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        color: #8b5cf6;
+        background: rgba(139,92,246,.08);
+        font-size: 27px;
+    }
+
+
+    .qr-empty-text {
+        font-size: 12px;
+    }
+
+
+    /* =========================
+           Responsive
+           ========================= */
+
+    @@media (max-width: 900px) {
+
+        .media-details-header {
+            align-items: flex-start;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    @@media (max-width: 700px) {
+
+        .media-details-page {
+            padding: 22px 12px 40px;
+        }
+
+        .media-details-header {
+            flex-direction: column;
+        }
+
+        .media-details-header-main {
+            width: 100%;
+        }
+
+        .back-button {
+            width: 100%;
+        }
+
+        .media-details-title {
+            font-size: 22px;
+        }
+
+        .media-details-icon {
+            width: 50px;
+            height: 50px;
+            flex-basis: 50px;
+            border-radius: 15px;
+        }
+
+        .details-card {
+            border-radius: 18px;
+        }
+
+        .details-card-header,
+        .details-card-body {
+            padding: 16px;
+        }
+    }
+
+
+    @@media (max-width: 400px) {
+
+        .media-details-title {
+            font-size: 19px;
+        }
+
+        .media-details-header-main {
+            gap: 10px;
+        }
+    }
+
+</style>
+
+
+<div class="media-details-page" dir="rtl">
+
+    <div class="details-shape details-shape-1"></div>
+    <div class="details-shape details-shape-2"></div>
+
+
+    <div class="media-details-wrapper">
+
+
+        <!-- =========================
+             Alerts
+             ========================= -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="details-alert details-alert-success">
+
+                <div class="details-alert-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+
+                <div class="details-alert-content">
+                    @TempData["SuccessMessage"]
+                </div>
+
+                <button type="button"
+                        class="details-alert-close"
+                        data-bs-dismiss="alert">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
             </div>
-        </div>
+        }
 
-        <div class="d-flex gap-2">
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="details-alert details-alert-danger">
+
+                <div class="details-alert-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+
+                <div class="details-alert-content">
+                    @TempData["ErrorMessage"]
+                </div>
+
+                <button type="button"
+                        class="details-alert-close"
+                        data-bs-dismiss="alert">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
+            </div>
+        }
+
+
+        <!-- =========================
+             Header
+             ========================= -->
+
+        <div class="media-details-header">
+
+            <div class="media-details-header-main">
+
+                <div class="media-details-icon">
+
+                    @switch (Model.MediaType)
+                    {
+                        case "Image":
+                            <i class="bi bi-image"></i>
+                            break;
+
+                        case "Audio":
+                            <i class="bi bi-music-note-beamed"></i>
+                            break;
+
+                        case "Video":
+                            <i class="bi bi-camera-video"></i>
+                            break;
+
+                        default:
+                            <i class="bi bi-file-earmark"></i>
+                            break;
+                    }
+
+                </div>
+
+
+                <div>
+
+                    <h1 class="media-details-title"
+                        title="@Model.Title">
+
+                        @Model.Title
+
+                    </h1>
+
+                    <p class="media-details-subtitle">
+                        جزئیات و مدیریت رسانه
+                    </p>
+
+                </div>
+
+            </div>
+
 
             <a asp-action="Index"
-               class="btn btn-outline-secondary">
+               class="back-button">
+
+                <i class="bi bi-arrow-right"></i>
+
                 بازگشت به لیست
+
             </a>
 
         </div>
 
-    </div>
+
+        <div class="row g-4">
 
 
-    <!-- اطلاعات اصلی رسانه -->
+            <!-- =========================
+                 Main column
+                 ========================= -->
 
-    <div class="row g-4">
+            <div class="col-lg-8">
 
-        <div class="col-lg-8">
 
-            <div class="card shadow-sm mb-4">
+                <!-- اطلاعات رسانه -->
 
-                <div class="card-header bg-white">
+                <div class="details-card">
 
-                    <strong>
-                        اطلاعات رسانه
-                    </strong>
+                    <div class="details-card-header">
 
-                </div>
+                        <div class="details-card-title">
 
-                <div class="card-body">
-
-                    <div class="row g-3">
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                عنوان
-                            </label>
-
-                            <div class="fw-semibold">
-                                @Model.Title
+                            <div class="details-card-title-icon">
+                                <i class="bi bi-info-circle"></i>
                             </div>
+
+                            <span>
+                                اطلاعات رسانه
+                            </span>
 
                         </div>
 
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                نوع رسانه
-                            </label>
-
-                            <div>
-
-                                @switch (Model.MediaType)
-                                {
-                                    case "Image":
-                                        <span class="badge bg-info">
-                                            تصویر
-                                        </span>
-                                        break;
-
-                                    case "Audio":
-                                        <span class="badge bg-warning text-dark">
-                                            صوت
-                                        </span>
-                                        break;
-
-                                    case "Video":
-                                        <span class="badge bg-primary">
-                                            ویدئو
-                                        </span>
-                                        break;
-
-                                    default:
-                                        <span class="badge bg-secondary">
-                                            @mediaTypeText
-                                        </span>
-                                        break;
-                                }
-
-                            </div>
-
-                        </div>
+                    </div>
 
 
-                        <div class="col-md-6">
+                    <div class="details-card-body">
 
-                            <label class="form-label text-muted">
-                                نام فایل
-                            </label>
-
-                            <div>
-                                @Model.OriginalFileName
-                            </div>
-
-                        </div>
+                        <div class="info-grid">
 
 
-                        <div class="col-md-6">
+                            <!-- عنوان -->
 
-                            <label class="form-label text-muted">
-                                Content Type
-                            </label>
+                            <div class="info-item">
 
-                            <div>
-                                <code>
-                                    @Model.ContentType
-                                </code>
-                            </div>
+                                <div class="info-label">
+                                    <i class="bi bi-type"></i>
+                                    عنوان
+                                </div>
 
-                        </div>
-
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                حجم فایل
-                            </label>
-
-                            <div>
-                                @FormatFileSize(Model.FileSize)
-                            </div>
-
-                        </div>
-
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                وضعیت
-                            </label>
-
-                            <div>
-
-                                @if (Model.IsActive)
-                                {
-                                    <span class="badge bg-success">
-                                        فعال
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        غیرفعال
-                                    </span>
-                                }
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                تاریخ ایجاد
-                            </label>
-
-                            <div>
-                                @Model.CreatedAt
-                                .ToLocalTime()
-                                .ToString("yyyy/MM/dd HH:mm")
-                            </div>
-
-                        </div>
-
-
-                        <div class="col-md-6">
-
-                            <label class="form-label text-muted">
-                                شناسه
-                            </label>
-
-                            <div>
-                                @Model.Id
-                            </div>
-
-                        </div>
-
-
-                        @if (!string.IsNullOrWhiteSpace(Model.Description))
-                        {
-                            <div class="col-12">
-
-                                <label class="form-label text-muted">
-                                    توضیحات
-                                </label>
-
-                                <div class="border rounded p-3 bg-light">
-                                    @Model.Description
+                                <div class="info-value">
+                                    @Model.Title
                                 </div>
 
                             </div>
-                        }
+
+
+                            <!-- نوع -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-collection-play"></i>
+                                    نوع رسانه
+                                </div>
+
+                                <div class="info-value">
+
+                                    @switch (Model.MediaType)
+                                    {
+                                        case "Image":
+
+                                            <span class="media-type-badge media-type-image">
+
+                                                <i class="bi bi-image"></i>
+
+                                                تصویر
+
+                                            </span>
+
+                                            break;
+
+                                        case "Audio":
+
+                                            <span class="media-type-badge media-type-audio">
+
+                                                <i class="bi bi-volume-up"></i>
+
+                                                صوت
+
+                                            </span>
+
+                                            break;
+
+                                        case "Video":
+
+                                            <span class="media-type-badge media-type-video">
+
+                                                <i class="bi bi-camera-video"></i>
+
+                                                ویدئو
+
+                                            </span>
+
+                                            break;
+
+                                        default:
+
+                                            <span class="media-type-badge media-type-default">
+
+                                                @mediaTypeText
+
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- فایل -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-file-earmark"></i>
+                                    نام فایل
+                                </div>
+
+                                <div class="info-value">
+                                    @Model.OriginalFileName
+                                </div>
+
+                            </div>
+
+
+                            <!-- Content Type -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-code-slash"></i>
+                                    Content Type
+                                </div>
+
+                                <div class="info-value info-code">
+                                    @Model.ContentType
+                                </div>
+
+                            </div>
+
+
+                            <!-- حجم -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-hdd"></i>
+                                    حجم فایل
+                                </div>
+
+                                <div class="info-value">
+                                    @FormatFileSize(Model.FileSize)
+                                </div>
+
+                            </div>
+
+
+                            <!-- وضعیت -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-toggle-on"></i>
+                                    وضعیت
+                                </div>
+
+                                <div class="info-value">
+
+                                    @if (Model.IsActive)
+                                    {
+                                        <span class="status-badge status-active">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            فعال
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+
+                                            <i class="bi bi-pause-circle"></i>
+
+                                            غیرفعال
+
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- تاریخ ایجاد -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-calendar3"></i>
+                                    تاریخ ایجاد
+                                </div>
+
+                                <div class="info-value">
+
+                                    @PersianDateHelper.ToPersianDateTime(
+                                    Model.CreatedAt.ToLocalTime()
+                                                                        )
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- شناسه -->
+
+                            <div class="info-item">
+
+                                <div class="info-label">
+                                    <i class="bi bi-hash"></i>
+                                    شناسه
+                                </div>
+
+                                <div class="info-value info-code">
+                                    @Model.Id
+                                </div>
+
+                            </div>
+
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Description))
+                            {
+                                <div class="info-item"
+                                     style="grid-column: 1 / -1;">
+
+                                    <div class="info-label">
+                                        <i class="bi bi-text-paragraph"></i>
+                                        توضیحات
+                                    </div>
+
+                                    <div class="description-box">
+                                        @Model.Description
+                                    </div>
+
+                                </div>
+                            }
+
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+
+                <!-- =========================
+                     QR Codes
+                     ========================= -->
+
+                <div class="details-card">
+
+                    <div class="details-card-header">
+
+                        <div class="details-card-title">
+
+                            <div class="details-card-title-icon">
+
+                                <i class="bi bi-qr-code"></i>
+
+                            </div>
+
+                            <span>
+                                QR Codeهای مرتبط
+                            </span>
+
+                        </div>
 
 
-            <!-- QR Codes -->
+                        <span class="qr-count-badge">
 
-            <div class="card shadow-sm">
+                            @qrCount
 
-                <div class="card-header bg-white">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <strong>
-                            QR Codeهای مرتبط
-                        </strong>
-
-                        <span class="badge bg-secondary">
-                            @Model.QrCodes.Count
                         </span>
 
                     </div>
 
-                </div>
 
-                <div class="card-body p-0">
-
-                    @if (!Model.QrCodes.Any())
+                    @if (qrCount == 0)
                     {
-                        <div class="text-center p-5 text-muted">
+                        <div class="qr-empty">
 
-                            هیچ QR Codeای برای این رسانه ثبت نشده است.
+                            <div class="qr-empty-icon">
+
+                                <i class="bi bi-qr-code"></i>
+
+                            </div>
+
+                            <div class="qr-empty-text">
+
+                                هیچ QR Codeای برای این رسانه ثبت نشده است.
+
+                            </div>
 
                         </div>
                     }
                     else
                     {
-                        <div class="table-responsive">
+                        <div class="qr-table-wrapper">
 
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="qr-table">
 
-                                <thead class="table-light">
+                                <thead>
 
                                     <tr>
 
@@ -322,6 +1244,7 @@
 
                                 </thead>
 
+
                                 <tbody>
 
                                     @foreach (var qr in Model.QrCodes)
@@ -332,19 +1255,27 @@
 
                                         <tr>
 
+
+                                            <!-- کد -->
+
                                             <td>
 
-                                                <code>
+                                                <span class="qr-code">
                                                     @qr.Code
-                                                </code>
+                                                </span>
 
                                             </td>
+
+
+                                            <!-- عنوان -->
 
                                             <td>
 
                                                 @if (!string.IsNullOrWhiteSpace(qr.Title))
                                                 {
-                                                    @qr.Title
+                                                    <span class="qr-title">
+                                                        @qr.Title
+                                                    </span>
                                                 }
                                                 else
                                                 {
@@ -355,51 +1286,86 @@
 
                                             </td>
 
+
+                                            <!-- وضعیت -->
+
                                             <td>
 
                                                 @if (!qr.IsActive)
                                                 {
-                                                    <span class="badge bg-secondary">
+                                                    <span class="status-badge status-inactive">
+
+                                                        <i class="bi bi-pause-circle"></i>
+
                                                         غیرفعال
+
                                                     </span>
                                                 }
                                                 else if (isExpired)
                                                 {
-                                                    <span class="badge bg-danger">
+                                                    <span class="status-badge status-expired">
+
+                                                        <i class="bi bi-clock-history"></i>
+
                                                         منقضی
+
                                                     </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-success">
+                                                    <span class="status-badge status-active">
+
+                                                        <i class="bi bi-check-circle"></i>
+
                                                         فعال
+
                                                     </span>
                                                 }
 
                                             </td>
+
+
+                                            <!-- انقضا -->
 
                                             <td>
 
                                                 @if (qr.ExpiresAt.HasValue)
                                                 {
-                                                    @qr.ExpiresAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
-                                                }
+                                                    <span class="qr-expiry">
+
+                                                        <i class="bi bi-calendar-event"></i>
+
+                                                        @PersianDateHelper.ToPersianDateTime(
+                                                        qr.ExpiresAt.Value.ToLocalTime()
+                                                                                        )
+
+                                        </span>
+                                                                                }
                                                 else
                                                 {
-                                                    <span class="text-muted">
+                                                    <span class="qr-no-expiry">
+
                                                         بدون انقضا
+
                                                     </span>
                                                 }
 
                                             </td>
+
+
+                                            <!-- عملیات -->
 
                                             <td class="text-center">
 
                                                 <a asp-controller="QrManagement"
                                                    asp-action="Details"
                                                    asp-route-id="@qr.Id"
-                                                   class="btn btn-sm btn-outline-primary">
+                                                   class="qr-action">
+
+                                                    <i class="bi bi-eye"></i>
+
                                                     جزئیات QR
+
                                                 </a>
 
                                             </td>
@@ -418,168 +1384,286 @@
 
             </div>
 
-        </div>
+
+            <!-- =========================
+                 Sidebar
+                 ========================= -->
+
+            <div class="col-lg-4">
 
 
-        <!-- Sidebar -->
+                <!-- وضعیت -->
 
-        <div class="col-lg-4">
+                <div class="details-card">
 
-            <div class="card shadow-sm mb-4">
+                    <div class="details-card-header">
 
-                <div class="card-header bg-white">
+                        <div class="details-card-title">
 
-                    <strong>
-                        وضعیت رسانه
-                    </strong>
+                            <div class="details-card-title-icon">
 
-                </div>
+                                <i class="bi bi-toggle2-on"></i>
 
-                <div class="card-body">
+                            </div>
 
-                    <div class="text-center mb-4">
+                            وضعیت رسانه
 
-                        @if (Model.IsActive)
-                        {
-                            <span class="badge bg-success fs-6 px-4 py-2">
-                                فعال
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary fs-6 px-4 py-2">
-                                غیرفعال
-                            </span>
-                        }
+                        </div>
 
                     </div>
 
-                    <form asp-action="Toggle"
-                          asp-route-id="@Model.Id"
-                          method="post">
 
-                        @Html.AntiForgeryToken()
+                    <div class="details-card-body">
 
-                        <button type="submit"
-                                class="btn @(Model.IsActive ? "btn-warning" : "btn-success") w-100">
+                        <div class="sidebar-status">
 
                             @if (Model.IsActive)
                             {
-                                <span>
-                                    غیرفعال کردن رسانه
+                                <span class="large-status large-status-active">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    رسانه فعال است
+
                                 </span>
                             }
                             else
                             {
-                                <span>
-                                    فعال کردن رسانه
+                                <span class="large-status large-status-inactive">
+
+                                    <i class="bi bi-pause-circle-fill"></i>
+
+                                    رسانه غیرفعال است
+
                                 </span>
                             }
 
-                        </button>
+                        </div>
 
-                    </form>
+
+                        <form asp-action="Toggle"
+                              asp-route-id="@Model.Id"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="sidebar-button @(Model.IsActive ? "sidebar-button-warning" : "sidebar-button-success")">
+
+                                @if (Model.IsActive)
+                                {
+                                    <i class="bi bi-pause-circle"></i>
+
+                                    <span>
+                                        غیرفعال کردن رسانه
+                                    </span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-play-circle"></i>
+
+                                    <span>
+                                        فعال کردن رسانه
+                                    </span>
+                                }
+
+                            </button>
+
+                        </form>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+                <!-- =========================
+                     Operations
+                     ========================= -->
 
-            <!-- عملیات -->
+                <div class="details-card">
 
-            <div class="card shadow-sm mb-4">
+                    <div class="details-card-header">
 
-                <div class="card-header bg-white">
+                        <div class="details-card-title">
 
-                    <strong>
-                        عملیات
-                    </strong>
+                            <div class="details-card-title-icon">
 
-                </div>
+                                <i class="bi bi-gear"></i>
 
-                <div class="card-body">
+                            </div>
 
-                    @if (Model.QrCodes.Any())
-                    {
-                        <div class="alert alert-warning">
-
-                            <small>
-                                برای حذف این رسانه ابتدا باید تمام
-                                QR Codeهای مرتبط با آن حذف شوند.
-                            </small>
+                            عملیات
 
                         </div>
-                    }
-
-                    <form asp-action="Delete"
-                          asp-route-id="@Model.Id"
-                          method="post"
-                          onsubmit="return confirm('آیا از حذف این رسانه اطمینان دارید؟');">
-
-                        @Html.AntiForgeryToken()
-
-                        <button type="submit"
-                                class="btn btn-danger w-100"
-                                @(Model.QrCodes.Any() ? "disabled" : "")>
-
-                            حذف رسانه
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-
-            <!-- اطلاعات آماری -->
-
-            <div class="card shadow-sm">
-
-                <div class="card-header bg-white">
-
-                    <strong>
-                        خلاصه
-                    </strong>
-
-                </div>
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span class="text-muted">
-                            تعداد QR
-                        </span>
-
-                        <strong>
-                            @Model.QrCodes.Count
-                        </strong>
 
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
 
-                        <span class="text-muted">
-                            نوع
-                        </span>
+                    <div class="details-card-body">
 
-                        <strong>
-                            @mediaTypeText
-                        </strong>
+                        @if (qrCount > 0)
+                        {
+                            <div class="delete-warning">
+
+                                <i class="bi bi-exclamation-triangle"></i>
+
+                                <span>
+                                    برای حذف این رسانه ابتدا باید تمام
+                                    QR Codeهای مرتبط با آن حذف شوند.
+                                </span>
+
+                            </div>
+                        }
+
+
+                        <form asp-action="Delete"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirmDelete();">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="sidebar-button sidebar-button-danger"
+                                    @(qrCount > 0 ? "disabled" : "")>
+
+                                <i class="bi bi-trash3"></i>
+
+                                حذف رسانه
+
+                            </button>
+
+                        </form>
 
                     </div>
 
-                    <div class="d-flex justify-content-between">
+                </div>
 
-                        <span class="text-muted">
-                            حجم
-                        </span>
 
-                        <strong>
-                            @FormatFileSize(Model.FileSize)
-                        </strong>
+                <!-- =========================
+                     Summary
+                     ========================= -->
+
+                <div class="details-card">
+
+                    <div class="details-card-header">
+
+                        <div class="details-card-title">
+
+                            <div class="details-card-title-icon">
+
+                                <i class="bi bi-bar-chart"></i>
+
+                            </div>
+
+                            خلاصه
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="details-card-body">
+
+                        <div class="summary-list">
+
+
+                            <div class="summary-item">
+
+                                <span class="summary-label">
+
+                                    <i class="bi bi-qr-code"></i>
+
+                                    تعداد QR
+
+                                </span>
+
+                                <strong class="summary-value summary-value-purple">
+
+                                    @qrCount
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span class="summary-label">
+
+                                    <i class="bi bi-check-circle"></i>
+
+                                    QR فعال
+
+                                </span>
+
+                                <strong class="summary-value summary-value-green">
+
+                                    @activeQrCount
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span class="summary-label">
+
+                                    <i class="bi bi-clock-history"></i>
+
+                                    QR منقضی
+
+                                </span>
+
+                                <strong class="summary-value summary-value-red">
+
+                                    @expiredQrCount
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span class="summary-label">
+
+                                    <i class="bi bi-collection-play"></i>
+
+                                    نوع رسانه
+
+                                </span>
+
+                                <strong class="summary-value">
+
+                                    @mediaTypeText
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span class="summary-label">
+
+                                    <i class="bi bi-hdd"></i>
+
+                                    حجم
+
+                                </span>
+
+                                <strong class="summary-value">
+
+                                    @FormatFileSize(Model.FileSize)
+
+                                </strong>
+
+                            </div>
+
+
+                        </div>
 
                     </div>
 
@@ -592,6 +1676,19 @@
     </div>
 
 </div>
+
+
+<script>
+
+    function confirmDelete() {
+
+        return confirm(
+            'آیا از حذف این رسانه اطمینان دارید؟ این عملیات قابل بازگشت نیست.'
+        );
+
+    }
+
+</script>
 
 
 @functions

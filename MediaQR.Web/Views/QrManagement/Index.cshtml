@@ -1,74 +1,933 @@
-﻿@model IReadOnlyList<MediaQR.Application.DTOs.Qr.QrCodeListItemDto>
+﻿@using MediaQR.Web.Helpers
+@model IReadOnlyList<MediaQR.Application.DTOs.Qr.QrCodeListItemDto>
 
 @{
     ViewData["Title"] = "مدیریت QR Code";
+
+    var totalCount = Model.Count;
+    var activeCount = Model.Count(x => x.IsActive && !x.IsExpired);
+    var expiredCount = Model.Count(x => x.IsExpired);
+    var inactiveCount = Model.Count(x => !x.IsActive);
 }
 
-<div class="container-fluid py-4" dir="rtl">
+<style>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">مدیریت QR Code</h1>
-            <p class="text-muted mb-0">
-                مدیریت QR Codeهای ایجاد شده برای رسانه‌ها
-            </p>
-        </div>
-
-        <div>
-            <span class="badge bg-secondary fs-6">
-                تعداد: @Model.Count
-            </span>
-        </div>
-    </div>
-
-    @if (TempData["SuccessMessage"] is string successMessage)
-    {
-        <div class="alert alert-success alert-dismissible fade show"
-             role="alert">
-
-            @successMessage
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="بستن">
-            </button>
-        </div>
+    .qr-management-page {
+        min-height: calc(100vh - 70px);
+        position: relative;
+        overflow: hidden;
+        padding: 35px 20px 60px;
+        background: radial-gradient(circle at 8% 10%, rgba(255, 182, 193, .20), transparent 28%), radial-gradient(circle at 92% 18%, rgba(196, 181, 253, .22), transparent 28%), radial-gradient(circle at 50% 100%, rgba(147, 197, 253, .16), transparent 35%), #faf9fc;
     }
 
-    @if (!Model.Any())
-    {
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
+    .qr-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .55;
+    }
 
-                <div class="mb-3">
-                    <span style="font-size: 48px;">
-                        ▦
-                    </span>
+    .qr-bg-shape-1 {
+        width: 280px;
+        height: 280px;
+        background: rgba(251, 207, 232, .25);
+        top: -100px;
+        right: -80px;
+    }
+
+    .qr-bg-shape-2 {
+        width: 220px;
+        height: 220px;
+        background: rgba(191, 219, 254, .25);
+        bottom: 50px;
+        left: -90px;
+    }
+
+    .qr-management-wrapper {
+        position: relative;
+        z-index: 2;
+        max-width: 1550px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+
+    .qr-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        margin-bottom: 28px;
+    }
+
+    .qr-header-main {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .qr-header-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #7c3aed;
+        background: linear-gradient( 135deg, rgba(251, 207, 232, .9), rgba(221, 214, 254, .95) );
+        box-shadow: 0 12px 30px rgba(124, 58, 237, .12), inset 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    .qr-header-text {
+        min-width: 0;
+    }
+
+    .qr-page-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 12px;
+        margin-bottom: 7px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(221,214,254,.75);
+        color: #7c3aed;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 5px 15px rgba(0,0,0,.04);
+    }
+
+    .qr-page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        color: #312e41;
+    }
+
+    .qr-page-subtitle {
+        margin: 5px 0 0;
+        color: #77758a;
+        font-size: 14px;
+    }
+
+    .qr-total-badge {
+        flex-shrink: 0;
+        min-width: 120px;
+        padding: 13px 18px;
+        text-align: center;
+        border-radius: 18px;
+        background: rgba(255,255,255,.78);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 10px 30px rgba(50,40,80,.07);
+    }
+
+    .qr-total-badge-number {
+        display: block;
+        font-size: 24px;
+        font-weight: 800;
+        color: #7c3aed;
+        line-height: 1.2;
+    }
+
+    .qr-total-badge-label {
+        display: block;
+        margin-top: 3px;
+        color: #858294;
+        font-size: 12px;
+    }
+
+    /* Statistics */
+
+    .qr-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .qr-stat-card {
+        position: relative;
+        overflow: hidden;
+        padding: 19px;
+        border-radius: 22px;
+        background: rgba(255,255,255,.72);
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 12px 35px rgba(60,50,90,.06);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+        .qr-stat-card::after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            top: -40px;
+            left: -35px;
+            opacity: .35;
+        }
+
+    .qr-stat-pink::after {
+        background: #fbcfe8;
+    }
+
+    .qr-stat-green::after {
+        background: #bbf7d0;
+    }
+
+    .qr-stat-orange::after {
+        background: #fed7aa;
+    }
+
+    .qr-stat-red::after {
+        background: #fecaca;
+    }
+
+    .qr-stat-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .qr-stat-icon {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        font-size: 21px;
+    }
+
+    .qr-stat-pink .qr-stat-icon {
+        color: #db2777;
+        background: #fce7f3;
+    }
+
+    .qr-stat-green .qr-stat-icon {
+        color: #16a34a;
+        background: #dcfce7;
+    }
+
+    .qr-stat-orange .qr-stat-icon {
+        color: #ea580c;
+        background: #ffedd5;
+    }
+
+    .qr-stat-red .qr-stat-icon {
+        color: #dc2626;
+        background: #fee2e2;
+    }
+
+    .qr-stat-number {
+        font-size: 23px;
+        line-height: 1.2;
+        font-weight: 800;
+        color: #302d3f;
+    }
+
+    .qr-stat-label {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #888596;
+    }
+
+    /* Alerts */
+
+    .qr-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 14px 18px;
+        border: 0;
+        border-radius: 17px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    }
+
+    .qr-alert-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 17px;
+    }
+
+    .qr-alert-success {
+        color: #166534;
+        background: rgba(220, 252, 231, .85);
+    }
+
+        .qr-alert-success .qr-alert-icon {
+            background: #bbf7d0;
+        }
+
+    /* Main card */
+
+    .qr-table-card {
+        overflow: hidden;
+        border-radius: 26px;
+        background: rgba(255,255,255,.78);
+        border: 1px solid rgba(255,255,255,.92);
+        box-shadow: 0 18px 50px rgba(55,45,80,.08);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    .qr-table-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 22px 24px;
+        border-bottom: 1px solid rgba(226, 222, 235, .65);
+    }
+
+    .qr-table-header-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: 17px;
+        font-weight: 800;
+        color: #363243;
+    }
+
+    .qr-table-header-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3e8ff;
+        color: #7c3aed;
+        font-size: 17px;
+    }
+
+    .qr-table-count {
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: #f5f3ff;
+        color: #7c3aed;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .qr-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .qr-table {
+        width: 100%;
+        min-width: 1050px;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .qr-table thead th {
+            padding: 15px 17px;
+            background: rgba(248,247,251,.85);
+            border-bottom: 1px solid #ebe8f0;
+            color: #777385;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .qr-table tbody td {
+            padding: 17px;
+            border-bottom: 1px solid #f0edf4;
+            vertical-align: middle;
+            color: #454153;
+            font-size: 13px;
+        }
+
+        .qr-table tbody tr {
+            transition: background .2s ease, transform .2s ease;
+        }
+
+            .qr-table tbody tr:hover {
+                background: rgba(250,247,255,.8);
+            }
+
+            .qr-table tbody tr:last-child td {
+                border-bottom: 0;
+            }
+
+    /* ID */
+
+    .qr-id {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 32px;
+        padding: 0 8px;
+        border-radius: 10px;
+        background: #f4f1fa;
+        color: #6d687a;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* Title */
+
+    .qr-title {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #363243;
+        font-weight: 700;
+    }
+
+    .qr-code {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 3px 7px;
+        border-radius: 6px;
+        direction: ltr;
+        background: #f7f5fa;
+        color: #918b9e;
+        font-family: monospace;
+        font-size: 10px;
+    }
+
+    /* Media */
+
+    .qr-media-title {
+        max-width: 210px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #454052;
+        font-weight: 700;
+    }
+
+    .qr-media-file {
+        display: block;
+        max-width: 210px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 4px;
+        color: #9a95a5;
+        font-size: 11px;
+    }
+
+    /* Badges */
+
+    .qr-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+        .qr-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+    .qr-badge-image {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .qr-badge-audio {
+        color: #7c3aed;
+        background: #ede9fe;
+    }
+
+    .qr-badge-video {
+        color: #374151;
+        background: #f3f4f6;
+    }
+
+    .qr-badge-other {
+        color: #6b7280;
+        background: #f3f4f6;
+    }
+
+    .qr-status-active {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .qr-status-expired {
+        color: #b45309;
+        background: #fef3c7;
+    }
+
+    .qr-status-inactive {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    /* Dates */
+
+    .qr-date {
+        direction: ltr;
+        text-align: right;
+        white-space: nowrap;
+        color: #595466;
+        font-size: 12px;
+    }
+
+    .qr-no-expire {
+        display: inline-flex;
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: #f5f3f7;
+        color: #96919f;
+        font-size: 11px;
+    }
+
+    /* Actions */
+
+    .qr-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .qr-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 35px;
+        padding: 0 11px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+    .qr-action-view {
+        color: #7c3aed;
+        background: #f3e8ff;
+    }
+
+        .qr-action-view:hover {
+            color: #fff;
+            background: #7c3aed;
+            transform: translateY(-1px);
+        }
+
+    .qr-action-edit {
+        color: #475569;
+        background: #f1f5f9;
+    }
+
+        .qr-action-edit:hover {
+            color: #fff;
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+    /* Empty */
+
+    .qr-empty {
+        padding: 80px 25px;
+        text-align: center;
+    }
+
+    .qr-empty-icon {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 28px;
+        font-size: 42px;
+        color: #8b5cf6;
+        background: linear-gradient( 135deg, #fce7f3, #ede9fe );
+        box-shadow: 0 15px 35px rgba(124,58,237,.10);
+    }
+
+    .qr-empty-title {
+        margin-bottom: 8px;
+        color: #373342;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .qr-empty-text {
+        max-width: 500px;
+        margin: 0 auto;
+        color: #888494;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+    /* Responsive */
+
+    @@media (max-width: 1100px) {
+
+        .qr-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .qr-page-title {
+            font-size: 24px;
+        }
+    }
+
+    @@media (max-width: 700px) {
+
+        .qr-management-page {
+            padding: 25px 12px 45px;
+        }
+
+        .qr-page-header {
+            align-items: flex-start;
+        }
+
+        .qr-header-main {
+            align-items: flex-start;
+        }
+
+        .qr-header-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 17px;
+            font-size: 25px;
+        }
+
+        .qr-page-title {
+            font-size: 21px;
+        }
+
+        .qr-page-subtitle {
+            font-size: 12px;
+        }
+
+        .qr-total-badge {
+            min-width: 80px;
+            padding: 10px;
+        }
+
+        .qr-total-badge-number {
+            font-size: 20px;
+        }
+
+        .qr-stats {
+            gap: 10px;
+        }
+
+        .qr-stat-card {
+            padding: 14px;
+            border-radius: 18px;
+        }
+
+        .qr-stat-content {
+            gap: 9px;
+        }
+
+        .qr-stat-icon {
+            width: 39px;
+            height: 39px;
+            border-radius: 12px;
+            font-size: 18px;
+        }
+
+        .qr-stat-number {
+            font-size: 19px;
+        }
+
+        .qr-stat-label {
+            font-size: 10px;
+        }
+
+        .qr-table-card {
+            border-radius: 20px;
+        }
+
+        .qr-table-header {
+            padding: 17px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .qr-page-header {
+            flex-direction: column;
+        }
+
+        .qr-total-badge {
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .qr-total-badge-number,
+        .qr-total-badge-label {
+            display: inline;
+            margin: 0;
+        }
+
+        .qr-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .qr-stat-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .qr-stat-card {
+            min-height: 120px;
+        }
+
+        .qr-alert {
+            align-items: flex-start;
+        }
+    }
+
+</style>
+
+<div class="qr-management-page" dir="rtl">
+
+    <div class="qr-bg-shape qr-bg-shape-1"></div>
+    <div class="qr-bg-shape qr-bg-shape-2"></div>
+
+    <div class="qr-management-wrapper">
+
+        <!-- Header -->
+        <div class="qr-page-header">
+
+            <div class="qr-header-main">
+
+                <div class="qr-header-icon">
+                    ▦
                 </div>
 
-                <h2 class="h5">
-                    هنوز QR Codeای ایجاد نشده است.
-                </h2>
+                <div class="qr-header-text">
 
-                <p class="text-muted mb-0">
-                    پس از ایجاد رسانه، QR Code مربوط به آن در این قسمت نمایش داده می‌شود.
-                </p>
+                    <div class="qr-page-badge">
+                        <span>♡</span>
+                        مدیریت کدهای QR
+                    </div>
+
+                    <h1 class="qr-page-title">
+                        مدیریت QR Code
+                    </h1>
+
+                    <p class="qr-page-subtitle">
+                        مدیریت و مشاهده QR Codeهای ایجاد شده برای رسانه‌ها
+                    </p>
+
+                </div>
 
             </div>
+
+            <div class="qr-total-badge">
+
+                <span class="qr-total-badge-number">
+                    @totalCount
+                </span>
+
+                <span class="qr-total-badge-label">
+                    کد QR
+                </span>
+
+            </div>
+
         </div>
-    }
-    else
-    {
-        <div class="card shadow-sm">
 
-            <div class="card-body p-0">
+        <!-- Statistics -->
+        <div class="qr-stats">
 
-                <div class="table-responsive">
+            <div class="qr-stat-card qr-stat-pink">
 
-                    <table class="table table-hover align-middle mb-0">
+                <div class="qr-stat-content">
 
-                        <thead class="table-light">
+                    <div class="qr-stat-icon">
+                        ▦
+                    </div>
+
+                    <div>
+                        <div class="qr-stat-number">
+                            @totalCount
+                        </div>
+
+                        <div class="qr-stat-label">
+                            کل QR Codeها
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="qr-stat-card qr-stat-green">
+
+                <div class="qr-stat-content">
+
+                    <div class="qr-stat-icon">
+                        ✓
+                    </div>
+
+                    <div>
+                        <div class="qr-stat-number">
+                            @activeCount
+                        </div>
+
+                        <div class="qr-stat-label">
+                            QR فعال
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="qr-stat-card qr-stat-orange">
+
+                <div class="qr-stat-content">
+
+                    <div class="qr-stat-icon">
+                        ◷
+                    </div>
+
+                    <div>
+                        <div class="qr-stat-number">
+                            @expiredCount
+                        </div>
+
+                        <div class="qr-stat-label">
+                            منقضی‌شده
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="qr-stat-card qr-stat-red">
+
+                <div class="qr-stat-content">
+
+                    <div class="qr-stat-icon">
+                        ×
+                    </div>
+
+                    <div>
+                        <div class="qr-stat-number">
+                            @inactiveCount
+                        </div>
+
+                        <div class="qr-stat-label">
+                            غیرفعال
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert qr-alert qr-alert-success alert-dismissible fade show"
+                 role="alert">
+
+                <div class="qr-alert-icon">
+                    ✓
+                </div>
+
+                <div class="flex-grow-1">
+                    @successMessage
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="بستن">
+                </button>
+
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <!-- Empty State -->
+            <div class="qr-table-card">
+
+                <div class="qr-empty">
+
+                    <div class="qr-empty-icon">
+                        ▦
+                    </div>
+
+                    <h2 class="qr-empty-title">
+                        هنوز QR Codeای ایجاد نشده است
+                    </h2>
+
+                    <p class="qr-empty-text">
+                        پس از ایجاد رسانه، QR Code مربوط به آن در این قسمت
+                        نمایش داده می‌شود و می‌توانید آن را مدیریت کنید.
+                    </p>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <!-- Table -->
+            <div class="qr-table-card">
+
+                <div class="qr-table-header">
+
+                    <h2 class="qr-table-header-title">
+
+                        <span class="qr-table-header-icon">
+                            ▦
+                        </span>
+
+                        لیست QR Codeها
+
+                    </h2>
+
+                    <span class="qr-table-count">
+                        @totalCount مورد
+                    </span>
+
+                </div>
+
+                <div class="qr-table-wrapper">
+
+                    <table class="qr-table">
+
+                        <thead>
 
                             <tr>
 
@@ -112,134 +971,172 @@
 
                             @foreach (var item in Model)
                             {
-                                var statusClass = "bg-success";
+                                var statusClass = "qr-status-active";
                                 var statusText = "فعال";
 
                                 if (!item.IsActive)
                                 {
-                                    statusClass = "bg-danger";
+                                    statusClass = "qr-status-inactive";
                                     statusText = "غیرفعال";
                                 }
                                 else if (item.IsExpired)
                                 {
-                                    statusClass = "bg-warning text-dark";
+                                    statusClass = "qr-status-expired";
                                     statusText = "منقضی‌شده";
                                 }
 
                             <tr>
 
+                                <!-- ID -->
                                 <td class="text-center">
-                                    @item.Id
+
+                                    <span class="qr-id">
+                                        @item.Id
+                                    </span>
+
                                 </td>
 
+                                <!-- QR Title -->
                                 <td>
 
-                                    <div class="fw-semibold">
+                                    <div class="qr-title"
+                                         title="@(string.IsNullOrWhiteSpace(item.Title) ? "بدون عنوان" : item.Title)">
+
                                         @(string.IsNullOrWhiteSpace(item.Title)
                                                                             ? "بدون عنوان"
                                                                             : item.Title)
+
                                 </div>
 
-                                        <small class="text-muted">
+                                        <span class="qr-code">
                                             @item.Code
-                                        </small>
+                                        </span>
 
                                     </td>
 
+                                    <!-- Media -->
                                     <td>
 
-                                        <div class="fw-semibold">
+                                        <div class="qr-media-title"
+                                             title="@item.MediaTitle">
+
                                             @item.MediaTitle
+
                                         </div>
 
-                                        <small class="text-muted">
+                                        <span class="qr-media-file"
+                                              title="@item.OriginalFileName">
+
                                             @item.OriginalFileName
-                                        </small>
+
+                                        </span>
 
                                     </td>
 
+                                    <!-- Media Type -->
                                     <td>
 
                                 @switch (item.MediaType)
                                         {
                                             case "Image":
-                                                <span class="badge bg-info text-dark">
+
+                                                <span class="qr-badge qr-badge-image">
                                                     تصویر
                                                 </span>
+
                                                 break;
 
                                             case "Audio":
-                                                <span class="badge bg-primary">
+
+                                                <span class="qr-badge qr-badge-audio">
                                                     صوت
                                                 </span>
+
                                                 break;
 
                                             case "Video":
-                                                <span class="badge bg-dark">
+
+                                                <span class="qr-badge qr-badge-video">
                                                     ویدئو
                                                 </span>
+
                                                 break;
 
                                             default:
-                                                <span class="badge bg-secondary">
+
+                                                <span class="qr-badge qr-badge-other">
                                                     @item.MediaType
                                                 </span>
+
                                                 break;
                                         }
 
                                     </td>
 
+                                    <!-- Status -->
                                     <td class="text-center">
 
-                                        <span class="badge @statusClass">
+                                        <span class="qr-badge @statusClass">
                                             @statusText
                                         </span>
 
                                     </td>
 
+                                    <!-- Created At -->
                                     <td>
 
-                                        @item.CreatedAt.ToLocalTime()
-                                        .ToString("yyyy/MM/dd HH:mm")
+                                        <div class="qr-date">
+                                            @PersianDateHelper.ToPersianDateTime(
+                                            item.CreatedAt.ToLocalTime()
+                                                                        )
+                                </div>
 
-                                    </td>
+                            </td>
 
-                                    <td>
+                            <!-- Expiration -->
+                            <td>
 
-                                        @if (item.ExpiresAt.HasValue)
+                                @if (item.ExpiresAt.HasValue)
                                         {
-                                            <span>
-                                                @item.ExpiresAt.Value
-                                                .ToLocalTime()
-                                                .ToString("yyyy/MM/dd HH:mm")
-                                            </span>
-                                        }
+                                            <div class="qr-date">
+
+                                                @PersianDateHelper.ToPersianDateTime(
+                                                item.ExpiresAt.Value.ToLocalTime()
+                                                                        )
+
+                                </div>
+                                                                }
                                         else
                                         {
-                                            <span class="text-muted">
+                                            <span class="qr-no-expire">
                                                 بدون انقضا
                                             </span>
                                         }
 
                                     </td>
 
-                                    <td class="text-center">
+                                    <!-- Actions -->
+                                    <td>
 
-                                        <a asp-action="Details"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-sm btn-outline-primary">
+                                        <div class="qr-actions">
 
-                                            مشاهده
+                                            <a asp-action="Details"
+                                               asp-route-id="@item.Id"
+                                               class="qr-action qr-action-view">
 
-                                        </a>
+                                                <span>مشاهده</span>
 
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-sm btn-outline-secondary">
+                                            </a>
 
-                                            ویرایش
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.Id"
+                                               class="qr-action qr-action-edit">
 
-                                        </a>
+                                                <span>ویرایش</span>
+
+                                            </a>
+
+                                        </div>
 
                                     </td>
 
@@ -253,8 +1150,8 @@
                 </div>
 
             </div>
+        }
 
-        </div>
-    }
+    </div>
 
 </div>
