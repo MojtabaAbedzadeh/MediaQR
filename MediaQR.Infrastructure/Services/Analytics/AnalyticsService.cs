@@ -1,27 +1,31 @@
 ﻿using MediaQR.Application.DTOs.Analytics;
 using MediaQR.Application.Interfaces;
+using MediaQR.Domain.Entities;
 using MediaQR.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace MediaQR.Infrastructure.Services;
+namespace MediaQR.Infrastructure.Services.Analytics;
 
 public class AnalyticsService : IAnalyticsService
 {
     private readonly MediaDbContext _dbContext;
     private readonly IRequestContextService _requestContextService;
     private readonly IUserAgentParser _userAgentParser;
+    private readonly IGeoIpService _geoIpService;
     private readonly ILogger<AnalyticsService> _logger;
 
     public AnalyticsService(
-    MediaDbContext dbContext,
-    IRequestContextService requestContextService,
-    IUserAgentParser userAgentParser,
-    ILogger<AnalyticsService> logger)
+     MediaDbContext dbContext,
+     IRequestContextService requestContextService,
+     IUserAgentParser userAgentParser,
+     IGeoIpService geoIpService,
+     ILogger<AnalyticsService> logger)
     {
         _dbContext = dbContext;
         _requestContextService = requestContextService;
         _userAgentParser = userAgentParser;
+        _geoIpService = geoIpService;
         _logger = logger;
     }
 
@@ -54,6 +58,32 @@ public class AnalyticsService : IAnalyticsService
 
             var userAgentInfo = _userAgentParser.Parse(userAgent);
 
+            var ipAddress = _requestContextService.GetIpAddress();
+
+            GeoIpResultDto? geoIpResult = null;
+
+            if (dto.EventType == AnalyticsEventType.Scan)
+            {
+                try
+                {
+                    geoIpResult =
+                        await _geoIpService.ResolveAsync(
+                            ipAddress,
+                            cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "خطا هنگام Resolve کردن GeoIP. IP: {IpAddress}",
+                        ipAddress);
+                }
+            }
+
             var analyticsEvent = new Domain.Entities.AnalyticsEvent
             {
                 QrCodeId = dto.QrCodeId,
@@ -70,8 +100,9 @@ public class AnalyticsService : IAnalyticsService
                 Browser = Normalize(userAgentInfo.Browser, 100),
                 BrowserVersion = Normalize(userAgentInfo.BrowserVersion, 50),
 
-                Country = Normalize(dto.Country, 100),
-                City = Normalize(dto.City, 100),
+                Country = Normalize(geoIpResult?.Country, 100),
+
+                City = Normalize(geoIpResult?.City, 100),
 
                 DurationSeconds = NormalizeDuration(
                     dto.DurationSeconds),

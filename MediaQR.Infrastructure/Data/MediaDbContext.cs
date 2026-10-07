@@ -1,9 +1,11 @@
 ﻿using MediaQR.Domain.Entities;
+using MediaQR.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediaQR.Infrastructure.Data;
 
-public class MediaDbContext : DbContext
+public class MediaDbContext : IdentityDbContext<ApplicationUser>
 {
     public MediaDbContext(DbContextOptions<MediaDbContext> options)
         : base(options)
@@ -178,6 +180,14 @@ public class MediaDbContext : DbContext
                 x.QrCodeId,
                 x.VisitorId
             });
+
+            entity.HasIndex(x =>
+                new
+                {
+                    x.QrCodeId,
+                    x.CreatedAt
+                })
+                .HasDatabaseName("IX_AnalyticsEvents_QrCodeId_CreatedAt");
         });
     }
 }

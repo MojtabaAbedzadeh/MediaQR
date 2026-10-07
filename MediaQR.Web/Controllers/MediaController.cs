@@ -1,9 +1,11 @@
 ﻿using MediaQR.Application.DTOs.Media;
 using MediaQR.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediaQR.Web.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class MediaController : Controller
 {
     private readonly IMediaService _mediaService;

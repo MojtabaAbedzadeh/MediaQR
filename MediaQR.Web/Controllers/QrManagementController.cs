@@ -1,10 +1,12 @@
 ﻿using MediaQR.Application.DTOs.Qr;
 using MediaQR.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediaQR.Web.Controllers;
 
 [Route("management/qr")]
+[Authorize(Roles = "Admin")]
 public class QrManagementController : Controller
 {
     private readonly IQrManagementService _qrManagementService;

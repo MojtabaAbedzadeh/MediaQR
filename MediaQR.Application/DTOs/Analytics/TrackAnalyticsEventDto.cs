@@ -13,8 +13,6 @@ public class TrackAnalyticsEventDto
     public string? OperatingSystem { get; set; }
     public string? Browser { get; set; }
     public string? BrowserVersion { get; set; }
-    public string? Country { get; set; }
-    public string? City { get; set; }
     public string? Referrer { get; set; }
     public double? DurationSeconds { get; set; }
     public double? ProgressPercent { get; set; }
