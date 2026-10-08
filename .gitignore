@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# MediaQR uploaded media
+MediaQR.Web/App_Data/Media/
