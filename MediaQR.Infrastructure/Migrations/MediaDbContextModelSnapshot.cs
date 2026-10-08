@@ -186,6 +186,12 @@ namespace MediaQR.Infrastructure.Migrations
                     b.Property<long>("MediaFileId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("OrderNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Title")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");

@@ -7,6 +7,8 @@ public class QrCode
     public string Code { get; set; } = null!;
     public string? Title { get; set; }
     public string? Description { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? OrderNumber { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ExpiresAt { get; set; }

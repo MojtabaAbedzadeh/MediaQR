@@ -5,8 +5,8 @@
 }
 <style>
     /* =========================================================
-       CREATE AUDIO PAGE
-    ========================================================= */
+           CREATE AUDIO PAGE
+        ========================================================= */
 
     .create-audio-page {
         position: relative;
@@ -17,8 +17,8 @@
 
 
     /* =========================================================
-       BACKGROUND
-    ========================================================= */
+           BACKGROUND
+        ========================================================= */
 
     .audio-bg-shape {
         position: fixed;
@@ -48,8 +48,8 @@
 
 
     /* =========================================================
-       WRAPPER
-    ========================================================= */
+           WRAPPER
+        ========================================================= */
 
     .create-audio-wrapper {
         position: relative;
@@ -61,8 +61,8 @@
 
 
     /* =========================================================
-       HEADER
-    ========================================================= */
+           HEADER
+        ========================================================= */
 
     .create-audio-header {
         display: flex;
@@ -116,8 +116,8 @@
 
 
     /* =========================================================
-       FORM CARD
-    ========================================================= */
+           FORM CARD
+        ========================================================= */
 
     .audio-form-card {
         padding: 32px;
@@ -131,8 +131,8 @@
 
 
     /* =========================================================
-       VALIDATION
-    ========================================================= */
+           VALIDATION
+        ========================================================= */
 
     .audio-validation {
         padding: 12px 15px;
@@ -150,8 +150,8 @@
 
 
     /* =========================================================
-       FORM GROUP
-    ========================================================= */
+           FORM GROUP
+        ========================================================= */
 
     .audio-form-group {
         margin-bottom: 23px;
@@ -185,8 +185,8 @@
 
 
     /* =========================================================
-       INPUT
-    ========================================================= */
+           INPUT
+        ========================================================= */
 
     .audio-input-wrapper {
         position: relative;
@@ -218,10 +218,17 @@
             box-shadow: 0 0 0 4px rgba(215,137,177,.10);
         }
 
+    .audio-input-hint {
+        margin-top: 7px;
+        padding-right: 3px;
+        color: #ab9aaa;
+        font-size: 9px;
+        line-height: 1.8;
+    }
 
     /* =========================================================
-       TEXTAREA
-    ========================================================= */
+           TEXTAREA
+        ========================================================= */
 
     .audio-textarea-wrapper {
         position: relative;
@@ -271,8 +278,8 @@
 
 
     /* =========================================================
-       UPLOAD
-    ========================================================= */
+           UPLOAD
+        ========================================================= */
 
     .audio-upload-box {
         position: relative;
@@ -363,8 +370,8 @@
 
 
     /* =========================================================
-       FILE INFO
-    ========================================================= */
+           FILE INFO
+        ========================================================= */
 
     .audio-file-info {
         display: flex;
@@ -402,8 +409,8 @@
 
 
     /* =========================================================
-       SELECTED FILE
-    ========================================================= */
+           SELECTED FILE
+        ========================================================= */
 
     .selected-file {
         display: none;
@@ -467,8 +474,8 @@
 
 
     /* =========================================================
-       ERROR
-    ========================================================= */
+           ERROR
+        ========================================================= */
 
     .audio-error {
         display: block;
@@ -480,8 +487,8 @@
 
 
     /* =========================================================
-       SUBMIT
-    ========================================================= */
+           SUBMIT
+        ========================================================= */
 
     .create-audio-button {
         width: 100%;
@@ -534,8 +541,8 @@
 
 
     /* =========================================================
-       SECURITY
-    ========================================================= */
+           SECURITY
+        ========================================================= */
 
     .form-security-note {
         display: flex;
@@ -549,8 +556,8 @@
 
 
     /* =========================================================
-       FOOTER
-    ========================================================= */
+           FOOTER
+        ========================================================= */
 
     .create-audio-footer {
         display: flex;
@@ -579,92 +586,86 @@
 
 
     /* =========================================================
-       RESPONSIVE
-    ========================================================= */
+           RESPONSIVE
+        ========================================================= */
 
     @@media (max-width: 767px) {
-        .create-audio-page
-
-    {
-        padding: 35px 15px 50px;
-    }
+        .create-audio-page {
+            padding: 35px 15px 50px;
+        }
 
 
-    .create-audio-header {
-        gap: 13px;
-        padding: 0 3px;
-    }
+        .create-audio-header {
+            gap: 13px;
+            padding: 0 3px;
+        }
 
 
-    .audio-main-icon {
-        width: 57px;
-        height: 57px;
-        border-radius: 18px;
-        font-size: 25px;
-    }
+        .audio-main-icon {
+            width: 57px;
+            height: 57px;
+            border-radius: 18px;
+            font-size: 25px;
+        }
 
 
-    .create-audio-header h1 {
-        font-size: 21px;
-    }
+        .create-audio-header h1 {
+            font-size: 21px;
+        }
 
 
-    .create-audio-header p {
-        font-size: 10px;
-    }
+        .create-audio-header p {
+            font-size: 10px;
+        }
 
 
-    .audio-form-card {
-        padding: 22px 17px;
-        border-radius: 25px;
-    }
+        .audio-form-card {
+            padding: 22px 17px;
+            border-radius: 25px;
+        }
 
 
-    .audio-upload-content {
-        min-height: 185px;
-        padding: 20px;
-    }
+        .audio-upload-content {
+            min-height: 185px;
+            padding: 20px;
+        }
 
 
-    .create-audio-footer {
-        flex-wrap: wrap;
-    }
-
+        .create-audio-footer {
+            flex-wrap: wrap;
+        }
     }
 
 
     @@media (max-width: 450px) {
-        .create-audio-header
-
-    {
-        align-items: flex-start;
-    }
+        .create-audio-header {
+            align-items: flex-start;
+        }
 
 
-    .audio-page-badge {
-        font-size: 8px;
-    }
+        .audio-page-badge {
+            font-size: 8px;
+        }
 
 
-    .create-audio-header h1 {
-        font-size: 19px;
-    }
+        .create-audio-header h1 {
+            font-size: 19px;
+        }
 
 
-    .create-audio-header p {
-        line-height: 1.8;
-    }
+        .create-audio-header p {
+            line-height: 1.8;
+        }
 
 
-    .textarea-bottom {
-        font-size: 8px;
-    }
+        .textarea-bottom {
+            font-size: 8px;
+        }
 
 
-    .upload-formats span {
-        padding: 4px 7px;
-    }
-
+        .upload-formats span {
+            padding: 4px 7px;
+        }
     }
 </style>
 <div class="create-audio-page" dir="rtl">
@@ -817,6 +818,88 @@
 
                     </div>
 
+
+                    <!-- =========================
+                         PHONE NUMBER
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="PhoneNumber">
+
+                            <span class="label-icon">
+                                📱
+                            </span>
+
+                            شماره همراه
+
+                            <small>
+                                اختیاری
+                            </small>
+
+                        </label>
+
+                        <div class="audio-input-wrapper">
+
+                            <input asp-for="PhoneNumber"
+                                   class="audio-input"
+                                   type="tel"
+                                   inputmode="numeric"
+                                   dir="ltr"
+                                   autocomplete="tel"
+                                   maxlength="11"
+                                   placeholder="09123456789" />
+
+                        </div>
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="audio-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- =========================
+                         ORDER NUMBER
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="OrderNumber">
+
+                            <span class="label-icon">
+                                🧾
+                            </span>
+
+                            شماره سفارش
+
+                            <small>
+                                اختیاری
+                            </small>
+
+                        </label>
+
+                        <div class="audio-input-wrapper">
+
+                            <input asp-for="OrderNumber"
+                                   class="audio-input"
+                                   type="text"
+                                   dir="ltr"
+                                   maxlength="100"
+                                   autocomplete="off"
+                                   placeholder="مثلاً: 12548 یا ORD-12548" />
+
+                        </div>
+
+                        <div class="audio-input-hint">
+                            ✨ شماره سفارش زیر QR Code چاپ خواهد شد.
+                        </div>
+
+                        <span asp-validation-for="OrderNumber"
+                              class="audio-error">
+                        </span>
+
+                    </div>
 
                     <!-- =========================
                          AUDIO FILE

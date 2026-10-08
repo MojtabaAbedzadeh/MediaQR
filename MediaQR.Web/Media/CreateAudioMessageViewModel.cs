@@ -13,11 +13,27 @@ public class CreateAudioMessageViewModel
     [Display(Name = "عنوان پیام")]
     public string Title { get; set; } = string.Empty;
 
+
     [StringLength(
         2000,
         ErrorMessage = "توضیحات نمی‌تواند بیشتر از 2000 کاراکتر باشد.")]
     [Display(Name = "متن پیام")]
     public string? Description { get; set; }
+
+
+    [RegularExpression(
+        @"^09\d{9}$",
+        ErrorMessage = "شماره همراه باید به صورت 11 رقمی و با 09 شروع شود.")]
+    [Display(Name = "شماره همراه")]
+    public string? PhoneNumber { get; set; }
+
+
+    [StringLength(
+        100,
+        ErrorMessage = "شماره سفارش نمی‌تواند بیشتر از 100 کاراکتر باشد.")]
+    [Display(Name = "شماره سفارش")]
+    public string? OrderNumber { get; set; }
+
 
     [Required(ErrorMessage = "انتخاب فایل صوتی الزامی است.")]
     [Display(Name = "فایل صوتی")]

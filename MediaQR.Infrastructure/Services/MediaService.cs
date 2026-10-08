@@ -128,26 +128,24 @@ public class MediaService : IMediaService
             var qrCode = new QrCode
             {
                 MediaFile = mediaFile,
-
                 Code = code,
-
+                PhoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim(),
+                OrderNumber = string.IsNullOrWhiteSpace(dto.OrderNumber) ? null : dto.OrderNumber.Trim(),
                 IsActive = true,
-
                 CreatedAt = DateTime.UtcNow
             };
 
             var qrUrl = BuildQrUrl(code);
 
-            var qrImageBytes =
-                await _qrCodeService.GenerateAsync(
-                    qrUrl,
-                    cancellationToken);
+            var qrImageBytes = await _qrCodeService.GenerateAsync(
+                qrUrl,
+                dto.OrderNumber,
+                cancellationToken);
 
             _dbContext.MediaFiles.Add(mediaFile);
             _dbContext.QrCodes.Add(qrCode);
 
-            await _dbContext.SaveChangesAsync(
-                cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return new CreateMediaResultDto
             {

@@ -17,6 +17,59 @@
         background: radial-gradient( circle at 10% 15%, rgba(255, 183, 215, .20), transparent 28% ), radial-gradient( circle at 90% 85%, rgba(190, 176, 255, .20), transparent 30% ), linear-gradient( 135deg, #fff8fc 0%, #f8f5ff 50%, #f6fbff 100% );
     }
 
+    .login-success {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 13px;
+        margin-bottom: 18px;
+        border-radius: 13px;
+        background: #effaf4;
+        border: 1px solid #c7ead5;
+        color: #43815b;
+        font-size: 12px;
+    }
+
+        .login-success > span:first-child {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #65b982;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+    /* =========================================
+       REGISTER LINK
+    ========================================= */
+
+    .login-register-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 19px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(225, 216, 229, .65);
+        color: #9b909f;
+        font-size: 11px;
+    }
+
+        .login-register-link a {
+            color: #a66b91;
+            font-weight: 800;
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+            .login-register-link a:hover {
+                color: #805a76;
+                text-decoration: underline;
+            }
 
     /* =========================================
        BACKGROUND
@@ -673,7 +726,13 @@
                         <input type="hidden"
                                asp-for="ReturnUrl" />
 
-
+                        @if (TempData["Success"] is string successMessage)
+                        {
+                            <div class="login-success">
+                                <span>✓</span>
+                                <span>@successMessage</span>
+                            </div>
+                        }
                         <!-- Validation -->
                         <div asp-validation-summary="ModelOnly"
                              class="login-validation">
@@ -803,6 +862,20 @@
                             <span>
                                 اطلاعات ورود شما به صورت امن ارسال می‌شود.
                             </span>
+
+                        </div>
+
+                        <!-- Register -->
+                        <div class="login-register-link">
+
+                            <span>
+                                حساب کاربری ندارید؟
+                            </span>
+
+                            <a asp-controller="Account"
+                               asp-action="Register">
+                                ایجاد حساب جدید
+                            </a>
 
                         </div>
 

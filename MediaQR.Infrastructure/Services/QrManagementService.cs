@@ -55,9 +55,7 @@ public class QrManagementService : IQrManagementService
             .ToList();
     }
 
-    public async Task<QrCodeDetailsDto?> GetByIdAsync(
-        long id,
-        CancellationToken cancellationToken = default)
+    public async Task<QrCodeDetailsDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         var qrCode = await _dbContext.QrCodes
             .AsNoTracking()
@@ -73,10 +71,10 @@ public class QrManagementService : IQrManagementService
 
         var qrUrl = BuildQrUrl(qrCode.Code);
 
-        var qrImageBytes =
-            await _qrCodeService.GenerateAsync(
-                qrUrl,
-                cancellationToken);
+        var qrImageBytes = await _qrCodeService.GenerateAsync(
+            qrUrl,
+            qrCode.OrderNumber,
+            cancellationToken);
 
         return new QrCodeDetailsDto
         {

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MediaQR.Web.Controllers;
 
-[AllowAnonymous]
 [Route("audio")]
+[Authorize]
 public class AudioMessageController : Controller
 {
     private readonly IMediaService _mediaService;
@@ -54,10 +54,9 @@ public class AudioMessageController : Controller
             var dto = new CreateMediaDto
             {
                 Title = model.Title.Trim(),
-                Description =
-                    string.IsNullOrWhiteSpace(model.Description)
-                        ? null
-                        : model.Description.Trim(),
+                Description = string.IsNullOrWhiteSpace(model.Description) ? null : model.Description.Trim(),
+                PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim(),
+                OrderNumber = string.IsNullOrWhiteSpace(model.OrderNumber) ? null : model.OrderNumber.Trim(),
                 File = model.AudioFile
             };
 

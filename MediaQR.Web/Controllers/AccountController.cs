@@ -115,6 +115,92 @@ public class AccountController : Controller
 
     [HttpGet]
     [AllowAnonymous]
+    public IActionResult Register()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var userName = model.UserName.Trim();
+        var phoneNumber = NormalizePhoneNumber(model.PhoneNumber);
+
+        // بررسی نام کاربری
+        var existingUser =
+            await _userManager.FindByNameAsync(userName);
+
+        if (existingUser != null)
+        {
+            ModelState.AddModelError(
+                nameof(model.UserName),
+                "این نام کاربری قبلاً استفاده شده است.");
+
+            return View(model);
+        }
+
+        // بررسی شماره همراه
+        var existingPhone =
+            _userManager.Users
+                .FirstOrDefault(x => x.PhoneNumber == phoneNumber);
+
+        if (existingPhone != null)
+        {
+            ModelState.AddModelError(
+                nameof(model.PhoneNumber),
+                "این شماره همراه قبلاً ثبت شده است.");
+
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            PhoneNumber = phoneNumber,
+            PhoneNumberConfirmed = false
+        };
+
+        var result =
+            await _userManager.CreateAsync(
+                user,
+                model.Password);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    GetIdentityErrorMessage(error));
+            }
+
+            return View(model);
+        }
+
+        _logger.LogInformation(
+            "New user {UserName} registered successfully.",
+            user.UserName);
+
+        TempData["Success"] =
+            "ثبت‌نام با موفقیت انجام شد. اکنون می‌توانید وارد حساب کاربری خود شوید.";
+
+        return RedirectToAction(nameof(Login));
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
     public IActionResult AccessDenied()
     {
         return View();
@@ -176,5 +262,48 @@ public class AccountController : Controller
             "رمز عبور شما با موفقیت تغییر کرد.";
 
         return RedirectToAction(nameof(ChangePassword));
+    }
+
+    private static string GetIdentityErrorMessage(
+    IdentityError error)
+    {
+        return error.Code switch
+        {
+            "PasswordTooShort" =>
+                "رمز عبور باید حداقل 8 کاراکتر باشد.",
+
+            "PasswordRequiresDigit" =>
+                "رمز عبور باید حداقل شامل یک عدد باشد.",
+
+            "PasswordRequiresLower" =>
+                "رمز عبور باید حداقل شامل یک حرف کوچک انگلیسی باشد.",
+
+            "PasswordRequiresUpper" =>
+                "رمز عبور باید حداقل شامل یک حرف بزرگ انگلیسی باشد.",
+
+            "DuplicateUserName" =>
+                "این نام کاربری قبلاً استفاده شده است.",
+
+            "DuplicateEmail" =>
+                "این ایمیل قبلاً ثبت شده است.",
+
+            _ =>
+                "ثبت‌نام انجام نشد. لطفاً اطلاعات وارد شده را بررسی کنید."
+        };
+    }
+
+    private static string NormalizePhoneNumber(string phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            return string.Empty;
+        }
+
+        return phoneNumber
+            .Trim()
+            .Replace(" ", "")
+            .Replace("-", "")
+            .Replace("(", "")
+            .Replace(")", "");
     }
 }

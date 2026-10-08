@@ -54,7 +54,7 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequiredLength = 8;
 
-        options.User.RequireUniqueEmail = true;
+        options.User.RequireUniqueEmail = false;
 
         options.Lockout.AllowedForNewUsers = true;
         options.Lockout.MaxFailedAccessAttempts = 5;
@@ -179,7 +179,8 @@ builder.Services.AddRateLimiter(options =>
                         });
                 }
 
-                if (path.StartsWithSegments("/audio/create"))
+                if (path.StartsWithSegments("/audio/create") &&
+                    HttpMethods.IsPost(httpContext.Request.Method))
                 {
                     var ipAddress =
                         httpContext.Connection.RemoteIpAddress?

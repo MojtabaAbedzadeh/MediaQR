@@ -1,0 +1,996 @@
+﻿@model MediaQR.Web.Models.Account.RegisterViewModel
+
+@{
+    ViewData["Title"] = "ثبت نام";
+}
+
+<style>
+    /* =========================================
+       REGISTER PAGE
+    ========================================= */
+
+    .register-page {
+        position: relative;
+        min-height: calc(100vh - 90px);
+        padding: 55px 0 70px;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 10% 15%, rgba(255, 183, 215, .20), transparent 28%),
+            radial-gradient(circle at 90% 85%, rgba(190, 176, 255, .20), transparent 30%),
+            linear-gradient(135deg, #fff8fc 0%, #f8f5ff 50%, #f6fbff 100%);
+    }
+
+
+    /* =========================================
+       BACKGROUND
+    ========================================= */
+
+    .register-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .55;
+    }
+
+    .register-bg-shape-1 {
+        width: 300px;
+        height: 300px;
+        top: -130px;
+        right: -110px;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 151, 195, .32),
+            rgba(206, 181, 255, .24)
+        );
+    }
+
+    .register-bg-shape-2 {
+        width: 360px;
+        height: 360px;
+        bottom: -180px;
+        left: -170px;
+        background: linear-gradient(
+            135deg,
+            rgba(183, 211, 255, .27),
+            rgba(239, 181, 255, .23)
+        );
+    }
+
+    .register-bg-shape-3 {
+        width: 120px;
+        height: 120px;
+        top: 35%;
+        left: 10%;
+        background: rgba(255, 185, 215, .15);
+    }
+
+
+    /* =========================================
+       WRAPPER
+    ========================================= */
+
+    .register-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 470px;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .register-logo {
+        width: 68px;
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 13px;
+        border-radius: 23px;
+        background: linear-gradient(135deg, #ff8fbc, #b596f5);
+        color: white;
+        font-size: 30px;
+        box-shadow: 0 16px 35px rgba(205, 127, 187, .25);
+    }
+
+    .register-logo span {
+        animation: registerHeart 2.5s ease-in-out infinite;
+    }
+
+    .register-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 14px;
+        margin-bottom: 8px;
+        border-radius: 50px;
+        background: rgba(255, 255, 255, .75);
+        border: 1px solid rgba(255, 174, 210, .28);
+        color: #a66b91;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .register-header h1 {
+        margin: 0 0 7px;
+        color: #47384f;
+        font-size: 29px;
+        font-weight: 800;
+    }
+
+    .register-header p {
+        max-width: 370px;
+        margin: 0 auto;
+        color: #8c7f92;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+
+    /* =========================================
+       CARD
+    ========================================= */
+
+    .register-card {
+        position: relative;
+        padding: 30px;
+        overflow: hidden;
+        border-radius: 31px;
+        background: rgba(255, 255, 255, .79);
+        border: 1px solid rgba(255, 255, 255, .9);
+        box-shadow:
+            0 28px 75px rgba(105, 79, 119, .13),
+            inset 0 1px 0 rgba(255, 255, 255, .95);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+    }
+
+    .register-card-inner {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    /* =========================================
+       DECORATIONS
+    ========================================= */
+
+    .register-card-decoration {
+        position: absolute;
+        pointer-events: none;
+        opacity: .55;
+        font-size: 30px;
+    }
+
+    .register-decoration-1 {
+        top: 18px;
+        right: 22px;
+        color: #e9aac8;
+        transform: rotate(-15deg);
+    }
+
+    .register-decoration-2 {
+        bottom: 20px;
+        left: 23px;
+        color: #b8a5ed;
+        font-size: 20px;
+        transform: rotate(12deg);
+    }
+
+
+    /* =========================================
+       CARD TITLE
+    ========================================= */
+
+    .register-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 23px;
+        margin-bottom: 23px;
+        border-bottom: 1px solid rgba(225, 216, 229, .7);
+    }
+
+    .register-card-icon {
+        width: 45px;
+        height: 45px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #fff0f7, #f0ebff);
+        font-size: 19px;
+    }
+
+    .register-card-title > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .register-card-title strong {
+        color: #5a4a61;
+        font-size: 15px;
+    }
+
+    .register-card-title span {
+        color: #a097a5;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       VALIDATION
+    ========================================= */
+
+    .register-validation {
+        padding: 11px 13px;
+        margin-bottom: 18px;
+        border-radius: 13px;
+        background: #fff1f4;
+        border: 1px solid #f5cbd5;
+        color: #b64f6b;
+        font-size: 12px;
+    }
+
+    .register-validation:empty {
+        display: none;
+    }
+
+
+    /* =========================================
+       FORM
+    ========================================= */
+
+    .register-form-group {
+        margin-bottom: 17px;
+    }
+
+    .register-form-group > label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        color: #695b6f;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .register-label-icon {
+        font-size: 14px;
+    }
+
+
+    /* =========================================
+       INPUT
+    ========================================= */
+
+    .register-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 54px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .78);
+        border: 1px solid #e7dfe9;
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            background .2s ease;
+    }
+
+    .register-input-wrapper:focus-within {
+        background: white;
+        border-color: #d9a8ca;
+        box-shadow: 0 0 0 4px rgba(226, 164, 202, .10);
+    }
+
+    .register-input-icon {
+        width: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #b293b0;
+        font-family: Arial, sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .register-input {
+        min-width: 0;
+        flex: 1;
+        height: 100%;
+        padding: 0 10px 0 12px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #5b4d61;
+        font-family: inherit;
+        font-size: 13px;
+    }
+
+    .register-input::placeholder {
+        color: #b7adb9;
+    }
+
+    .register-input:-webkit-autofill,
+    .register-input:-webkit-autofill:hover,
+    .register-input:-webkit-autofill:focus {
+        -webkit-text-fill-color: #5b4d61;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+
+    /* =========================================
+       PASSWORD
+    ========================================= */
+
+    .register-password-input {
+        padding-left: 52px;
+    }
+
+    .register-password-toggle {
+        position: absolute;
+        left: 10px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 11px;
+        background: transparent;
+        color: #9c8ba1;
+        font-size: 16px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .register-password-toggle:hover {
+        background: #faf1f8;
+        color: #a86f98;
+    }
+
+
+    /* =========================================
+       ERROR
+    ========================================= */
+
+    .register-error {
+        display: block;
+        margin-top: 6px;
+        color: #c05b76;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       PASSWORD HINT
+    ========================================= */
+
+    .register-password-hint {
+        margin-top: 7px;
+        color: #a097a5;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+
+    /* =========================================
+       SUBMIT
+    ========================================= */
+
+    .register-submit-button {
+        width: 100%;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        margin-top: 22px;
+        border: 0;
+        border-radius: 17px;
+        background: linear-gradient(135deg, #ff8fbc, #b393f3);
+        color: white;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 14px 28px rgba(195, 125, 189, .24);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .register-submit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 35px rgba(195, 125, 189, .31);
+    }
+
+    .register-submit-button:active {
+        transform: translateY(0);
+    }
+
+    .register-submit-icon {
+        font-size: 16px;
+    }
+
+    .register-submit-arrow {
+        margin-right: 5px;
+        font-size: 18px;
+    }
+
+
+    /* =========================================
+       SECURITY
+    ========================================= */
+
+    .register-security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 17px;
+        color: #a197a5;
+        font-size: 10px;
+    }
+
+    .register-security-note span:first-child {
+        font-size: 13px;
+    }
+
+
+    /* =========================================
+       LOGIN LINK
+    ========================================= */
+
+    .register-login-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 19px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(225, 216, 229, .65);
+        color: #9b909f;
+        font-size: 11px;
+    }
+
+    .register-login-link a {
+        color: #a66b91;
+        font-weight: 800;
+        text-decoration: none;
+        transition: color .2s ease;
+    }
+
+    .register-login-link a:hover {
+        color: #805a76;
+        text-decoration: underline;
+    }
+
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+
+    .register-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 21px;
+        color: #9b909f;
+        font-size: 10px;
+    }
+
+    .register-footer-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .register-footer-item span {
+        font-size: 13px;
+    }
+
+    .register-footer-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #d4c9d8;
+    }
+
+    .register-footer-message {
+        margin-top: 15px;
+        text-align: center;
+        color: #aa9eaa;
+        font-size: 10px;
+    }
+
+
+    /* =========================================
+       ANIMATION
+    ========================================= */
+
+    @@keyframes registerHeart {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.12);
+        }
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @@media (max-width: 576px) {
+
+        .register-page {
+            padding: 35px 0 55px;
+        }
+
+        .register-wrapper {
+            padding: 0 10px;
+        }
+
+        .register-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 20px;
+            font-size: 27px;
+        }
+
+        .register-header h1 {
+            font-size: 24px;
+        }
+
+        .register-header p {
+            font-size: 12px;
+        }
+
+        .register-card {
+            padding: 22px 17px;
+            border-radius: 26px;
+        }
+
+        .register-card-title {
+            padding-bottom: 19px;
+            margin-bottom: 19px;
+        }
+
+        .register-footer {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .register-footer-dot {
+            display: none;
+        }
+
+        .register-footer-item {
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .5);
+        }
+    }
+
+    @@media (max-width: 380px) {
+
+        .register-card {
+            padding: 19px 14px;
+        }
+
+        .register-header h1 {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="register-page" dir="rtl">
+
+    <div class="register-bg-shape register-bg-shape-1"></div>
+    <div class="register-bg-shape register-bg-shape-2"></div>
+    <div class="register-bg-shape register-bg-shape-3"></div>
+
+    <div class="container">
+
+        <div class="register-wrapper">
+
+            <!-- Header -->
+            <div class="register-header">
+
+                <div class="register-logo">
+                    <span>♥</span>
+                </div>
+
+                <div class="register-badge">
+                    ✨ شروع یک تجربه جدید
+                </div>
+
+                <h1>
+                    ایجاد حساب MediaQR
+                </h1>
+
+                <p>
+                    حساب خودت را بساز و پیام‌های صوتی و خاطره‌های دوست‌داشتنی‌ات را مدیریت کن.
+                </p>
+
+            </div>
+
+
+            <!-- Register Card -->
+            <div class="register-card">
+
+                <div class="register-card-decoration register-decoration-1">
+                    ♡
+                </div>
+
+                <div class="register-card-decoration register-decoration-2">
+                    ✦
+                </div>
+
+
+                <div class="register-card-inner">
+
+                    <div class="register-card-title">
+
+                        <div class="register-card-icon">
+                            ✨
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                ایجاد حساب کاربری
+                            </strong>
+
+                            <span>
+                                اطلاعات خود را برای ثبت‌نام وارد کنید
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <form asp-action="Register"
+                          asp-controller="Account"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+
+                        <!-- Validation -->
+                        <div asp-validation-summary="ModelOnly"
+                             class="register-validation">
+                        </div>
+
+
+                        <!-- Username -->
+                        <div class="register-form-group">
+
+                            <label asp-for="UserName">
+
+                                <span class="register-label-icon">
+                                    👤
+                                </span>
+
+                                نام کاربری
+
+                            </label>
+
+                            <div class="register-input-wrapper">
+
+                                <span class="register-input-icon">
+                                    @@
+                                </span>
+
+                                <input asp-for="UserName"
+                                       class="register-input"
+                                       autocomplete="username"
+                                       autofocus
+                                       placeholder="نام کاربری خود را وارد کنید" />
+
+                            </div>
+
+                            <span asp-validation-for="UserName"
+                                  class="register-error">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Phone Number -->
+                        <div class="register-form-group">
+
+                            <label asp-for="PhoneNumber">
+
+                                <span class="register-label-icon">
+                                    📱
+                                </span>
+
+                                شماره همراه
+
+                            </label>
+
+                            <div class="register-input-wrapper">
+
+                                <span class="register-input-icon">
+                                    +
+                                </span>
+
+                                <input asp-for="PhoneNumber"
+                                       class="register-input"
+                                       type="tel"
+                                       inputmode="numeric"
+                                       dir="ltr"
+                                       autocomplete="tel"
+                                       maxlength="11"
+                                       placeholder="09123456789" />
+
+                            </div>
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="register-error">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Password -->
+                        <div class="register-form-group">
+
+                            <label asp-for="Password">
+
+                                <span class="register-label-icon">
+                                    🔑
+                                </span>
+
+                                رمز عبور
+
+                            </label>
+
+                            <div class="register-input-wrapper">
+
+                                <span class="register-input-icon">
+                                    •••
+                                </span>
+
+                                <input asp-for="Password"
+                                       id="registerPassword"
+                                       class="register-input register-password-input"
+                                       autocomplete="new-password"
+                                       placeholder="رمز عبور خود را وارد کنید" />
+
+                                <button type="button"
+                                        class="register-password-toggle"
+                                        id="toggleRegisterPassword"
+                                        aria-label="نمایش رمز عبور">
+                                    👁
+                                </button>
+
+                            </div>
+
+                            <span asp-validation-for="Password"
+                                  class="register-error">
+                            </span>
+
+                            <div class="register-password-hint">
+                                حداقل ۸ کاراکتر، شامل حداقل یک عدد، یک حرف کوچک و یک حرف بزرگ انگلیسی.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Confirm Password -->
+                        <div class="register-form-group">
+
+                            <label asp-for="ConfirmPassword">
+
+                                <span class="register-label-icon">
+                                    🔐
+                                </span>
+
+                                تکرار رمز عبور
+
+                            </label>
+
+                            <div class="register-input-wrapper">
+
+                                <span class="register-input-icon">
+                                    •••
+                                </span>
+
+                                <input asp-for="ConfirmPassword"
+                                       id="registerConfirmPassword"
+                                       class="register-input register-password-input"
+                                       autocomplete="new-password"
+                                       placeholder="رمز عبور را دوباره وارد کنید" />
+
+                                <button type="button"
+                                        class="register-password-toggle"
+                                        id="toggleRegisterConfirmPassword"
+                                        aria-label="نمایش رمز عبور">
+                                    👁
+                                </button>
+
+                            </div>
+
+                            <span asp-validation-for="ConfirmPassword"
+                                  class="register-error">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Submit -->
+                        <button type="submit"
+                                class="register-submit-button">
+
+                            <span class="register-submit-icon">
+                                ✨
+                            </span>
+
+                            <span>
+                                ایجاد حساب
+                            </span>
+
+                            <span class="register-submit-arrow">
+                                ←
+                            </span>
+
+                        </button>
+
+
+                        <!-- Security -->
+                        <div class="register-security-note">
+
+                            <span>
+                                🔒
+                            </span>
+
+                            <span>
+                                اطلاعات شما به صورت امن ذخیره می‌شود.
+                            </span>
+
+                        </div>
+
+
+                        <!-- Login -->
+                        <div class="register-login-link">
+
+                            <span>
+                                قبلاً حساب ساخته‌اید؟
+                            </span>
+
+                            <a asp-controller="Account"
+                               asp-action="Login">
+                                ورود به حساب
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="register-footer">
+
+                <div class="register-footer-item">
+                    <span>💌</span>
+                    پیام‌های خاص
+                </div>
+
+                <div class="register-footer-dot"></div>
+
+                <div class="register-footer-item">
+                    <span>▦</span>
+                    QR Code
+                </div>
+
+                <div class="register-footer-dot"></div>
+
+                <div class="register-footer-item">
+                    <span>♥</span>
+                    MediaQR
+                </div>
+
+            </div>
+
+
+            <div class="register-footer-message">
+                لحظه‌های قشنگت را ماندگار کن ♥
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            function setupPasswordToggle(buttonId, inputId) {
+
+                const button =
+                    document.getElementById(buttonId);
+
+                const input =
+                    document.getElementById(inputId);
+
+
+                if (!button || !input) {
+                    return;
+                }
+
+
+                button.addEventListener("click", function () {
+
+                    if (input.type === "password") {
+
+                        input.type = "text";
+
+                        button.textContent = "🙈";
+
+                        button.setAttribute(
+                            "aria-label",
+                            "مخفی کردن رمز عبور"
+                        );
+
+                    }
+                    else {
+
+                        input.type = "password";
+
+                        button.textContent = "👁";
+
+                        button.setAttribute(
+                            "aria-label",
+                            "نمایش رمز عبور"
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            setupPasswordToggle(
+                "toggleRegisterPassword",
+                "registerPassword"
+            );
+
+
+            setupPasswordToggle(
+                "toggleRegisterConfirmPassword",
+                "registerConfirmPassword"
+            );
+
+        });
+
+    </script>
+}
