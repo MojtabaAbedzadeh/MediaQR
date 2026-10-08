@@ -1,4 +1,4 @@
-﻿namespace MediaQR.Domain.Entities;
+﻿namespace MediaQR.Domain.Enums;
 
 public enum AnalyticsEventType
 {

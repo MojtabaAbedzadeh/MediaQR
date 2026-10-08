@@ -1,4 +1,6 @@
-﻿namespace MediaQR.Domain.Entities;
+﻿using MediaQR.Domain.Enums;
+
+namespace MediaQR.Domain.Entities;
 
 public class AnalyticsEvent
 {

@@ -1,0 +1,777 @@
+﻿@model IReadOnlyList<MediaQR.Application.DTOs.Qr.QrCodeListItemDto>
+
+@{
+    ViewData["Title"] = "QRهای من";
+}
+
+<div class="my-qr-page" dir="rtl">
+
+    <div class="container-fluid py-4">
+
+        <!-- Header -->
+        <div class="page-header mb-4">
+
+            <div>
+                <div class="breadcrumb-text">
+                    <a asp-controller="Dashboard"
+                       asp-action="Index">
+                        داشبورد
+                    </a>
+
+                    <i class="bi bi-chevron-left"></i>
+
+                    <span>QRهای من</span>
+                </div>
+
+                <h1>
+                    QR Codeهای من
+                </h1>
+
+                <p>
+                    مدیریت QR Codeهایی که برای رسانه‌های خود ایجاد کرده‌اید.
+                </p>
+            </div>
+
+            <div>
+                <a asp-controller="AudioMessage"
+                   asp-action="Create"
+                   class="btn btn-primary create-button">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    ایجاد پیام صوتی
+
+                </a>
+            </div>
+
+        </div>
+
+
+        <!-- Success message -->
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success custom-alert">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <span>
+                    @successMessage
+                </span>
+
+            </div>
+        }
+
+
+        <!-- Summary -->
+
+        <div class="summary-card mb-4">
+
+            <div class="summary-icon">
+                <i class="bi bi-qr-code"></i>
+            </div>
+
+            <div class="summary-content">
+
+                <span>
+                    تعداد QR Codeهای شما
+                </span>
+
+                <strong>
+                    @Model.Count
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- QR list -->
+
+        <div class="qr-card">
+
+            <div class="qr-card-header">
+
+                <div>
+                    <h2>
+                        لیست QR Codeها
+                    </h2>
+
+                    <p>
+                        QR Codeهای ایجاد شده توسط حساب کاربری شما
+                    </p>
+                </div>
+
+            </div>
+
+
+            @if (Model.Count == 0)
+            {
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="bi bi-qr-code"></i>
+                    </div>
+
+                    <h3>
+                        هنوز QR Codeای ندارید
+                    </h3>
+
+                    <p>
+                        اولین پیام صوتی خود را ایجاد کنید
+                        تا QR Code اختصاصی آن ساخته شود.
+                    </p>
+
+                    <a asp-controller="AudioMessage"
+                       asp-action="Create"
+                       class="btn btn-primary">
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        ایجاد پیام صوتی
+
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table qr-table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    QR Code
+                                </th>
+
+                                <th>
+                                    رسانه
+                                </th>
+
+                                <th>
+                                    وضعیت
+                                </th>
+
+                                <th>
+                                    تاریخ ایجاد
+                                </th>
+
+                                <th class="text-center">
+                                    عملیات
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var qr in Model)
+                            {
+                                var isExpired =
+                                qr.IsExpired;
+
+                                var isActive =
+                                qr.IsActive && !isExpired;
+
+                                <tr>
+
+                                    <!-- QR -->
+
+                                    <td>
+
+                                        <div class="qr-info">
+
+                                            <div class="qr-icon">
+                                                <i class="bi bi-qr-code"></i>
+                                            </div>
+
+                                            <div class="qr-info-content">
+
+                                                <strong>
+                                                    @(string.IsNullOrWhiteSpace(qr.Title)
+                                                                                                ? "بدون عنوان"
+                                                                                                : qr.Title)
+                                        </strong>
+
+                                                <span dir="ltr">
+                                                    @qr.Code
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Media -->
+
+                                    <td>
+
+                                        <div class="media-info">
+
+                                            <strong>
+                                                @qr.MediaTitle
+                                            </strong>
+
+                                            <span>
+                                                @qr.MediaType
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Status -->
+
+                                    <td>
+
+                                @if (isExpired)
+                                        {
+                                            <span class="status status-expired">
+                                                <i class="bi bi-clock-history"></i>
+                                                منقضی شده
+                                            </span>
+                                        }
+                                        else if (isActive)
+                                        {
+                                            <span class="status status-active">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                                فعال
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status status-disabled">
+                                                <i class="bi bi-pause-circle-fill"></i>
+                                                غیرفعال
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Date -->
+
+                                    <td>
+
+                                        <span class="created-date"
+                                              dir="ltr">
+
+                                            @qr.CreatedAt
+                                            .ToLocalTime()
+                                            .ToString("yyyy/MM/dd")
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+
+                                    <td>
+
+                                        <div class="actions">
+
+                                            <!-- View -->
+
+                                            <a asp-controller="MyQr"
+                                               asp-action="Details"
+                                               asp-route-id="@qr.Id"
+                                               class="action-button action-view"
+                                               title="مشاهده">
+
+                                                <i class="bi bi-eye"></i>
+
+                                            </a>
+
+
+                                            <!-- Open -->
+
+                                            <a href="@qr.QrUrl"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               class="action-button action-open"
+                                               title="باز کردن QR">
+
+                                                <i class="bi bi-box-arrow-up-left"></i>
+
+                                            </a>
+
+
+                                            <!-- Toggle -->
+
+                                            <form asp-controller="MyQr"
+                                                  asp-action="Toggle"
+                                                  asp-route-id="@qr.Id"
+                                                  method="post"
+                                                  class="action-form">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="action-button @(isActive ? "action-disable" : "action-enable")"
+                                                        title="@(isActive ? "غیرفعال کردن" : "فعال کردن")">
+
+                                                    <i class="bi @(isActive
+                                                                                                                                                                      ? "bi-pause-circle"
+                                                                                                                                                                      : "bi-play-circle")"></i>
+
+                                        </button>
+
+                                            </form>
+
+
+                                            <!-- Delete -->
+
+                                            <form asp-controller="MyQr"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@qr.Id"
+                                                  method="post"
+                                                  class="action-form"
+                                                  onsubmit="return confirmDelete();">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="action-button action-delete"
+                                                        title="حذف">
+
+                                                    <i class="bi bi-trash3"></i>
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                                                }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .my-qr-page {
+        min-height: calc(100vh - 80px);
+        background: #f7f8fc;
+        color: #252336;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .breadcrumb-text {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 10px;
+        color: #9995a8;
+        font-size: 12px;
+    }
+
+        .breadcrumb-text a {
+            color: #7251a7;
+            text-decoration: none;
+        }
+
+        .breadcrumb-text i {
+            font-size: 9px;
+        }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 27px;
+        font-weight: 800;
+        color: #252336;
+    }
+
+    .page-header p {
+        margin: 7px 0 0;
+        color: #858296;
+        font-size: 13px;
+    }
+
+    .create-button {
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 11px;
+        font-weight: 600;
+    }
+
+    .custom-alert {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 12px;
+        font-size: 13px;
+    }
+
+    .summary-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        width: fit-content;
+        min-width: 220px;
+        padding: 16px 20px;
+        background: #fff;
+        border: 1px solid #ececf2;
+        border-radius: 15px;
+        box-shadow: 0 7px 22px rgba(40, 35, 70, .04);
+    }
+
+    .summary-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0eafa;
+        color: #6f42c1;
+        font-size: 20px;
+    }
+
+    .summary-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+        .summary-content span {
+            color: #858296;
+            font-size: 11px;
+        }
+
+        .summary-content strong {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+    .qr-card {
+        background: #fff;
+        border: 1px solid #ececf2;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(40, 35, 70, .05);
+        overflow: hidden;
+    }
+
+    .qr-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px;
+        border-bottom: 1px solid #eeeeF3;
+    }
+
+        .qr-card-header h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .qr-card-header p {
+            margin: 5px 0 0;
+            color: #858296;
+            font-size: 12px;
+        }
+
+    .qr-table {
+        margin: 0;
+    }
+
+        .qr-table thead th {
+            padding: 14px 20px;
+            background: #fafafe;
+            border-bottom: 1px solid #eeeeF3;
+            color: #77748a;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .qr-table tbody td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f4;
+            color: #464355;
+            font-size: 13px;
+        }
+
+        .qr-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+    .qr-info {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 210px;
+    }
+
+    .qr-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0eafa;
+        color: #6f42c1;
+        font-size: 19px;
+    }
+
+    .qr-info-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .qr-info-content strong {
+            color: #302d3e;
+            font-size: 13px;
+        }
+
+        .qr-info-content span {
+            color: #9995a8;
+            font-size: 10px;
+            letter-spacing: .3px;
+        }
+
+    .media-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .media-info strong {
+            color: #393646;
+            font-size: 13px;
+        }
+
+        .media-info span {
+            color: #9995a8;
+            font-size: 11px;
+        }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e9f8ef;
+        color: #218c57;
+    }
+
+    .status-disabled {
+        background: #f1f1f4;
+        color: #777582;
+    }
+
+    .status-expired {
+        background: #fff0f0;
+        color: #c34d4d;
+    }
+
+    .created-date {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .action-form {
+        margin: 0;
+        padding: 0;
+    }
+
+    .action-button {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border: 0;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform .15s ease, background .15s ease;
+    }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+        }
+
+    .action-view {
+        background: #f0eafa;
+        color: #6840a4;
+    }
+
+        .action-view:hover {
+            background: #e6def5;
+            color: #58338d;
+        }
+
+    .action-open {
+        background: #edf3ff;
+        color: #3768d5;
+    }
+
+        .action-open:hover {
+            background: #e0eaff;
+            color: #2859c3;
+        }
+
+    .action-enable {
+        background: #e9f8ef;
+        color: #218c57;
+    }
+
+        .action-enable:hover {
+            background: #ddf3e6;
+        }
+
+    .action-disable {
+        background: #fff5e6;
+        color: #c27a18;
+    }
+
+        .action-disable:hover {
+            background: #ffecd0;
+        }
+
+    .action-delete {
+        background: #fff0f0;
+        color: #c34d4d;
+    }
+
+        .action-delete:hover {
+            background: #ffe2e2;
+        }
+
+    .empty-state {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 17px;
+        border-radius: 19px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3f0fa;
+        color: #7251a7;
+        font-size: 31px;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        max-width: 430px;
+        margin: 0 auto 20px;
+        color: #858296;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .empty-state .btn {
+        border-radius: 10px;
+    }
+
+    @@media (max-width: 767.98px) {
+        .my-qr-page .container-fluid {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .page-header {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+        .create-button {
+            width: 100%;
+        }
+
+        .summary-card {
+            width: 100%;
+        }
+
+        .qr-card-header {
+            padding: 18px;
+        }
+
+        .qr-table thead th,
+        .qr-table tbody td {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+    }
+</style>
+
+
+@section Scripts {
+
+    <script>
+
+        function confirmDelete() {
+
+            return confirm(
+                "آیا از حذف این QR Code اطمینان دارید؟\n\nاین عملیات قابل بازگشت نیست."
+            );
+
+        }
+
+    </script>
+
+}

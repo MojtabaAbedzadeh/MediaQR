@@ -1,6 +1,7 @@
 ﻿using MediaQR.Application.DTOs.Analytics;
 using MediaQR.Application.Interfaces;
 using MediaQR.Domain.Entities;
+using MediaQR.Domain.Enums;
 using MediaQR.Infrastructure.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

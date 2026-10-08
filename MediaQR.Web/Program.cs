@@ -122,6 +122,7 @@ builder.Services.AddScoped<FileSignatureValidator>();
 builder.Services.AddScoped<IQrCodeService, QrCodeService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IMediaViewerService, MediaViewerService>();
+builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
 builder.Services.AddScoped<IQrManagementService, QrManagementService>();
 builder.Services.AddScoped<IMediaManagementService, MediaManagementService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();

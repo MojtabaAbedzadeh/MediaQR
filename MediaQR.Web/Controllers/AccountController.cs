@@ -199,10 +199,12 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Login));
     }
 
-    [HttpGet]
     [AllowAnonymous]
-    public IActionResult AccessDenied()
+    [HttpGet("/account/access-denied")]
+    public IActionResult AccessDenied(string? returnUrl = null)
     {
+        ViewBag.ReturnUrl = returnUrl;
+
         return View();
     }
 

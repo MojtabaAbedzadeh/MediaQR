@@ -7,6 +7,7 @@ using MediaQR.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace MediaQR.Infrastructure.Services;
@@ -45,6 +46,8 @@ public class MediaService : IMediaService
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
+
+        var userId = GetCurrentUserId();
 
         if (string.IsNullOrWhiteSpace(dto.Title))
         {
@@ -95,34 +98,16 @@ public class MediaService : IMediaService
             var mediaFile = new MediaFile
             {
                 Title = dto.Title.Trim(),
-
-                Description =
-                    string.IsNullOrWhiteSpace(dto.Description)
-                        ? null
-                        : dto.Description.Trim(),
-
-                OriginalFileName =
-                    dto.File.FileName,
-
-                StoredFileName =
-                    Path.GetFileName(storagePath),
-
-                StoragePath =
-                    storagePath,
-
-                ContentType =
-                    dto.File.ContentType,
-
-                FileSize =
-                    dto.File.Length,
-
-                MediaType =
-                    mediaType,
-
+                UserId = userId,
+                Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
+                OriginalFileName = dto.File.FileName,
+                StoredFileName = Path.GetFileName(storagePath),
+                StoragePath = storagePath,
+                ContentType = dto.File.ContentType,
+                FileSize = dto.File.Length,
+                MediaType =  mediaType,
                 IsActive = true,
-
-                CreatedAt =
-                    DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             var qrCode = new QrCode
@@ -244,5 +229,29 @@ public class MediaService : IMediaService
         }
 
         return $"{request.Scheme}://{request.Host}/m/{code}";
+    }
+
+    private string GetCurrentUserId()
+    {
+        var user =
+            _httpContextAccessor.HttpContext?.User;
+
+        if (user?.Identity?.IsAuthenticated != true)
+        {
+            throw new UnauthorizedAccessException(
+                "برای ایجاد رسانه باید وارد حساب کاربری شوید.");
+        }
+
+        var userId =
+            user.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new UnauthorizedAccessException(
+                "شناسه کاربر در اطلاعات احراز هویت یافت نشد.");
+        }
+
+        return userId;
     }
 }

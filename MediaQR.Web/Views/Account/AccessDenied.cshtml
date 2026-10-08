@@ -1,21 +1,662 @@
 ﻿@{
-    ViewData["Title"] = "عدم دسترسی";
+    ViewData["Title"] = "دسترسی غیرمجاز";
 }
 
-<div class="container py-5 text-center" dir="rtl">
+<div class="access-denied-page" dir="rtl">
 
-    <h1 class="mb-3">
-        عدم دسترسی
-    </h1>
+    <!-- Decorative Background -->
+    <div class="access-bg-shape access-bg-shape-1"></div>
+    <div class="access-bg-shape access-bg-shape-2"></div>
+    <div class="access-bg-shape access-bg-shape-3"></div>
 
-    <p class="text-muted mb-4">
-        شما مجوز دسترسی به این بخش را ندارید.
-    </p>
+    <div class="access-denied-wrapper">
 
-    <a asp-controller="Home"
-       asp-action="Index"
-       class="btn btn-primary">
-        بازگشت به صفحه اصلی
-    </a>
+        <!-- Main Card -->
+        <div class="access-denied-card">
 
+            <!-- Icon -->
+            <div class="access-icon-wrapper">
+                <div class="access-icon-glow"></div>
+
+                <div class="access-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7 10V8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8V10"
+                              stroke="currentColor"
+                              stroke-width="1.8"
+                              stroke-linecap="round" />
+
+                        <rect x="4" y="10" width="16" height="11" rx="3"
+                              stroke="currentColor"
+                              stroke-width="1.8" />
+
+                        <path d="M12 14V17"
+                              stroke="currentColor"
+                              stroke-width="1.8"
+                              stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Badge -->
+            <div class="access-badge">
+                <span class="access-badge-dot"></span>
+                محدودیت دسترسی
+            </div>
+
+            <!-- Content -->
+            <div class="access-content">
+
+                <h1 class="access-title">
+                    دسترسی
+                    <span>امکان‌پذیر نیست</span>
+                </h1>
+
+                <p class="access-description">
+                    متأسفانه شما مجوز لازم برای مشاهده این صفحه را ندارید.
+                    اگر فکر می‌کنید این محدودیت اشتباه است، با مدیر سیستم تماس بگیرید.
+                </p>
+
+            </div>
+
+            <!-- Permission Info -->
+            <div class="access-info-box">
+
+                <div class="access-info-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9"
+                                stroke="currentColor"
+                                stroke-width="1.7" />
+
+                        <path d="M12 10V16"
+                              stroke="currentColor"
+                              stroke-width="1.7"
+                              stroke-linecap="round" />
+
+                        <circle cx="12" cy="7.5" r="1"
+                                fill="currentColor" />
+                    </svg>
+                </div>
+
+                <div class="access-info-content">
+                    <strong>مجوز مورد نیاز</strong>
+                    <span>
+                        برای دسترسی به این بخش، حساب کاربری شما باید
+                        دارای سطح دسترسی مناسب باشد.
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="access-actions">
+
+                <a href="@Url.Action("Index", "Home")"
+                   class="access-primary-button">
+
+                    <span class="access-button-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M3 10.5L12 3L21 10.5"
+                                  stroke="currentColor"
+                                  stroke-width="1.8"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round" />
+
+                            <path d="M5.5 9.5V20H18.5V9.5"
+                                  stroke="currentColor"
+                                  stroke-width="1.8"
+                                  stroke-linejoin="round" />
+
+                            <path d="M9.5 20V14H14.5V20"
+                                  stroke="currentColor"
+                                  stroke-width="1.8"
+                                  stroke-linejoin="round" />
+                        </svg>
+                    </span>
+
+                    <span>بازگشت به داشبورد</span>
+
+                    <span class="access-button-arrow">
+                        ←
+                    </span>
+
+                </a>
+
+                <button type="button"
+                        class="access-secondary-button"
+                        onclick="goBack()">
+
+                    <span class="access-secondary-icon">
+                        ←
+                    </span>
+
+                    بازگشت به صفحه قبل
+
+                </button>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="access-footer">
+
+                <span class="access-footer-dot"></span>
+
+                <span>
+                    دسترسی شما توسط سیستم مدیریت می‌شود
+                </span>
+
+                <span class="access-footer-heart">♡</span>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>
+
+
+<style>
+
+    /* =========================================================
+           ACCESS DENIED PAGE
+        ========================================================= */
+
+    .access-denied-page {
+        position: relative;
+        min-height: calc(100vh - 80px);
+        padding: 60px 20px 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: radial-gradient( circle at 10% 15%, rgba(244, 180, 214, .20), transparent 30% ), radial-gradient( circle at 90% 20%, rgba(184, 174, 255, .20), transparent 32% ), radial-gradient( circle at 50% 100%, rgba(165, 220, 255, .16), transparent 35% ), #fffafd;
+    }
+
+
+    /* =========================================================
+           BACKGROUND SHAPES
+        ========================================================= */
+
+    .access-bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(2px);
+    }
+
+    .access-bg-shape-1 {
+        width: 320px;
+        height: 320px;
+        top: -150px;
+        right: -100px;
+        background: radial-gradient( circle, rgba(239, 170, 211, .25), rgba(239, 170, 211, 0) );
+    }
+
+    .access-bg-shape-2 {
+        width: 380px;
+        height: 380px;
+        bottom: -190px;
+        left: -130px;
+        background: radial-gradient( circle, rgba(179, 171, 255, .23), rgba(179, 171, 255, 0) );
+    }
+
+    .access-bg-shape-3 {
+        width: 180px;
+        height: 180px;
+        top: 35%;
+        left: 8%;
+        background: radial-gradient( circle, rgba(255, 210, 228, .18), rgba(255, 210, 228, 0) );
+    }
+
+
+    /* =========================================================
+           WRAPPER
+        ========================================================= */
+
+    .access-denied-wrapper {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        max-width: 620px;
+    }
+
+
+    /* =========================================================
+           CARD
+        ========================================================= */
+
+    .access-denied-card {
+        position: relative;
+        padding: 48px 46px 34px;
+        border: 1px solid rgba(255, 255, 255, .78);
+        border-radius: 32px;
+        background: linear-gradient( 145deg, rgba(255, 255, 255, .90), rgba(255, 245, 251, .78) );
+        box-shadow: 0 30px 80px rgba(103, 74, 111, .10), 0 10px 30px rgba(103, 74, 111, .06), inset 0 1px 0 rgba(255,255,255,.9);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        text-align: center;
+        overflow: hidden;
+    }
+
+
+        .access-denied-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            right: 12%;
+            height: 1px;
+            background: linear-gradient( 90deg, transparent, rgba(222, 151, 198, .45), rgba(173, 164, 241, .45), transparent );
+        }
+
+
+    /* =========================================================
+           ICON
+        ========================================================= */
+
+    .access-icon-wrapper {
+        position: relative;
+        width: 112px;
+        height: 112px;
+        margin: 0 auto 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .access-icon-glow {
+        position: absolute;
+        inset: 0;
+        border-radius: 34px;
+        background: linear-gradient( 145deg, rgba(242, 177, 211, .30), rgba(178, 169, 247, .28) );
+        filter: blur(14px);
+        animation: accessGlow 3s ease-in-out infinite;
+    }
+
+
+    .access-icon {
+        position: relative;
+        z-index: 2;
+        width: 88px;
+        height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 28px;
+        color: #9b5f8d;
+        background: linear-gradient( 145deg, rgba(255, 235, 246, .95), rgba(239, 231, 255, .95) );
+        border: 1px solid rgba(255,255,255,.9);
+        box-shadow: 0 16px 35px rgba(163, 103, 151, .13), inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+
+        .access-icon svg {
+            width: 42px;
+            height: 42px;
+        }
+
+
+    /* =========================================================
+           BADGE
+        ========================================================= */
+
+    .access-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        margin-bottom: 18px;
+        border-radius: 999px;
+        color: #8d5d83;
+        background: rgba(247, 224, 240, .70);
+        border: 1px solid rgba(225, 184, 215, .55);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    .access-badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #c47eae;
+        box-shadow: 0 0 0 4px rgba(196, 126, 174, .10);
+    }
+
+
+    /* =========================================================
+           CONTENT
+        ========================================================= */
+
+    .access-content {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+
+    .access-title {
+        margin: 0;
+        color: #3e3442;
+        font-size: clamp(29px, 5vw, 39px);
+        font-weight: 900;
+        line-height: 1.45;
+        letter-spacing: -1px;
+    }
+
+
+        .access-title span {
+            display: block;
+            background: linear-gradient( 90deg, #c273a7, #9b87dc );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+
+    .access-description {
+        margin: 18px auto 0;
+        max-width: 470px;
+        color: #756b78;
+        font-size: 14px;
+        line-height: 2;
+        font-weight: 500;
+    }
+
+
+    /* =========================================================
+           INFO BOX
+        ========================================================= */
+
+    .access-info-box {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin: 28px auto 0;
+        padding: 15px 17px;
+        text-align: right;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, rgba(255, 240, 248, .72), rgba(241, 237, 255, .72) );
+        border: 1px solid rgba(222, 198, 225, .50);
+    }
+
+
+    .access-info-icon {
+        flex: 0 0 40px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        color: #9871ae;
+        background: rgba(255,255,255,.75);
+    }
+
+
+        .access-info-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+
+    .access-info-content {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+
+        .access-info-content strong {
+            color: #554653;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+
+        .access-info-content span {
+            color: #887d8b;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+
+    /* =========================================================
+           ACTIONS
+        ========================================================= */
+
+    .access-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        margin-top: 26px;
+    }
+
+
+    .access-primary-button,
+    .access-secondary-button {
+        min-height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+    }
+
+
+    .access-primary-button {
+        gap: 11px;
+        color: #fff;
+        background: linear-gradient( 135deg, #c879a9, #9a88d8 );
+        box-shadow: 0 13px 27px rgba(174, 116, 171, .22);
+    }
+
+
+        .access-primary-button:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 17px 32px rgba(174, 116, 171, .28);
+        }
+
+
+    .access-button-icon {
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+        .access-button-icon svg {
+            width: 21px;
+            height: 21px;
+        }
+
+
+    .access-button-arrow {
+        margin-right: 3px;
+        font-size: 17px;
+        transition: transform .22s ease;
+    }
+
+
+    .access-primary-button:hover .access-button-arrow {
+        transform: translateX(-4px);
+    }
+
+
+    .access-secondary-button {
+        gap: 8px;
+        color: #716473;
+        background: rgba(255,255,255,.70);
+        border: 1px solid rgba(220, 207, 222, .75);
+        cursor: pointer;
+    }
+
+
+        .access-secondary-button:hover {
+            color: #5f5060;
+            background: rgba(255,255,255,.95);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(90, 70, 95, .07);
+        }
+
+
+    .access-secondary-icon {
+        font-size: 17px;
+        transition: transform .22s ease;
+    }
+
+
+    .access-secondary-button:hover .access-secondary-icon {
+        transform: translateX(4px);
+    }
+
+
+    /* =========================================================
+           FOOTER
+        ========================================================= */
+
+    .access-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 27px;
+        padding-top: 22px;
+        border-top: 1px solid rgba(222, 209, 222, .55);
+        color: #9a909d;
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+
+    .access-footer-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #c18aaf;
+    }
+
+
+    .access-footer-heart {
+        color: #ca83ac;
+        font-size: 14px;
+        line-height: 1;
+    }
+
+
+    /* =========================================================
+           ANIMATION
+        ========================================================= */
+
+    @@keyframes accessGlow {
+        0%,
+        100% {
+            transform: scale(.95);
+            opacity: .65;
+        }
+
+        50% {
+            transform: scale(1.08);
+            opacity: 1;
+        }
+    }
+
+
+    /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+    @@media (max-width: 640px) {
+
+        .access-denied-page {
+            min-height: calc(100vh - 70px);
+            padding: 35px 15px 55px;
+        }
+
+        .access-denied-card {
+            padding: 36px 22px 27px;
+            border-radius: 27px;
+        }
+
+        .access-icon-wrapper {
+            width: 96px;
+            height: 96px;
+        }
+
+        .access-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 23px;
+        }
+
+            .access-icon svg {
+                width: 36px;
+                height: 36px;
+            }
+
+        .access-title {
+            font-size: 28px;
+        }
+
+        .access-description {
+            font-size: 13px;
+        }
+
+        .access-info-box {
+            align-items: flex-start;
+            text-align: right;
+        }
+
+        .access-primary-button,
+        .access-secondary-button {
+            min-height: 51px;
+        }
+
+        .access-footer {
+            flex-wrap: wrap;
+        }
+    }
+
+
+    @@media (max-width: 380px) {
+
+        .access-denied-card {
+            padding-left: 17px;
+            padding-right: 17px;
+        }
+
+        .access-title {
+            font-size: 25px;
+        }
+
+        .access-description {
+            font-size: 12px;
+        }
+
+        .access-info-content span {
+            font-size: 10px;
+        }
+    }
+
+</style>
+
+
+<script>
+
+    function goBack() {
+
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '@Url.Action("Index", "Home")';
+        }
+
+    }
+
+</script>

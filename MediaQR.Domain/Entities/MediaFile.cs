@@ -6,6 +6,7 @@ public class MediaFile
 {
     public long Id { get; set; }
     public string Title { get; set; } = null!;
+    public string? UserId { get; set; }
     public string? Description { get; set; }
     public string OriginalFileName { get; set; } = null!;
     public string StoredFileName { get; set; } = null!;

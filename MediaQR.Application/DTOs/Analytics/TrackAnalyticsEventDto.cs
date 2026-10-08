@@ -1,4 +1,5 @@
 ﻿using MediaQR.Domain.Entities;
+using MediaQR.Domain.Enums;
 
 namespace MediaQR.Application.DTOs.Analytics;
 

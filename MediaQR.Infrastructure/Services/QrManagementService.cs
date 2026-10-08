@@ -1,9 +1,9 @@
 ﻿using MediaQR.Application.DTOs.Qr;
 using MediaQR.Application.Interfaces;
-using MediaQR.Domain.Entities;
 using MediaQR.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace MediaQR.Infrastructure.Services;
 
@@ -26,11 +26,13 @@ public class QrManagementService : IQrManagementService
     public async Task<IReadOnlyList<QrCodeListItemDto>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
+        var userId = GetCurrentUserId();
         var now = DateTime.UtcNow;
 
         var qrCodes = await _dbContext.QrCodes
             .AsNoTracking()
             .Include(x => x.MediaFile)
+            .Where(x => x.MediaFile.UserId == userId)
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
@@ -55,13 +57,19 @@ public class QrManagementService : IQrManagementService
             .ToList();
     }
 
-    public async Task<QrCodeDetailsDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<QrCodeDetailsDto?> GetByIdAsync(
+        long id,
+        CancellationToken cancellationToken = default)
     {
+        var userId = GetCurrentUserId();
+
         var qrCode = await _dbContext.QrCodes
             .AsNoTracking()
             .Include(x => x.MediaFile)
             .FirstOrDefaultAsync(
-                x => x.Id == id,
+                x =>
+                    x.Id == id &&
+                    x.MediaFile.UserId == userId,
                 cancellationToken);
 
         if (qrCode == null)
@@ -82,27 +90,38 @@ public class QrManagementService : IQrManagementService
             Code = qrCode.Code,
             Title = qrCode.Title,
             Description = qrCode.Description,
+
             MediaFileId = qrCode.MediaFileId,
             MediaTitle = qrCode.MediaFile.Title,
             MediaDescription = qrCode.MediaFile.Description,
+
             OriginalFileName =
                 qrCode.MediaFile.OriginalFileName,
+
             MediaType =
                 qrCode.MediaFile.MediaType.ToString(),
+
             ContentType =
                 qrCode.MediaFile.ContentType,
+
             FileSize =
                 qrCode.MediaFile.FileSize,
+
             IsActive =
                 qrCode.IsActive,
+
             CreatedAt =
                 qrCode.CreatedAt,
+
             ExpiresAt =
                 qrCode.ExpiresAt,
+
             IsExpired =
                 qrCode.ExpiresAt.HasValue &&
                 qrCode.ExpiresAt.Value <= now,
+
             QrUrl = qrUrl,
+
             QrImageBase64 =
                 Convert.ToBase64String(qrImageBytes)
         };
@@ -116,9 +135,13 @@ public class QrManagementService : IQrManagementService
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
 
+        var userId = GetCurrentUserId();
+
         var qrCode = await _dbContext.QrCodes
             .FirstOrDefaultAsync(
-                x => x.Id == id,
+                x =>
+                    x.Id == id &&
+                    x.MediaFile.UserId == userId,
                 cancellationToken);
 
         if (qrCode == null)
@@ -148,9 +171,13 @@ public class QrManagementService : IQrManagementService
         bool isActive,
         CancellationToken cancellationToken = default)
     {
+        var userId = GetCurrentUserId();
+
         var qrCode = await _dbContext.QrCodes
             .FirstOrDefaultAsync(
-                x => x.Id == id,
+                x =>
+                    x.Id == id &&
+                    x.MediaFile.UserId == userId,
                 cancellationToken);
 
         if (qrCode == null)
@@ -168,9 +195,13 @@ public class QrManagementService : IQrManagementService
         long id,
         CancellationToken cancellationToken = default)
     {
+        var userId = GetCurrentUserId();
+
         var qrCode = await _dbContext.QrCodes
             .FirstOrDefaultAsync(
-                x => x.Id == id,
+                x =>
+                    x.Id == id &&
+                    x.MediaFile.UserId == userId,
                 cancellationToken);
 
         if (qrCode == null)
@@ -182,6 +213,30 @@ public class QrManagementService : IQrManagementService
             cancellationToken);
 
         return true;
+    }
+
+    private string GetCurrentUserId()
+    {
+        var user =
+            _httpContextAccessor.HttpContext?.User;
+
+        if (user?.Identity?.IsAuthenticated != true)
+        {
+            throw new UnauthorizedAccessException(
+                "برای انجام این عملیات باید وارد حساب کاربری شوید.");
+        }
+
+        var userId =
+            user.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new UnauthorizedAccessException(
+                "شناسه کاربر در اطلاعات احراز هویت یافت نشد.");
+        }
+
+        return userId;
     }
 
     private string BuildQrUrl(string code)

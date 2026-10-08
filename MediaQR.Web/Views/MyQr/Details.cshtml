@@ -1,0 +1,833 @@
+﻿@model MediaQR.Application.DTOs.Qr.QrCodeDetailsDto
+
+@{
+    ViewData["Title"] = "جزئیات QR Code";
+}
+
+<div class="qr-details-page" dir="rtl">
+
+    <div class="container-fluid py-4">
+
+        <!-- Breadcrumb -->
+
+        <div class="breadcrumb-text mb-3">
+
+            <a asp-controller="Dashboard"
+               asp-action="Index">
+                داشبورد
+            </a>
+
+            <i class="bi bi-chevron-left"></i>
+
+            <a asp-controller="MyQr"
+               asp-action="Index">
+                QRهای من
+            </a>
+
+            <i class="bi bi-chevron-left"></i>
+
+            <span>
+                جزئیات
+            </span>
+
+        </div>
+
+
+        <!-- Header -->
+
+        <div class="page-header mb-4">
+
+            <div>
+
+                <h1>
+                    جزئیات QR Code
+                </h1>
+
+                <p>
+                    اطلاعات و مدیریت QR Code انتخاب شده
+                </p>
+
+            </div>
+
+            <a asp-controller="MyQr"
+               asp-action="Index"
+               class="btn btn-outline-secondary back-button">
+
+                <i class="bi bi-arrow-right"></i>
+
+                بازگشت به QRهای من
+
+            </a>
+
+        </div>
+
+
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success custom-alert mb-4">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                <span>
+                    @successMessage
+                </span>
+
+            </div>
+        }
+
+
+        <div class="row g-4">
+
+            <!-- QR Preview -->
+
+            <div class="col-12 col-lg-5">
+
+                <div class="details-card qr-preview-card">
+
+                    <div class="card-header-custom">
+
+                        <div>
+
+                            <h2>
+                                QR Code
+                            </h2>
+
+                            <p>
+                                QR اختصاصی این رسانه
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="qr-preview">
+
+                        @if (!string.IsNullOrWhiteSpace(Model.QrImageBase64))
+                        {
+                            <img src="data:image/png;base64,@Model.QrImageBase64"
+                                 alt="QR Code"
+                                 class="qr-image" />
+                        }
+
+                    </div>
+
+
+                    <div class="qr-code-value">
+
+                        <span>
+                            کد QR
+                        </span>
+
+                        <strong dir="ltr">
+                            @Model.Code
+                        </strong>
+
+                    </div>
+
+
+                    <div class="qr-actions">
+
+                        <a href="@Model.QrUrl"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-primary">
+
+                            <i class="bi bi-box-arrow-up-left"></i>
+
+                            باز کردن QR
+
+                        </a>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="downloadQr()">
+
+                            <i class="bi bi-download"></i>
+
+                            دانلود QR
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Details -->
+
+            <div class="col-12 col-lg-7">
+
+                <div class="details-card">
+
+                    <div class="card-header-custom">
+
+                        <div>
+
+                            <h2>
+                                اطلاعات QR
+                            </h2>
+
+                            <p>
+                                مشخصات این QR Code
+                            </p>
+
+                        </div>
+
+                        @if (Model.IsExpired)
+                        {
+                            <span class="status status-expired">
+                                <i class="bi bi-clock-history"></i>
+                                منقضی شده
+                            </span>
+                        }
+                        else if (Model.IsActive)
+                        {
+                            <span class="status status-active">
+                                <i class="bi bi-check-circle-fill"></i>
+                                فعال
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status status-disabled">
+                                <i class="bi bi-pause-circle-fill"></i>
+                                غیرفعال
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <div class="details-body">
+
+                        <!-- Title -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                عنوان QR
+                            </span>
+
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(Model.Title)
+                                                                ? "بدون عنوان"
+                                                                : Model.Title)
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Description -->
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <div class="detail-row detail-description">
+
+                                <span>
+                                    توضیحات
+                                </span>
+
+                                <p>
+                                    @Model.Description
+                                </p>
+
+                            </div>
+                        }
+
+
+                        <!-- Media -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                فایل رسانه
+                            </span>
+
+                            <strong>
+                                @Model.MediaTitle
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Media type -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                نوع رسانه
+                            </span>
+
+                            <strong>
+                                @Model.MediaType
+                            </strong>
+
+                        </div>
+
+
+                        <!-- File -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                نام فایل
+                            </span>
+
+                            <strong dir="ltr"
+                                    class="ltr-value">
+                                @Model.OriginalFileName
+                            </strong>
+
+                        </div>
+
+
+                        <!-- File size -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                حجم فایل
+                            </span>
+
+                            <strong>
+                                @FormatFileSize(Model.FileSize)
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Created -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                تاریخ ایجاد
+                            </span>
+
+                            <strong>
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("yyyy/MM/dd HH:mm")
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Expiration -->
+
+                        <div class="detail-row">
+
+                            <span>
+                                تاریخ انقضا
+                            </span>
+
+                            <strong>
+
+                                @if (Model.ExpiresAt.HasValue)
+                                {
+                                    @Model.ExpiresAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        بدون انقضا
+                                    </span>
+                                }
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- URL -->
+
+                        <div class="detail-row detail-url">
+
+                            <span>
+                                لینک QR
+                            </span>
+
+                            <div class="url-box">
+
+                                <code dir="ltr">
+                                    @Model.QrUrl
+                                </code>
+
+                                <button type="button"
+                                        onclick="copyQrUrl()"
+                                        title="کپی لینک">
+
+                                    <i class="bi bi-copy"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Management -->
+
+                    <div class="management-actions">
+
+                        <form asp-controller="MyQr"
+                              asp-action="Toggle"
+                              asp-route-id="@Model.Id"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn @(Model.IsActive
+                                                                                                                                                                                                                            ? "btn-warning"
+                                                                                                                                                                                                                            : "btn-success")">
+
+                                <i class="bi @(Model.IsActive
+                                                                                                                                                                                                                   ? "bi-pause-circle"
+                                                                                                                                                                                                                   : "bi-play-circle")"></i>
+
+                                @(Model.IsActive
+                                                                ? "غیرفعال کردن"
+                                                                : "فعال کردن")
+
+                            </button>
+
+                        </form>
+
+
+                        <form asp-controller="MyQr"
+                              asp-action="Delete"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirmDelete();">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+
+                                <i class="bi bi-trash3"></i>
+
+                                حذف QR
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@functions {
+
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+        {
+            return $"{bytes} بایت";
+        }
+
+        if (bytes < 1024 * 1024)
+        {
+            return $"{bytes / 1024d:0.##} KB";
+        }
+
+        if (bytes < 1024L * 1024L * 1024L)
+        {
+            return $"{bytes / (1024d * 1024d):0.##} MB";
+        }
+
+        return $"{bytes / (1024d * 1024d * 1024d):0.##} GB";
+    }
+
+}
+
+
+<style>
+
+    .qr-details-page {
+        min-height: calc(100vh - 80px);
+        background: #f7f8fc;
+        color: #252336;
+    }
+
+    .breadcrumb-text {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #9995a8;
+        font-size: 12px;
+    }
+
+        .breadcrumb-text a {
+            color: #7251a7;
+            text-decoration: none;
+        }
+
+        .breadcrumb-text i {
+            font-size: 9px;
+        }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 27px;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            margin: 7px 0 0;
+            color: #858296;
+            font-size: 13px;
+        }
+
+    .back-button {
+        border-radius: 10px;
+        min-height: 42px;
+    }
+
+    .custom-alert {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border: 0;
+        border-radius: 12px;
+        font-size: 13px;
+    }
+
+    .details-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid #ececf2;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(40, 35, 70, .05);
+        overflow: hidden;
+    }
+
+    .card-header-custom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #eeeeF3;
+    }
+
+        .card-header-custom h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .card-header-custom p {
+            margin: 5px 0 0;
+            color: #858296;
+            font-size: 12px;
+        }
+
+    .qr-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 35px 20px;
+        background: #fafafe;
+    }
+
+    .qr-image {
+        display: block;
+        width: min(320px, 80%);
+        height: auto;
+        padding: 12px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 7px 25px rgba(40, 35, 70, .08);
+    }
+
+    .qr-code-value {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        padding: 18px;
+        border-bottom: 1px solid #eeeeF3;
+    }
+
+        .qr-code-value span {
+            color: #858296;
+            font-size: 11px;
+        }
+
+        .qr-code-value strong {
+            color: #393646;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+    .qr-actions {
+        display: flex;
+        gap: 10px;
+        padding: 20px 24px;
+    }
+
+        .qr-actions .btn {
+            flex: 1;
+            min-height: 42px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+    .details-body {
+        padding: 5px 24px;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 58px;
+        border-bottom: 1px solid #f0f0f4;
+    }
+
+        .detail-row > span {
+            color: #858296;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .detail-row > strong {
+            color: #343142;
+            font-size: 13px;
+            text-align: left;
+        }
+
+    .detail-description {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px 0;
+        gap: 8px;
+    }
+
+        .detail-description p {
+            width: 100%;
+            margin: 0;
+            color: #555263;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+    .ltr-value {
+        direction: ltr;
+        word-break: break-all;
+    }
+
+    .detail-url {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px 0;
+        gap: 9px;
+    }
+
+    .url-box {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border: 1px solid #e7e6ee;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fafafe;
+    }
+
+        .url-box code {
+            flex: 1;
+            padding: 11px 13px;
+            color: #555263;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .url-box button {
+            width: 42px;
+            min-width: 42px;
+            height: 42px;
+            border: 0;
+            border-right: 1px solid #e7e6ee;
+            background: #fff;
+            color: #6840a4;
+            cursor: pointer;
+        }
+
+            .url-box button:hover {
+                background: #f4f0fa;
+            }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e9f8ef;
+        color: #218c57;
+    }
+
+    .status-disabled {
+        background: #f1f1f4;
+        color: #777582;
+    }
+
+    .status-expired {
+        background: #fff0f0;
+        color: #c34d4d;
+    }
+
+    .management-actions {
+        display: flex;
+        gap: 10px;
+        padding: 20px 24px;
+        border-top: 1px solid #eeeeF3;
+    }
+
+        .management-actions form {
+            margin: 0;
+        }
+
+        .management-actions .btn {
+            min-height: 42px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+    @@media (max-width: 767.98px) {
+        .qr-details-page .container-fluid {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .page-header {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+        .back-button {
+            width: 100%;
+        }
+
+        .card-header-custom {
+            padding: 18px;
+        }
+
+        .details-body {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .qr-actions {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .management-actions {
+            padding-left: 18px;
+            padding-right: 18px;
+            flex-direction: column;
+        }
+
+            .management-actions form,
+            .management-actions .btn {
+                width: 100%;
+            }
+    }
+</style>
+
+
+@section Scripts {
+
+    <script>
+
+        function confirmDelete() {
+
+            return confirm(
+                "آیا از حذف این QR Code اطمینان دارید؟\n\nاین عملیات قابل بازگشت نیست."
+            );
+
+        }
+
+        async function copyQrUrl() {
+
+            const url = '@Html.Raw(Model.QrUrl)';
+
+            try {
+
+                await navigator.clipboard.writeText(url);
+
+                alert("لینک QR با موفقیت کپی شد.");
+
+            }
+            catch {
+
+                alert("کپی لینک انجام نشد.");
+
+            }
+
+        }
+
+        function downloadQr() {
+
+            const image =
+                document.querySelector(".qr-image");
+
+            if (!image) {
+                return;
+            }
+
+            const link =
+                document.createElement("a");
+
+            link.href =
+                image.src;
+
+            @{
+                    var qrFileName = $"qr-{Model.Code}.png";
+            }
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+        }
+
+    </script>
+
+}
