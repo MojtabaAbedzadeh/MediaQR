@@ -1,12 +1,12 @@
 ﻿using MediaQR.Application.DTOs.Dashboard;
 using MediaQR.Application.Interfaces;
+using MediaQR.Domain.Enums;
 using MediaQR.Infrastructure.Data;
 using MediaQR.Infrastructure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using MediaQR.Domain.Enums;
 
 namespace MediaQR.Infrastructure.Services;
 
@@ -47,36 +47,52 @@ public class UserDashboardService : IUserDashboardService
             .AsNoTracking()
             .Where(x => x.MediaFile.UserId == userId);
 
-        var mediaCountTask =
-            mediaQuery.CountAsync(cancellationToken);
+        // ---------------------------------------------------------
+        // 1. تعداد فایل‌های رسانه‌ای
+        // ---------------------------------------------------------
 
-        var qrCodeCountTask =
-            qrQuery.CountAsync(cancellationToken);
+        var mediaCount =
+            await mediaQuery.CountAsync(
+                cancellationToken);
 
-        var playCountTask =
-            qrQuery
+        // ---------------------------------------------------------
+        // 2. تعداد QR Codeها
+        // ---------------------------------------------------------
+
+        var qrCodeCount =
+            await qrQuery.CountAsync(
+                cancellationToken);
+
+        // ---------------------------------------------------------
+        // 3. تعداد پخش‌ها
+        // ---------------------------------------------------------
+
+        var playCount =
+            await qrQuery
                 .SelectMany(x => x.AnalyticsEvents)
                 .CountAsync(
                     x => x.EventType == AnalyticsEventType.Play,
                     cancellationToken);
 
-        var recentQrCodesTask =
-            qrQuery
+        // ---------------------------------------------------------
+        // 4. آخرین QR Codeها
+        // ---------------------------------------------------------
+
+        var recentQrEntities =
+            await qrQuery
                 .Include(x => x.MediaFile)
                 .OrderByDescending(x => x.CreatedAt)
                 .Take(5)
                 .ToListAsync(cancellationToken);
 
-        await Task.WhenAll(
-            mediaCountTask,
-            qrCodeCountTask,
-            playCountTask,
-            recentQrCodesTask);
+        // ---------------------------------------------------------
+        // 5. تبدیل Entity به DTO
+        // ---------------------------------------------------------
 
         var now = DateTime.UtcNow;
 
         var recentQrCodes =
-            recentQrCodesTask.Result
+            recentQrEntities
                 .Select(x => new UserDashboardQrDto
                 {
                     Id = x.Id,
@@ -118,13 +134,13 @@ public class UserDashboardService : IUserDashboardService
                 user.PhoneNumber,
 
             MediaCount =
-                mediaCountTask.Result,
+                mediaCount,
 
             QrCodeCount =
-                qrCodeCountTask.Result,
+                qrCodeCount,
 
             PlayCount =
-                playCountTask.Result,
+                playCount,
 
             RecentQrCodes =
                 recentQrCodes
@@ -134,7 +150,9 @@ public class UserDashboardService : IUserDashboardService
     private string GetCurrentUserId()
     {
         var user =
-            _httpContextAccessor.HttpContext?.User;
+            _httpContextAccessor
+                .HttpContext?
+                .User;
 
         if (user?.Identity?.IsAuthenticated != true)
         {

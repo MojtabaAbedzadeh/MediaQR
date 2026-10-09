@@ -1,0 +1,344 @@
+﻿@model MediaQR.Application.DTOs.Media.UpdateMediaDto
+
+@{
+    ViewData["Title"] = "ویرایش فایل";
+
+    var media = ViewBag.Media
+        as MediaQR.Application.DTOs.Media.UserMediaDetailsDto;
+
+    var mediaId = (long)ViewBag.MediaId;
+}
+
+<style>
+    .edit-card {
+        border: 0;
+        border-radius: 24px;
+        box-shadow: 0 12px 40px rgba(80, 60, 100, .08);
+        overflow: hidden;
+    }
+
+        .edit-card .form-label {
+            font-weight: 700;
+            color: #554658;
+            margin-bottom: 8px;
+        }
+
+        .edit-card .form-control {
+            border-radius: 14px;
+            border: 1px solid #eadfea;
+            padding: 12px 15px;
+            transition: .2s ease;
+        }
+
+            .edit-card .form-control:focus {
+                border-color: #a56bff;
+                box-shadow: 0 0 0 4px rgba(165, 107, 255, .10);
+            }
+
+    .media-summary {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, #fff5fa, #f7f3ff );
+        border: 1px solid #f0e5f1;
+    }
+
+        .media-summary .media-icon {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            font-size: 23px;
+            box-shadow: 0 5px 15px rgba(100, 70, 120, .08);
+        }
+
+        .media-summary strong {
+            display: block;
+            color: #554658;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .media-summary small {
+            display: block;
+            color: #9a8e9e;
+        }
+
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #faf8fb;
+        border: 1px solid #eee6f0;
+    }
+
+        .status-box strong {
+            display: block;
+            color: #554658;
+            margin-bottom: 4px;
+        }
+
+        .status-box small {
+            display: block;
+            color: #968a9b;
+        }
+
+        .status-box .form-check {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-box .form-check-input {
+            width: 42px;
+            height: 22px;
+            cursor: pointer;
+        }
+
+    @media (max-width: 575.98px) {
+        .status-box
+
+    {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .status-box .form-check {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    }
+</style>
+
+<div class="my-media-page" dir="rtl">
+
+    <div class="container py-4 py-md-5">
+
+        <!-- Breadcrumb -->
+        <div class="mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Dashboard"
+                           asp-action="Index">
+                            داشبورد
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a asp-controller="MyMedia"
+                           asp-action="Index">
+                            فایل‌های من
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a asp-controller="MyMedia"
+                           asp-action="Details"
+                           asp-route-id="@mediaId">
+                            جزئیات
+                        </a>
+                    </li>
+
+                    <li class="breadcrumb-item active">
+                        ویرایش
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Header -->
+        <div class="page-header mb-4">
+            <div>
+                <h1 class="page-title">
+                    ویرایش فایل
+                </h1>
+
+                <p class="page-subtitle">
+                    اطلاعات فایل را ویرایش کنید.
+                </p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+
+            <div class="col-12 col-lg-8">
+
+                <div class="card edit-card">
+
+                    <div class="card-body p-4 p-md-5">
+
+                        @if (media != null)
+                        {
+                            <div class="media-summary mb-4">
+
+                                <div class="media-icon">
+                                    @if (media.MediaType == "صوت")
+                                    {
+                                        <span>🎵</span>
+                                    }
+                                    else if (media.MediaType == "تصویر")
+                                    {
+                                        <span>🖼️</span>
+                                    }
+                                    else
+                                    {
+                                        <span>🎬</span>
+                                    }
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        @media.OriginalFileName
+                                    </strong>
+
+                                    <small>
+                                        @media.MediaType
+                                        ·
+                                        @FormatFileSize(media.FileSize)
+                                    </small>
+                                </div>
+
+                            </div>
+                        }
+
+                        <form asp-action="Edit"
+                              asp-route-id="@mediaId"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <div asp-validation-summary="ModelOnly"
+                                 class="alert alert-danger"
+                                 role="alert">
+                            </div>
+
+                            <!-- Title -->
+                            <div class="mb-4">
+
+                                <label asp-for="Title"
+                                       class="form-label">
+                                    عنوان فایل
+                                </label>
+
+                                <input asp-for="Title"
+                                       class="form-control form-control-lg"
+                                       autocomplete="off"
+                                       placeholder="عنوان فایل را وارد کنید..." />
+
+                                <span asp-validation-for="Title"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+
+                                <label asp-for="Description"
+                                       class="form-label">
+                                    توضیحات
+                                </label>
+
+                                <textarea asp-for="Description"
+                                          class="form-control"
+                                          rows="5"
+                                          placeholder="توضیحات فایل..."></textarea>
+
+                                <span asp-validation-for="Description"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                            <!-- Status -->
+                            <div class="status-box mb-4">
+
+                                <div>
+                                    <strong>
+                                        وضعیت فایل
+                                    </strong>
+
+                                    <small>
+                                        فایل غیرفعال از طریق QR قابل استفاده نخواهد بود.
+                                    </small>
+                                </div>
+
+                                <div class="form-check form-switch">
+
+                                    <input asp-for="IsActive"
+                                           class="form-check-input"
+                                           role="switch" />
+
+                                    <label asp-for="IsActive"
+                                           class="form-check-label">
+                                        فعال
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex flex-column flex-sm-row gap-2">
+
+                                <button type="submit"
+                                        class="btn btn-primary flex-grow-1">
+                                    ذخیره تغییرات
+                                </button>
+
+                                <a asp-controller="MyMedia"
+                                   asp-action="Details"
+                                   asp-route-id="@mediaId"
+                                   class="btn btn-outline-secondary">
+                                    انصراف
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@functions
+{
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes} بایت";
+
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024d:0.##} کیلوبایت";
+
+        if (bytes < 1024L * 1024 * 1024)
+            return $"{bytes / (1024d * 1024):0.##} مگابایت";
+
+        return $"{bytes / (1024d * 1024 * 1024):0.##} گیگابایت";
+    }
+}
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

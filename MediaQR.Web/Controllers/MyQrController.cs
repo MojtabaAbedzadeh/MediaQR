@@ -191,4 +191,110 @@ public class MyQrController : Controller
                 nameof(Index));
         }
     }
+
+    [HttpGet("{id:long}/edit")]
+    public async Task<IActionResult> Edit(
+    long id,
+    CancellationToken cancellationToken)
+    {
+        try
+        {
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            var model = new MediaQR.Application.DTOs.Qr.UpdateQrCodeDto
+            {
+                Title = qrCode.Title,
+                Description = qrCode.Description,
+                ExpiresAt = qrCode.ExpiresAt,
+                IsActive = qrCode.IsActive
+            };
+
+            ViewBag.QrCodeId = id;
+            ViewBag.QrCode = qrCode.Code;
+
+            return View(model);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        catch (OperationCanceledException)
+            when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading QR {QrCodeId} for editing.", id);
+            return View("Error");
+        }
+    }
+
+    [HttpPost("{id:long}/edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(
+        long id,
+        MediaQR.Application.DTOs.Qr.UpdateQrCodeDto model,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.QrCodeId = id;
+                ViewBag.QrCode = await GetQrCodeForEditAsync(
+                    id,
+                    cancellationToken);
+
+                return View(model);
+            }
+
+            var updated = await _qrManagementService.UpdateAsync(
+                id,
+                model,
+                cancellationToken);
+
+            if (!updated)
+                return NotFound();
+
+            TempData["SuccessMessage"] = "اطلاعات QR با موفقیت ذخیره شد.";
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        catch (OperationCanceledException)
+            when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating QR {QrCodeId}.", id);
+            ModelState.AddModelError(
+                string.Empty,
+                "ذخیره تغییرات انجام نشد. لطفاً دوباره تلاش کنید.");
+
+            ViewBag.QrCodeId = id;
+            return View(model);
+        }
+    }
+
+    private async Task<string?> GetQrCodeForEditAsync(
+        long id,
+        CancellationToken cancellationToken)
+    {
+        var qrCode = await _qrManagementService.GetByIdAsync(
+            id,
+            cancellationToken);
+
+        return qrCode?.Code;
+    }
 }

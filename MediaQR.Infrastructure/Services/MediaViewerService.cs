@@ -20,13 +20,13 @@ public class MediaViewerService : IMediaViewerService
     }
 
     public async Task<MediaViewerDto?> GetByCodeAsync(
-        string code,
-        CancellationToken cancellationToken = default)
+    string code,
+    CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(code))
             return null;
 
-        code = code.Trim();
+        var now = DateTime.UtcNow;
 
         var qrCode = await _dbContext.QrCodes
             .AsNoTracking()
@@ -38,29 +38,51 @@ public class MediaViewerService : IMediaViewerService
         if (qrCode == null)
             return null;
 
+        // QR غیرفعال است
         if (!qrCode.IsActive)
             return null;
 
-        if (!qrCode.MediaFile.IsActive)
-            return null;
-
+        // QR منقضی شده است
         if (qrCode.ExpiresAt.HasValue &&
-            qrCode.ExpiresAt.Value <= DateTime.UtcNow)
+            qrCode.ExpiresAt.Value <= now)
         {
             return null;
         }
 
+        var media = qrCode.MediaFile;
+
+        if (media == null)
+            return null;
+
+        // فایل Media غیرفعال است
+        if (!media.IsActive)
+            return null;
+
         return new MediaViewerDto
         {
-            MediaFileId = qrCode.MediaFileId,
+            MediaFileId = media.Id,
+
             QrCodeId = qrCode.Id,
+
             QrCode = qrCode.Code,
-            Title = qrCode.Title ?? qrCode.MediaFile.Title,
-            Description = qrCode.Description ?? qrCode.MediaFile.Description,
-            OriginalFileName = qrCode.MediaFile.OriginalFileName,
-            ContentType = qrCode.MediaFile.ContentType,
-            MediaType = qrCode.MediaFile.MediaType.ToString(),
-            StoragePath = qrCode.MediaFile.StoragePath
+
+            ContentUrl = null,
+
+            Title = string.IsNullOrWhiteSpace(qrCode.Title)
+                ? media.Title
+                : qrCode.Title,
+
+            Description = string.IsNullOrWhiteSpace(qrCode.Description)
+                ? media.Description
+                : qrCode.Description,
+
+            OriginalFileName = media.OriginalFileName,
+
+            ContentType = media.ContentType,
+
+            MediaType = media.MediaType.ToString(),
+
+            StoragePath = media.StoragePath
         };
     }
 

@@ -1,0 +1,539 @@
+﻿@model MediaQR.Application.DTOs.Qr.UpdateQrCodeDto
+
+@{
+    ViewData["Title"] = "ویرایش QR Code";
+
+    var qrCodeId = (long)(ViewBag.QrCodeId ?? 0L);
+    var qrCode = ViewBag.QrCode as string ?? string.Empty;
+
+    var expiresAtValue = Model.ExpiresAt.HasValue
+        ? Model.ExpiresAt.Value.ToString("yyyy-MM-ddTHH:mm")
+        : string.Empty;
+}
+
+<div class="qr-edit-page" dir="rtl">
+    <div class="container py-4 py-lg-5">
+
+        <div class="page-header mb-4">
+            <div>
+                <div class="page-eyebrow">
+                    <i class="bi bi-qr-code"></i>
+                    مدیریت کدهای QR
+                </div>
+
+                <h1 class="page-title">ویرایش کد QR</h1>
+
+                <p class="page-description">
+                    اطلاعات و تنظیمات کد QR خود را ویرایش کنید.
+                </p>
+            </div>
+
+            <a asp-controller="MyQr"
+               asp-action="Details"
+               asp-route-id="@qrCodeId"
+               class="btn btn-outline-secondary back-btn">
+                <i class="bi bi-arrow-right"></i>
+                بازگشت به جزئیات
+            </a>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-lg-8">
+                <div class="edit-card">
+
+                    <div class="card-heading">
+                        <div class="heading-icon">
+                            <i class="bi bi-sliders"></i>
+                        </div>
+
+                        <div>
+                            <h2>اطلاعات کد QR</h2>
+                            <p>فیلدهای موردنظر را تغییر دهید.</p>
+                        </div>
+                    </div>
+
+                    <form asp-controller="MyQr"
+                          asp-action="Edit"
+                          asp-route-id="@qrCodeId"
+                          method="post"
+                          class="edit-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="validation-summary"
+                             role="alert"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Title" class="form-label">
+                                عنوان QR
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control custom-input"
+                                   maxlength="200"
+                                   placeholder="مثلاً: فایل صوتی مراسم" />
+
+                            <span asp-validation-for="Title"
+                                  class="field-error"></span>
+
+                            <div class="form-hint">
+                                عنوانی انتخاب کنید که شناسایی این QR را آسان کند.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">
+                                توضیحات
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control custom-input"
+                                      rows="5"
+                                      maxlength="2000"
+                                      placeholder="توضیحات مربوط به این کد QR..."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="field-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ExpiresAt" class="form-label">
+                                تاریخ و ساعت انقضا
+                            </label>
+
+                            <input asp-for="ExpiresAt"
+                                   type="datetime-local"
+                                   value="@expiresAtValue"
+                                   class="form-control custom-input"
+                                   dir="ltr" />
+
+                            <span asp-validation-for="ExpiresAt"
+                                  class="field-error"></span>
+
+                            <div class="form-hint">
+                                در صورت خالی گذاشتن این فیلد، تاریخ انقضایی برای QR تعیین نمی‌شود.
+                            </div>
+                        </div>
+
+                        <div class="status-panel">
+                            <div class="status-icon">
+                                <i class="bi bi-power"></i>
+                            </div>
+
+                            <div class="status-content">
+                                <label asp-for="IsActive" class="status-title">
+                                    فعال بودن کد QR
+                                </label>
+
+                                <p class="status-description">
+                                    در صورت غیرفعال بودن، دسترسی عمومی به این QR باید متوقف شود.
+                                </p>
+                            </div>
+
+                            <div class="form-check form-switch status-switch">
+                                <input asp-for="IsActive"
+                                       class="form-check-input"
+                                       role="switch" />
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a asp-controller="MyQr"
+                               asp-action="Details"
+                               asp-route-id="@qrCodeId"
+                               class="btn btn-light cancel-btn">
+                                انصراف
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary save-btn">
+                                <i class="bi bi-check2-circle"></i>
+                                ذخیره تغییرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="side-card">
+
+                    <div class="side-qr-icon">
+                        <i class="bi bi-qr-code"></i>
+                    </div>
+
+                    <h3>کد QR شما</h3>
+
+                    <p class="side-description">
+                        با استفاده از شناسه زیر می‌توانید این کد را در بخش مدیریت شناسایی کنید.
+                    </p>
+
+                    <div class="qr-code-value" dir="ltr">
+                        @(string.IsNullOrWhiteSpace(qrCode) ? "—" : qrCode)
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(qrCode))
+                    {
+                        <a href="/m/@Uri.EscapeDataString(qrCode)"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary public-link">
+                            <i class="bi bi-box-arrow-up-left"></i>
+                            مشاهده صفحه عمومی
+                        </a>
+                    }
+
+                    <div class="side-divider"></div>
+
+                    <div class="tip-item">
+                        <i class="bi bi-info-circle"></i>
+                        <span>تغییر عنوان یا توضیحات نباید شناسه اصلی QR را تغییر دهد.</span>
+                    </div>
+
+                    <div class="tip-item">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>تاریخ انقضا را با دقت تنظیم کنید تا دسترسی ناخواسته ایجاد نشود.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .qr-edit-page {
+        min-height: 75vh;
+        background: #f7f8fc;
+        color: #20243a;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .page-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6d5ce8;
+        font-size: .85rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .page-title {
+        font-size: clamp(1.6rem, 3vw, 2.1rem);
+        font-weight: 800;
+        margin: 0 0 10px;
+    }
+
+    .page-description {
+        color: #7b8097;
+        margin: 0;
+        line-height: 1.9;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+    }
+
+    .edit-card,
+    .side-card {
+        background: #fff;
+        border: 1px solid #eaecf4;
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(35, 39, 70, .045);
+    }
+
+    .edit-card {
+        padding: clamp(20px, 4vw, 32px);
+    }
+
+    .card-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-bottom: 24px;
+        margin-bottom: 28px;
+        border-bottom: 1px solid #eef0f6;
+    }
+
+    .heading-icon,
+    .side-qr-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0edff;
+        color: #6d5ce8;
+        flex-shrink: 0;
+    }
+
+    .heading-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        font-size: 1.4rem;
+    }
+
+    .card-heading h2 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 0 0 7px;
+    }
+
+    .card-heading p {
+        color: #858aa0;
+        font-size: .9rem;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: .94rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .custom-input {
+        border: 1px solid #e1e4ef;
+        border-radius: 13px;
+        padding: 13px 15px;
+        background-color: #fcfcfe;
+        color: #252940;
+        transition: border-color .2s, box-shadow .2s, background-color .2s;
+    }
+
+        .custom-input:focus {
+            background: #fff;
+            border-color: #8b7cf0;
+            box-shadow: 0 0 0 4px rgba(109, 92, 232, .1);
+        }
+
+    textarea.custom-input {
+        resize: vertical;
+        min-height: 125px;
+    }
+
+    .form-hint {
+        color: #8b90a4;
+        font-size: .82rem;
+        margin-top: 8px;
+        line-height: 1.8;
+    }
+
+    .field-error,
+    .validation-summary {
+        color: #c03950;
+        font-size: .85rem;
+        margin-top: 7px;
+    }
+
+        .validation-summary:empty {
+            display: none;
+        }
+
+        .validation-summary ul {
+            margin-bottom: 15px;
+            padding-right: 20px;
+        }
+
+    .status-panel {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #f8f7ff;
+        border: 1px solid #e9e5ff;
+        border-radius: 16px;
+        padding: 18px;
+        margin: 30px 0;
+    }
+
+    .status-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #eae6ff;
+        color: #6d5ce8;
+        font-size: 1.2rem;
+    }
+
+    .status-content {
+        flex: 1;
+    }
+
+    .status-title {
+        display: block;
+        font-weight: 800;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+
+    .status-description {
+        font-size: .82rem;
+        color: #82869c;
+        margin: 0;
+        line-height: 1.8;
+    }
+
+    .status-switch {
+        margin: 0;
+        padding: 0;
+    }
+
+        .status-switch .form-check-input {
+            float: none;
+            margin: 0;
+            width: 2.8em;
+            height: 1.4em;
+            cursor: pointer;
+        }
+
+            .status-switch .form-check-input:checked {
+                background-color: #6d5ce8;
+                border-color: #6d5ce8;
+            }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 24px;
+        border-top: 1px solid #eef0f6;
+    }
+
+    .cancel-btn,
+    .save-btn {
+        border-radius: 12px;
+        padding: 12px 22px;
+        font-weight: 700;
+    }
+
+    .save-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #6d5ce8;
+        border-color: #6d5ce8;
+    }
+
+        .save-btn:hover {
+            background: #5947d4;
+            border-color: #5947d4;
+        }
+
+    .side-card {
+        padding: 28px;
+        text-align: center;
+        position: sticky;
+        top: 24px;
+    }
+
+    .side-qr-icon {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 20px;
+        border-radius: 24px;
+        font-size: 2.5rem;
+    }
+
+    .side-card h3 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .side-description {
+        font-size: .9rem;
+        line-height: 1.9;
+        color: #8388a0;
+    }
+
+    .qr-code-value {
+        padding: 13px;
+        margin: 20px 0;
+        background: #f7f8fc;
+        border: 1px dashed #d9dced;
+        border-radius: 12px;
+        font-size: .9rem;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .public-link {
+        width: 100%;
+        padding: 11px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+
+    .side-divider {
+        height: 1px;
+        background: #eef0f6;
+        margin: 25px 0;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        text-align: right;
+        font-size: .82rem;
+        line-height: 1.9;
+        color: #7c8198;
+        margin-bottom: 14px;
+    }
+
+        .tip-item i {
+            color: #6d5ce8;
+            font-size: 1rem;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+    @@media (max-width: 575.98px) {
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+        .side-card {
+            position: static;
+        }
+
+        .status-panel {
+            align-items: flex-start;
+        }
+
+        .status-switch {
+            padding-top: 8px;
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

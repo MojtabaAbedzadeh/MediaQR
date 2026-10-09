@@ -1,0 +1,3050 @@
+﻿@model MediaQR.Application.DTOs.Media.UserMediaDetailsDto
+
+@using MediaQR.Application.DTOs.Analytics
+@using System.Globalization
+
+@{
+    ViewData["Title"] = $"جزئیات فایل - {Model.Title}";
+
+    var analytics = ViewBag.UserAnalytics as UserMediaAnalyticsDto;
+
+    var qrCount = Model.QrCodes?.Count ?? 0;
+
+    var averageDuration = analytics?.AverageDurationSeconds is double seconds
+        ? TimeSpan.FromSeconds(Math.Max(0, seconds))
+        : (TimeSpan?)null;
+}
+
+@functions {
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes:N0} بایت";
+
+        if (bytes < 1024L * 1024)
+            return $"{bytes / 1024d:N1} کیلوبایت";
+
+        if (bytes < 1024L * 1024 * 1024)
+            return $"{bytes / (1024d * 1024):N1} مگابایت";
+
+        return $"{bytes / (1024d * 1024 * 1024):N2} گیگابایت";
+    }
+
+    private static string EventLabel(string eventType)
+    {
+        return eventType switch
+        {
+            "Scan" => "اسکن QR",
+            "Play" => "شروع پخش",
+            "Pause" => "توقف پخش",
+            "Progress25" => "۲۵٪ پخش",
+            "Progress50" => "۵۰٪ پخش",
+            "Progress75" => "۷۵٪ پخش",
+            "Progress100" => "۱۰۰٪ پخش",
+            "Complete" => "پخش تکمیل شد",
+            _ => eventType
+        };
+    }
+
+    private static string EventIcon(string eventType)
+    {
+        return eventType switch
+        {
+            "Scan" => "⌗",
+            "Play" => "▶",
+            "Pause" => "Ⅱ",
+            "Progress25" => "¼",
+            "Progress50" => "½",
+            "Progress75" => "¾",
+            "Progress100" => "✓",
+            "Complete" => "✓",
+            _ => "•"
+        };
+    }
+
+    private static string EventCss(string eventType)
+    {
+        return eventType switch
+        {
+            "Scan" => "event-scan",
+            "Play" => "event-play",
+            "Pause" => "event-pause",
+            "Complete" or "Progress100" => "event-complete",
+            _ => "event-progress"
+        };
+    }
+}
+
+<div class="my-media-details-page" dir="rtl">
+
+    <div class="details-container">
+
+        <!-- Breadcrumb -->
+        <nav class="details-breadcrumb" aria-label="مسیر صفحه">
+            <a asp-controller="Account" asp-action="Dashboard">
+                داشبورد
+            </a>
+
+            <span class="breadcrumb-separator">‹</span>
+
+            <a asp-controller="MyMedia" asp-action="Index">
+                فایل‌های من
+            </a>
+
+            <span class="breadcrumb-separator">‹</span>
+
+            <span class="breadcrumb-current">جزئیات فایل</span>
+        </nav>
+
+        <!-- Page Header -->
+        <section class="details-hero">
+
+            <div class="hero-decoration hero-decoration-one"></div>
+            <div class="hero-decoration hero-decoration-two"></div>
+
+            <div class="hero-content">
+
+                <div class="hero-title-row">
+
+                    <div class="hero-file-icon">
+                        @if (Model.MediaType == "صوت")
+                        {
+                            <span>♫</span>
+                        }
+                        else if (Model.MediaType == "تصویر")
+                        {
+                            <span>▧</span>
+                        }
+                        else
+                        {
+                            <span>▷</span>
+                        }
+                    </div>
+
+                    <div class="hero-title-content">
+
+                        <div class="hero-eyebrow">
+                            <span class="eyebrow-dot"></span>
+                            مدیریت فایل
+                        </div>
+
+                        <h1>@Model.Title</h1>
+
+                        <p class="hero-filename" title="@Model.OriginalFileName">
+                            @Model.OriginalFileName
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-badges">
+
+                    @if (Model.IsActive)
+                    {
+                        <span class="status-badge status-active">
+                            <span class="status-dot"></span>
+                            فعال
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-badge status-inactive">
+                            <span class="status-dot"></span>
+                            غیرفعال
+                        </span>
+                    }
+
+                    <span class="type-badge">
+                        @Model.MediaType
+                    </span>
+
+                    <span class="type-badge">
+                        @FormatFileSize(Model.FileSize)
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="hero-actions">
+
+                <a asp-controller="MyMedia"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="action-button action-edit">
+
+                    <span class="action-icon">✎</span>
+                    <span>ویرایش فایل</span>
+                </a>
+
+                <a asp-controller="MyMedia"
+                   asp-action="Index"
+                   class="action-button action-back">
+
+                    <span class="action-icon">→</span>
+                    <span>بازگشت</span>
+                </a>
+
+                <form asp-controller="MyMedia"
+                      asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      class="delete-form"
+                      onsubmit="return confirm('آیا از حذف این فایل و QRهای مرتبط مطمئن هستید؟ این عملیات قابل بازگشت نیست.');">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="action-button action-delete">
+                        <span class="action-icon">⌫</span>
+                        <span>حذف فایل</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <!-- Preview + File Information -->
+        <section class="top-content-grid">
+
+            <!-- Preview -->
+            <article class="panel preview-panel">
+
+                <div class="panel-heading">
+
+                    <div class="panel-heading-icon preview-heading-icon">
+                        ♫
+                    </div>
+
+                    <div>
+                        <h2>پیش‌نمایش فایل</h2>
+                        <p>محتوای فایل را بررسی کنید</p>
+                    </div>
+
+                </div>
+
+                <div class="preview-body">
+
+                    @if (Model.MediaType == "صوت")
+                    {
+                        <div class="audio-player-container">
+
+                            <div class="sound-visualizer" id="soundVisualizer" aria-hidden="true">
+                                @for (var i = 0; i < 9; i++)
+                                {
+                                    <span></span>
+                                }
+                            </div>
+
+                            <div class="audio-player-content">
+
+                                <div class="audio-note">♫</div>
+
+                                <div class="audio-text">
+                                    <strong>@Model.Title</strong>
+                                    <span>برای شنیدن فایل، دکمه پخش را بزنید ❤️</span>
+                                </div>
+
+                            </div>
+
+                            <audio id="mediaPlayer"
+                                   preload="metadata"
+                                   class="audio-player">
+
+                                <source src="@Model.ContentUrl"
+                                        type="@Model.ContentType" />
+
+                                مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند.
+                            </audio>
+
+                            <div class="custom-audio-controls">
+
+                                <button type="button"
+                                        id="audioPlayButton"
+                                        class="audio-play-button"
+                                        aria-label="پخش"
+                                        aria-pressed="false">
+
+                                    <span id="playIcon">▶</span>
+                                </button>
+
+                                <div class="audio-timeline">
+
+                                    <div class="audio-times">
+                                        <span id="currentTime">00:00</span>
+                                        <span id="duration">00:00</span>
+                                    </div>
+
+                                    <div class="progress-track"
+                                         id="progressTrack"
+                                         role="slider"
+                                         tabindex="0"
+                                         aria-label="موقعیت پخش"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         aria-valuenow="0">
+
+                                        <div class="progress-fill" id="progressFill"></div>
+                                        <div class="progress-thumb" id="progressThumb"></div>
+
+                                    </div>
+
+                                </div>
+
+                                <button type="button"
+                                        id="volumeButton"
+                                        class="volume-button"
+                                        aria-label="قطع صدا"
+                                        aria-pressed="false">
+                                    🔊
+                                </button>
+
+                            </div>
+
+                            <div class="audio-player-message"
+                                 id="audioPlayerMessage"
+                                 role="status"
+                                 aria-live="polite"></div>
+
+                        </div>
+                    }
+                    else if (Model.MediaType == "تصویر")
+                    {
+                        <div class="media-preview-image">
+                            <img src="@Model.ContentUrl"
+                                 alt="@Model.Title"
+                                 loading="lazy" />
+                        </div>
+                    }
+                    else if (Model.MediaType == "ویدئو")
+                    {
+                        <div class="media-preview-video">
+                            <video controls
+                                   preload="metadata"
+                                   playsinline>
+                                <source src="@Model.ContentUrl"
+                                        type="@Model.ContentType" />
+                                مرورگر شما از پخش این ویدئو پشتیبانی نمی‌کند.
+                            </video>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="preview-unavailable">
+                            <span class="unavailable-icon">!</span>
+                            <strong>پیش‌نمایش در دسترس نیست</strong>
+                            <p>نوع این فایل برای پیش‌نمایش پشتیبانی نشده است.</p>
+                        </div>
+                    }
+
+                    <div class="preview-footer">
+                        <span class="preview-footer-icon">♡</span>
+                        پیش‌نمایش فایل اصلی
+                    </div>
+
+                </div>
+
+            </article>
+
+            <!-- File Information -->
+            <article class="panel information-panel">
+
+                <div class="panel-heading">
+
+                    <div class="panel-heading-icon information-heading-icon">
+                        ▤
+                    </div>
+
+                    <div>
+                        <h2>اطلاعات فایل</h2>
+                        <p>مشخصات و وضعیت فایل</p>
+                    </div>
+
+                </div>
+
+                <div class="information-list">
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">Aa</span>
+                            عنوان
+                        </div>
+
+                        <strong class="information-value">@Model.Title</strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">♫</span>
+                            نوع فایل
+                        </div>
+
+                        <strong class="information-value">@Model.MediaType</strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">▧</span>
+                            نام فایل اصلی
+                        </div>
+
+                        <strong class="information-value information-break">
+                            @Model.OriginalFileName
+                        </strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">⌁</span>
+                            نوع محتوا
+                        </div>
+
+                        <strong class="information-value information-ltr">
+                            @Model.ContentType
+                        </strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">⇧</span>
+                            حجم فایل
+                        </div>
+
+                        <strong class="information-value">
+                            @FormatFileSize(Model.FileSize)
+                        </strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">⌗</span>
+                            QRهای متصل
+                        </div>
+
+                        <strong class="information-value">
+                            @qrCount عدد
+                        </strong>
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">◉</span>
+                            وضعیت
+                        </div>
+
+                        @if (Model.IsActive)
+                        {
+                            <span class="status-badge status-active">
+                                <span class="status-dot"></span>
+                                فعال
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-inactive">
+                                <span class="status-dot"></span>
+                                غیرفعال
+                            </span>
+                        }
+
+                    </div>
+
+                    <div class="information-row">
+
+                        <div class="information-label">
+                            <span class="information-symbol">◷</span>
+                            تاریخ ایجاد
+                        </div>
+
+                        <strong class="information-value persian-date"
+                                data-date="@Model.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                            @Model.CreatedAt.ToString("yyyy/MM/dd HH:mm")
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </section>
+
+        <!-- Description -->
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <section class="panel description-panel">
+
+                <div class="panel-heading">
+
+                    <div class="panel-heading-icon description-heading-icon">
+                        ☷
+                    </div>
+
+                    <div>
+                        <h2>توضیحات فایل</h2>
+                        <p>اطلاعات تکمیلی درباره این محتوا</p>
+                    </div>
+
+                </div>
+
+                <div class="description-content">
+                    @Model.Description
+                </div>
+
+            </section>
+        }
+
+        <!-- Analytics -->
+        <section class="analytics-section">
+
+            <div class="section-heading">
+
+                <div class="section-heading-main">
+
+                    <div class="section-icon analytics-section-icon">
+                        ↗
+                    </div>
+
+                    <div>
+                        <h2>آمار عملکرد فایل</h2>
+                        <p>نمای کلی از اسکن و تعامل کاربران با QRهای این فایل</p>
+                    </div>
+
+                </div>
+
+                <div class="analytics-period">
+                    <span class="analytics-period-dot"></span>
+                    آمار ثبت‌شده
+                </div>
+
+            </div>
+
+            <!-- Primary metrics -->
+            <div class="analytics-primary-grid">
+
+                <article class="analytics-card analytics-card-pink">
+
+                    <div class="analytics-card-top">
+                        <span class="analytics-card-label">اسکن QR</span>
+                        <span class="analytics-card-icon">⌗</span>
+                    </div>
+
+                    <strong class="analytics-number">
+                        @(analytics?.ScanCount ?? 0)
+                    </strong>
+
+                    <span class="analytics-card-description">
+                        دفعات باز شدن صفحه QR
+                    </span>
+
+                </article>
+
+                <article class="analytics-card analytics-card-purple">
+
+                    <div class="analytics-card-top">
+                        <span class="analytics-card-label">شروع پخش</span>
+                        <span class="analytics-card-icon">▶</span>
+                    </div>
+
+                    <strong class="analytics-number">
+                        @(analytics?.PlayCount ?? 0)
+                    </strong>
+
+                    <span class="analytics-card-description">
+                        دفعات ثبت شروع پخش
+                    </span>
+
+                </article>
+
+                <article class="analytics-card analytics-card-blue">
+
+                    <div class="analytics-card-top">
+                        <span class="analytics-card-label">پخش تکمیل‌شده</span>
+                        <span class="analytics-card-icon">✓</span>
+                    </div>
+
+                    <strong class="analytics-number">
+                        @(analytics?.CompleteCount ?? 0)
+                    </strong>
+
+                    <span class="analytics-card-description">
+                        دفعات ثبت تکمیل محتوا
+                    </span>
+
+                </article>
+
+                <article class="analytics-card analytics-card-yellow">
+
+                    <div class="analytics-card-top">
+                        <span class="analytics-card-label">بازدیدکننده یکتا</span>
+                        <span class="analytics-card-icon">♙</span>
+                    </div>
+
+                    <strong class="analytics-number">
+                        @(analytics?.UniqueVisitorCount ?? 0)
+                    </strong>
+
+                    <span class="analytics-card-description">
+                        شناسه‌های بازدیدکننده ثبت‌شده
+                    </span>
+
+                </article>
+
+                <article class="analytics-card analytics-card-green">
+
+                    <div class="analytics-card-top">
+                        <span class="analytics-card-label">میانگین مدت</span>
+                        <span class="analytics-card-icon">◷</span>
+                    </div>
+
+                    <strong class="analytics-number analytics-duration">
+                        @if (averageDuration.HasValue)
+                        {
+                            @($"{(int)averageDuration.Value.TotalHours:00}:{averageDuration.Value.Minutes:00}:{averageDuration.Value.Seconds:00}")
+                        }
+                        else
+                        {
+                            @("—")
+                        }
+                    </strong>
+
+                    <span class="analytics-card-description">
+                        میانگین زمان ثبت‌شده در رویدادها
+                    </span>
+
+                </article>
+
+            </div>
+
+            <!-- Secondary metrics -->
+            <div class="analytics-secondary-panel">
+
+                <div class="secondary-heading">
+                    <div>
+                        <h3>میزان پیشرفت پخش</h3>
+                        <p>تعداد رویدادهای ثبت‌شده در هر نقطه از پخش</p>
+                    </div>
+
+                    <span class="secondary-heading-icon">◴</span>
+                </div>
+
+                <div class="progress-stats-grid">
+
+                    <div class="progress-stat">
+                        <div class="progress-stat-top">
+                            <span>۲۵٪</span>
+                            <strong>@(analytics?.Progress25Count ?? 0)</strong>
+                        </div>
+                        <div class="progress-stat-track">
+                            <span class="progress-stat-fill progress-25"></span>
+                        </div>
+                    </div>
+
+                    <div class="progress-stat">
+                        <div class="progress-stat-top">
+                            <span>۵۰٪</span>
+                            <strong>@(analytics?.Progress50Count ?? 0)</strong>
+                        </div>
+                        <div class="progress-stat-track">
+                            <span class="progress-stat-fill progress-50"></span>
+                        </div>
+                    </div>
+
+                    <div class="progress-stat">
+                        <div class="progress-stat-top">
+                            <span>۷۵٪</span>
+                            <strong>@(analytics?.Progress75Count ?? 0)</strong>
+                        </div>
+                        <div class="progress-stat-track">
+                            <span class="progress-stat-fill progress-75"></span>
+                        </div>
+                    </div>
+
+                    <div class="progress-stat">
+                        <div class="progress-stat-top">
+                            <span>۱۰۰٪</span>
+                            <strong>@(analytics?.Progress100Count ?? 0)</strong>
+                        </div>
+                        <div class="progress-stat-track">
+                            <span class="progress-stat-fill progress-100"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="analytics-footer-info">
+
+                    <div>
+                        <span class="footer-info-icon">Ⅱ</span>
+                        <span>توقف پخش</span>
+                        <strong>@(analytics?.PauseCount ?? 0)</strong>
+                    </div>
+
+                    <div>
+                        <span class="footer-info-icon">◷</span>
+                        <span>آخرین فعالیت</span>
+
+                        @if (analytics?.LastActivityAt is DateTime lastActivity)
+                        {
+                            <strong class="persian-date"
+                                    data-date="@lastActivity.ToString("O", CultureInfo.InvariantCulture)">
+                                @lastActivity.ToString("yyyy/MM/dd HH:mm")
+                            </strong>
+                        }
+                        else
+                        {
+                            <strong>ثبت نشده</strong>
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- QR Codes -->
+        <section class="panel qr-panel">
+
+            <div class="panel-heading qr-panel-heading">
+
+                <div class="section-heading-main">
+
+                    <div class="panel-heading-icon qr-heading-icon">
+                        ⌗
+                    </div>
+
+                    <div>
+                        <h2>QRهای متصل به فایل</h2>
+                        <p>مدیریت کدها و بررسی عملکرد هر QR به‌صورت جداگانه</p>
+                    </div>
+
+                </div>
+
+                <span class="qr-count-badge">
+                    @qrCount کد
+                </span>
+
+            </div>
+
+            @if (Model.QrCodes != null && Model.QrCodes.Any())
+            {
+                <div class="qr-table-wrapper">
+
+                    <table class="qr-table">
+
+                        <thead>
+                            <tr>
+                                <th>عنوان و کد</th>
+                                <th>وضعیت</th>
+                                <th>اسکن</th>
+                                <th>پخش</th>
+                                <th>تکمیل</th>
+                                <th>آخرین فعالیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var qr in Model.QrCodes)
+                            {
+                                var qrAnalytics = analytics?.QrCodes?
+                                .FirstOrDefault(x => x.QrCodeId == qr.Id);
+
+                                <tr>
+
+                                    <td>
+                                        <div class="qr-identity">
+
+                                            <div class="qr-mini-icon">⌗</div>
+
+                                            <div class="qr-identity-info">
+
+                                                <strong>
+                                                    @(string.IsNullOrWhiteSpace(qr.Title)
+                                                                                                ? "بدون عنوان"
+                                                                                                : qr.Title)
+                                        </strong>
+
+                                                <code>@qr.Code</code>
+
+                                        @if (qr.ExpiresAt.HasValue)
+                                                {
+                                                    <small class="qr-expiry persian-date"
+                                                           data-date="@qr.ExpiresAt.Value.ToString("O", CultureInfo.InvariantCulture)">
+                                                        انقضا:
+                                                        @qr.ExpiresAt.Value.ToString("yyyy/MM/dd HH:mm")
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="qr-expiry">بدون تاریخ انقضا</small>
+                                                }
+
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @if (!qr.IsActive || qr.IsExpired)
+                                        {
+                                            <span class="status-badge status-inactive">
+                                                <span class="status-dot"></span>
+                                                غیرفعال
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-active">
+                                                <span class="status-dot"></span>
+                                                فعال
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <span class="qr-metric">
+                                            @(qrAnalytics?.ScanCount ?? 0)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="qr-metric">
+                                            @(qrAnalytics?.PlayCount ?? 0)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="qr-metric">
+                                            @(qrAnalytics?.CompleteCount ?? 0)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (qrAnalytics?.LastActivityAt is DateTime qrLastActivity)
+                                        {
+                                            <span class="qr-last-activity persian-date"
+                                                  data-date="@qrLastActivity.ToString("O", CultureInfo.InvariantCulture)">
+                                                @qrLastActivity.ToString("yyyy/MM/dd HH:mm")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="qr-last-activity">بدون فعالیت</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="qr-actions">
+
+                                            <a href="@qr.QrUrl"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               class="qr-action-button qr-view-button">
+                                                مشاهده
+                                            </a>
+
+                                            <button type="button"
+                                                    class="qr-action-button qr-copy-button"
+                                                    data-copy-url="@qr.QrUrl">
+                                                کپی لینک
+                                            </button>
+
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+
+                    <div class="empty-state-icon">⌗</div>
+
+                    <h3>هنوز QR متصلی وجود ندارد</h3>
+
+                    <p>
+                        برای این فایل هنوز کد QR ثبت نشده است.
+                    </p>
+
+                </div>
+            }
+
+        </section>
+
+        <!-- Recent Events -->
+        <section class="panel recent-events-panel">
+
+            <div class="panel-heading">
+
+                <div class="section-heading-main">
+
+                    <div class="panel-heading-icon events-heading-icon">
+                        ◷
+                    </div>
+
+                    <div>
+                        <h2>رویدادهای اخیر</h2>
+                        <p>آخرین تعامل‌های ثبت‌شده برای فایل</p>
+                    </div>
+
+                </div>
+
+                <span class="events-count-badge">
+                    @(analytics?.RecentEvents?.Count ?? 0) رویداد
+                </span>
+
+            </div>
+
+            @if (analytics?.RecentEvents != null && analytics.RecentEvents.Any())
+            {
+                <div class="recent-events-list">
+
+                    @foreach (var item in analytics.RecentEvents)
+                    {
+                        <div class="recent-event-item">
+
+                            <div class="event-type-icon @EventCss(item.EventType)">
+                                @EventIcon(item.EventType)
+                            </div>
+
+                            <div class="event-main">
+
+                                <div class="event-title-row">
+
+                                    <strong>@EventLabel(item.EventType)</strong>
+
+                                    <span class="event-qr-code">
+                                        QR: @item.QrCode
+                                    </span>
+
+                                </div>
+
+                                <div class="event-meta">
+
+                                    @if (!string.IsNullOrWhiteSpace(item.QrTitle))
+                                    {
+                                        <span>@item.QrTitle</span>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(item.DeviceType))
+                                    {
+                                        <span>@item.DeviceType</span>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(item.OperatingSystem))
+                                    {
+                                        <span>@item.OperatingSystem</span>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Browser))
+                                    {
+                                        <span>@item.Browser</span>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Country))
+                                    {
+                                        <span>
+                                            @item.Country
+                                            @if (!string.IsNullOrWhiteSpace(item.City))
+                                            {
+                                                <text>، @item.City</text>
+                                            }
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <time class="event-date persian-date"
+                                  data-date="@item.CreatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                                @item.CreatedAt.ToString("yyyy/MM/dd HH:mm")
+                            </time>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state empty-state-compact">
+
+                    <div class="empty-state-icon">◷</div>
+
+                    <h3>هنوز رویدادی ثبت نشده است</h3>
+
+                    <p>
+                        پس از تعامل کاربران با QRهای این فایل، رویدادها در این بخش نمایش داده می‌شوند.
+                    </p>
+
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+</div>
+
+<style>
+    /* =========================================
+               THEME
+            ========================================= */
+
+    .my-media-details-page {
+        --detail-pink: #f45b9a;
+        --detail-pink-dark: #dc4284;
+        --detail-pink-light: #fff0f7;
+        --detail-purple: #9567ee;
+        --detail-purple-light: #f3edff;
+        --detail-blue: #4e9fe8;
+        --detail-blue-light: #edf6ff;
+        --detail-green: #299c78;
+        --detail-green-light: #e9f8f1;
+        --detail-yellow: #bd8a1b;
+        --detail-yellow-light: #fff7df;
+        --detail-text: #493d52;
+        --detail-muted: #92869a;
+        --detail-border: #f0e8f1;
+        --detail-surface: #ffffff;
+        --detail-shadow: 0 12px 35px rgba(106, 72, 120, .07);
+        color: var(--detail-text);
+        min-height: calc(100vh - 100px);
+        background: radial-gradient(circle at 5% 5%, rgba(255, 188, 218, .16), transparent 25%), radial-gradient(circle at 95% 20%, rgba(197, 177, 255, .15), transparent 25%);
+        font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+    }
+
+        .my-media-details-page *,
+        .my-media-details-page *::before,
+        .my-media-details-page *::after {
+            box-sizing: border-box;
+        }
+
+    .details-container {
+        width: 100%;
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 18px 16px 45px;
+    }
+
+    .my-media-details-page h1,
+    .my-media-details-page h2,
+    .my-media-details-page h3,
+    .my-media-details-page p {
+        font-family: inherit;
+    }
+
+    .my-media-details-page a {
+        text-decoration: none;
+    }
+
+    /* =========================================
+               BREADCRUMB
+            ========================================= */
+
+    .details-breadcrumb {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 22px;
+        color: var(--detail-muted);
+        font-size: 13px;
+    }
+
+        .details-breadcrumb a {
+            color: #9b7fa2;
+            transition: color .2s ease;
+        }
+
+            .details-breadcrumb a:hover {
+                color: var(--detail-pink-dark);
+            }
+
+    .breadcrumb-separator {
+        color: #c4b5c9;
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .breadcrumb-current {
+        color: var(--detail-text);
+        font-weight: 700;
+    }
+
+    /* =========================================
+               HERO
+            ========================================= */
+
+    .details-hero {
+        position: relative;
+        isolation: isolate;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 24px;
+        padding: 27px 30px;
+        margin-bottom: 25px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, .9);
+        border-radius: 25px;
+        background: linear-gradient(120deg, #fff 0%, #fff5fa 54%, #f5f0ff 100%);
+        box-shadow: var(--detail-shadow);
+    }
+
+    .hero-content,
+    .hero-actions {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-content {
+        min-width: 0;
+        flex: 1 1 330px;
+    }
+
+    .hero-title-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .hero-file-icon {
+        width: 66px;
+        height: 66px;
+        flex: 0 0 66px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 21px;
+        color: white;
+        font-size: 30px;
+        background: linear-gradient(135deg, #ff78b1, #9d76f4);
+        box-shadow: 0 10px 25px rgba(192, 104, 180, .22);
+    }
+
+    .hero-title-content {
+        min-width: 0;
+    }
+
+    .hero-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 6px;
+        color: var(--detail-pink-dark);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .eyebrow-dot,
+    .analytics-period-dot {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 7px;
+        border-radius: 50%;
+        background: var(--detail-pink);
+    }
+
+    .hero-title-content h1 {
+        margin: 0 0 5px;
+        color: #49344f;
+        font-size: clamp(20px, 2.5vw, 27px);
+        font-weight: 800;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .hero-filename {
+        max-width: 500px;
+        margin: 0;
+        overflow: hidden;
+        color: var(--detail-muted);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        direction: ltr;
+        text-align: right;
+    }
+
+    .hero-badges {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .status-badge,
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 29px;
+        padding: 5px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        color: #23815f;
+        border: 1px solid #c9efdf;
+        background: #eafaf2;
+    }
+
+    .status-inactive {
+        color: #ad5169;
+        border: 1px solid #f6d6df;
+        background: #fff0f4;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        flex: 0 0 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .type-badge {
+        color: #77618d;
+        border: 1px solid #e9def7;
+        background: rgba(255, 255, 255, .75);
+    }
+
+    .hero-decoration {
+        position: absolute;
+        z-index: -1;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero-decoration-one {
+        width: 200px;
+        height: 200px;
+        top: -115px;
+        left: 22%;
+        background: rgba(255, 190, 221, .18);
+    }
+
+    .hero-decoration-two {
+        width: 160px;
+        height: 160px;
+        bottom: -115px;
+        right: 35%;
+        background: rgba(194, 175, 255, .16);
+    }
+
+    .hero-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .delete-form {
+        display: inline-flex;
+        margin: 0;
+    }
+
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 42px;
+        padding: 9px 14px;
+        border: 1px solid transparent;
+        border-radius: 13px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+        white-space: nowrap;
+    }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+    .action-icon {
+        font-size: 17px;
+        line-height: 1;
+    }
+
+    .action-edit {
+        color: #fff;
+        background: linear-gradient(135deg, #f86ca8, #a16cf0);
+        box-shadow: 0 7px 17px rgba(182, 99, 177, .17);
+    }
+
+        .action-edit:hover {
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(182, 99, 177, .25);
+        }
+
+    .action-back {
+        color: #6e5a7c;
+        border-color: #e9dff0;
+        background: #fff;
+    }
+
+        .action-back:hover {
+            color: var(--detail-purple);
+            background: #faf7ff;
+        }
+
+    .action-delete {
+        color: #c94e70;
+        border-color: #f4d8e0;
+        background: #fff7f9;
+    }
+
+        .action-delete:hover {
+            color: #fff;
+            border-color: #e85d83;
+            background: #e85d83;
+        }
+
+    /* =========================================
+               PANELS AND HEADINGS
+            ========================================= */
+
+    .top-content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+        gap: 22px;
+        align-items: stretch;
+    }
+
+    .panel {
+        min-width: 0;
+        border: 1px solid rgba(237, 227, 240, .9);
+        border-radius: 22px;
+        background: var(--detail-surface);
+        box-shadow: var(--detail-shadow);
+        overflow: hidden;
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 22px 23px;
+        border-bottom: 1px solid #f5eff6;
+    }
+
+        .panel-heading h2,
+        .section-heading h2 {
+            margin: 0;
+            color: #4b3a53;
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.7;
+        }
+
+        .panel-heading p,
+        .section-heading p {
+            margin: 3px 0 0;
+            color: var(--detail-muted);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+    .panel-heading-icon,
+    .section-icon {
+        width: 43px;
+        height: 43px;
+        flex: 0 0 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 21px;
+    }
+
+    .preview-heading-icon {
+        color: #d74d91;
+        background: #fff0f7;
+    }
+
+    .information-heading-icon {
+        color: #8161d1;
+        background: #f3edff;
+    }
+
+    .description-heading-icon {
+        color: #388fbc;
+        background: #edf8ff;
+    }
+
+    .qr-heading-icon {
+        color: #8b64dc;
+        background: #f4efff;
+    }
+
+    .events-heading-icon {
+        color: #b48725;
+        background: #fff7e3;
+    }
+
+    /* =========================================
+               PREVIEW
+            ========================================= */
+
+    .preview-body {
+        padding: 23px;
+    }
+
+    .audio-player-container {
+        padding: 25px 22px 19px;
+        border: 1px solid #f3e2f0;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #fff3f9, #f6f1ff);
+        box-shadow: inset 0 1px 0 #fff;
+        direction: ltr;
+    }
+
+    .sound-visualizer {
+        height: 66px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+        .sound-visualizer span {
+            display: block;
+            width: 5px;
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(to top, #ff6baa, #a879ff);
+            opacity: .55;
+        }
+
+        .sound-visualizer.active span {
+            animation: detailSoundWave .8s infinite ease-in-out;
+        }
+
+        .sound-visualizer span:nth-child(2),
+        .sound-visualizer span:nth-child(8) {
+            animation-delay: .1s;
+        }
+
+        .sound-visualizer span:nth-child(3),
+        .sound-visualizer span:nth-child(7) {
+            animation-delay: .2s;
+        }
+
+        .sound-visualizer span:nth-child(4),
+        .sound-visualizer span:nth-child(6) {
+            animation-delay: .3s;
+        }
+
+        .sound-visualizer span:nth-child(5) {
+            animation-delay: .4s;
+        }
+
+    @@keyframes detailSoundWave {
+        0%, 100% {
+            height: 18px;
+        }
+
+        50% {
+            height: 55px;
+        }
+    }
+
+    .audio-player-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        text-align: right;
+        direction: rtl;
+    }
+
+    .audio-note {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        color: #fff;
+        background: linear-gradient(135deg, #ff70ac, #9f70ff);
+        font-size: 22px;
+        box-shadow: 0 6px 16px rgba(181, 94, 170, .16);
+    }
+
+    .audio-text {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+        .audio-text strong {
+            color: #554658;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .audio-text span {
+            color: #9a8e9e;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+    .audio-player {
+        display: none;
+    }
+
+    .custom-audio-controls {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        direction: ltr;
+    }
+
+    .audio-play-button {
+        width: 53px;
+        height: 53px;
+        flex: 0 0 53px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 50%;
+        color: white;
+        background: linear-gradient(135deg, #ff63a6, #a36aff);
+        box-shadow: 0 8px 20px rgba(181, 94, 170, .28);
+        cursor: pointer;
+        font: inherit;
+        font-size: 18px;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .audio-play-button:hover {
+            transform: scale(1.06);
+            box-shadow: 0 11px 25px rgba(181, 94, 170, .35);
+        }
+
+        .audio-play-button:disabled {
+            cursor: not-allowed;
+            opacity: .5;
+            transform: none;
+        }
+
+    .audio-timeline {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .audio-times {
+        display: flex;
+        justify-content: space-between;
+        direction: ltr;
+        color: #968a9b;
+        font-size: 10px;
+        margin-bottom: 9px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .progress-track {
+        position: relative;
+        height: 7px;
+        border-radius: 20px;
+        background: #e9dfea;
+        cursor: pointer;
+        direction: ltr;
+        outline-offset: 5px;
+    }
+
+        .progress-track:focus-visible {
+            outline: 2px solid #9e6aff;
+        }
+
+    .progress-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #ff67a9, #9e6aff);
+    }
+
+    .progress-thumb {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 14px;
+        height: 14px;
+        transform: translate(-50%, -50%);
+        border: 3px solid #a56bff;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 3px 8px rgba(120, 80, 150, .2);
+    }
+
+    .volume-button {
+        width: 39px;
+        height: 39px;
+        flex: 0 0 39px;
+        border: 1px solid #f0e5f0;
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+        transition: background .2s ease;
+    }
+
+        .volume-button:hover {
+            background: #fff0f7;
+        }
+
+    .audio-player-message {
+        min-height: 17px;
+        margin-top: 10px;
+        color: #9a8e9e;
+        font-size: 11px;
+        text-align: center;
+    }
+
+        .audio-player-message.error {
+            color: #c34268;
+        }
+
+    .preview-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 17px;
+        color: #a394a9;
+        font-size: 11px;
+    }
+
+    .preview-footer-icon {
+        color: #e86b9f;
+        font-size: 15px;
+    }
+
+    .media-preview-image,
+    .media-preview-video {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 270px;
+        padding: 15px;
+        border-radius: 18px;
+        background: #faf7fb;
+    }
+
+        .media-preview-image img {
+            display: block;
+            max-width: 100%;
+            max-height: 440px;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .media-preview-video video {
+            width: 100%;
+            max-height: 440px;
+            border-radius: 12px;
+            background: #17131a;
+        }
+
+    .preview-unavailable {
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-align: center;
+        color: var(--detail-muted);
+    }
+
+        .preview-unavailable strong {
+            color: var(--detail-text);
+        }
+
+        .preview-unavailable p {
+            margin: 0;
+            font-size: 12px;
+        }
+
+    .unavailable-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #bc7092;
+        background: #fff0f6;
+        font-size: 24px;
+    }
+
+    /* =========================================
+               FILE INFORMATION
+            ========================================= */
+
+    .information-list {
+        padding: 7px 23px 12px;
+    }
+
+    .information-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 54px;
+        padding: 11px 0;
+        border-bottom: 1px solid #f4eef5;
+    }
+
+        .information-row:last-child {
+            border-bottom: 0;
+        }
+
+    .information-label {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex: 0 0 auto;
+        color: #8f8197;
+        font-size: 12px;
+    }
+
+    .information-symbol {
+        width: 27px;
+        height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        color: #9877b4;
+        background: #f8f2fa;
+        font-size: 12px;
+    }
+
+    .information-value {
+        min-width: 0;
+        color: #514357;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .information-break {
+        max-width: 58%;
+        direction: ltr;
+    }
+
+    .information-ltr {
+        direction: ltr;
+        unicode-bidi: plaintext;
+    }
+
+    /* =========================================
+               DESCRIPTION
+            ========================================= */
+
+    .description-panel {
+        margin-top: 22px;
+    }
+
+    .description-content {
+        padding: 21px 24px 24px;
+        color: #6f6277;
+        font-size: 13px;
+        line-height: 2.2;
+        overflow-wrap: anywhere;
+        white-space: pre-line;
+    }
+
+    /* =========================================
+               ANALYTICS
+            ========================================= */
+
+    .analytics-section {
+        margin-top: 32px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .section-heading-main {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-width: 0;
+    }
+
+    .section-icon {
+        color: #fff;
+        background: linear-gradient(135deg, #ff70aa, #a16df0);
+        box-shadow: 0 7px 17px rgba(181, 94, 170, .16);
+    }
+
+    .analytics-period {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid #ece3f0;
+        border-radius: 25px;
+        color: #897991;
+        background: #fff;
+        font-size: 11px;
+    }
+
+    .analytics-period-dot {
+        background: #43b58b;
+    }
+
+    .analytics-primary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .analytics-card {
+        position: relative;
+        min-width: 0;
+        min-height: 150px;
+        padding: 18px;
+        overflow: hidden;
+        border: 1px solid #eee7f0;
+        border-radius: 19px;
+        background: #fff;
+        box-shadow: 0 5px 18px rgba(90, 60, 110, .045);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .analytics-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(90, 60, 110, .09);
+        }
+
+        .analytics-card::after {
+            content: "";
+            position: absolute;
+            left: -22px;
+            bottom: -36px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            opacity: .55;
+            pointer-events: none;
+        }
+
+    .analytics-card-pink::after {
+        background: #ffe3ef;
+    }
+
+    .analytics-card-purple::after {
+        background: #eae0ff;
+    }
+
+    .analytics-card-blue::after {
+        background: #e0f2ff;
+    }
+
+    .analytics-card-yellow::after {
+        background: #fff1c8;
+    }
+
+    .analytics-card-green::after {
+        background: #dff7eb;
+    }
+
+    .analytics-card-top {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .analytics-card-label {
+        color: #8d8094;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .analytics-card-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .analytics-card-pink .analytics-card-icon {
+        color: #dc4c8c;
+        background: #fff0f6;
+    }
+
+    .analytics-card-purple .analytics-card-icon {
+        color: #8860d5;
+        background: #f3edff;
+    }
+
+    .analytics-card-blue .analytics-card-icon {
+        color: #418ec7;
+        background: #edf7ff;
+    }
+
+    .analytics-card-yellow .analytics-card-icon {
+        color: #ae811c;
+        background: #fff8e5;
+    }
+
+    .analytics-card-green .analytics-card-icon {
+        color: #288b68;
+        background: #eaf9f1;
+    }
+
+    .analytics-number {
+        position: relative;
+        z-index: 1;
+        display: block;
+        margin-top: 14px;
+        color: #4b3b52;
+        font-size: clamp(22px, 2vw, 30px);
+        font-weight: 800;
+        line-height: 1.4;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+    }
+
+    .analytics-duration {
+        font-size: 23px;
+        direction: ltr;
+        text-align: right;
+    }
+
+    .analytics-card-description {
+        position: relative;
+        z-index: 1;
+        display: block;
+        margin-top: 5px;
+        color: #a296aa;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .analytics-secondary-panel {
+        margin-top: 16px;
+        padding: 22px 23px 18px;
+        border: 1px solid #eee6f1;
+        border-radius: 21px;
+        background: rgba(255, 255, 255, .93);
+        box-shadow: var(--detail-shadow);
+    }
+
+    .secondary-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+        .secondary-heading h3 {
+            margin: 0;
+            color: #514258;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .secondary-heading p {
+            margin: 5px 0 0;
+            color: #9a8ea0;
+            font-size: 11px;
+        }
+
+    .secondary-heading-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #8d69d7;
+        background: #f4efff;
+        font-size: 19px;
+    }
+
+    .progress-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .progress-stat {
+        min-width: 0;
+    }
+
+    .progress-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: #8e8197;
+        font-size: 12px;
+    }
+
+        .progress-stat-top strong {
+            color: #56465d;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+
+    .progress-stat-track {
+        height: 7px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #f0eaf2;
+    }
+
+    .progress-stat-fill {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+    }
+
+    .progress-25 {
+        background: linear-gradient(90deg, #ff91bd, #f45b9a);
+    }
+
+    .progress-50 {
+        background: linear-gradient(90deg, #c1a3ff, #9567ee);
+    }
+
+    .progress-75 {
+        background: linear-gradient(90deg, #8ccfff, #4e9fe8);
+    }
+
+    .progress-100 {
+        background: linear-gradient(90deg, #8ddfbd, #299c78);
+    }
+
+    .analytics-footer-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 22px;
+        padding-top: 16px;
+        border-top: 1px solid #f1eaf2;
+    }
+
+        .analytics-footer-info > div {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            color: #96899d;
+            font-size: 11px;
+        }
+
+    .footer-info-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        color: #9a70d6;
+        background: #f4efff;
+        font-size: 14px;
+    }
+
+    .analytics-footer-info strong {
+        color: #5d4a65;
+        font-size: 11px;
+    }
+
+    /* =========================================
+               QR TABLE
+            ========================================= */
+
+    .qr-panel {
+        margin-top: 28px;
+    }
+
+    .qr-panel-heading {
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .qr-count-badge,
+    .events-count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 30px;
+        padding: 6px 11px;
+        border-radius: 20px;
+        color: #8a65d5;
+        background: #f4efff;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .qr-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .qr-table {
+        width: 100%;
+        min-width: 900px;
+        border-collapse: collapse;
+        text-align: right;
+    }
+
+        .qr-table thead {
+            background: #fcf9fd;
+        }
+
+        .qr-table th {
+            padding: 15px 17px;
+            border-bottom: 1px solid #f0e8f1;
+            color: #9a8da0;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .qr-table td {
+            padding: 17px;
+            border-bottom: 1px solid #f5eff6;
+            color: #67596e;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .qr-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .qr-table tbody tr {
+            transition: background .2s ease;
+        }
+
+            .qr-table tbody tr:hover {
+                background: #fffbfe;
+            }
+
+    .qr-identity {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 210px;
+    }
+
+    .qr-mini-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ece1fa;
+        border-radius: 13px;
+        color: #9567d9;
+        background: #f7f2ff;
+        font-size: 21px;
+    }
+
+    .qr-identity-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        min-width: 0;
+    }
+
+        .qr-identity-info strong {
+            color: #514257;
+            font-size: 12px;
+        }
+
+        .qr-identity-info code {
+            color: #9567d9;
+            font-size: 11px;
+            direction: ltr;
+        }
+
+    .qr-expiry {
+        color: #a194a8;
+        font-size: 10px;
+    }
+
+    .qr-metric {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 33px;
+        min-height: 30px;
+        padding: 4px 7px;
+        border-radius: 9px;
+        color: #66546f;
+        background: #f9f5fa;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .qr-last-activity {
+        color: #8e8096;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .qr-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .qr-action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 6px 10px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background .2s ease, color .2s ease;
+    }
+
+    .qr-view-button {
+        color: #fff;
+        background: linear-gradient(135deg, #f56ca6, #a06af0);
+    }
+
+        .qr-view-button:hover {
+            color: #fff;
+            filter: brightness(.97);
+        }
+
+    .qr-copy-button {
+        color: #7f64b6;
+        border-color: #e9dff8;
+        background: #faf7ff;
+    }
+
+        .qr-copy-button:hover {
+            color: #fff;
+            border-color: #9670dc;
+            background: #9670dc;
+        }
+
+    /* =========================================
+               RECENT EVENTS
+            ========================================= */
+
+    .recent-events-panel {
+        margin-top: 28px;
+    }
+
+    .events-count-badge {
+        color: #a27c2a;
+        background: #fff7e4;
+    }
+
+    .recent-events-list {
+        padding: 0 23px;
+    }
+
+    .recent-event-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+        padding: 17px 0;
+        border-bottom: 1px solid #f3edf4;
+    }
+
+        .recent-event-item:last-child {
+            border-bottom: 0;
+        }
+
+    .event-type-icon {
+        width: 43px;
+        height: 43px;
+        flex: 0 0 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .event-scan {
+        color: #d74e91;
+        background: #fff0f7;
+    }
+
+    .event-play {
+        color: #8161d1;
+        background: #f3edff;
+    }
+
+    .event-pause {
+        color: #af841f;
+        background: #fff8e5;
+    }
+
+    .event-complete {
+        color: #268b68;
+        background: #eaf9f1;
+    }
+
+    .event-progress {
+        color: #3e91c6;
+        background: #edf7ff;
+    }
+
+    .event-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .event-title-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+    }
+
+        .event-title-row strong {
+            color: #53425b;
+            font-size: 12px;
+        }
+
+    .event-qr-code {
+        color: #9676ba;
+        font-size: 10px;
+        direction: ltr;
+    }
+
+    .event-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 7px;
+    }
+
+        .event-meta span {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 7px;
+            border-radius: 7px;
+            color: #96899c;
+            background: #faf7fb;
+            font-size: 10px;
+        }
+
+    .event-date {
+        flex: 0 0 auto;
+        color: #9b8fa1;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    /* =========================================
+               EMPTY STATE
+            ========================================= */
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+        text-align: center;
+    }
+
+    .empty-state-compact {
+        padding: 36px 20px;
+    }
+
+    .empty-state-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        border-radius: 20px;
+        color: #9768d8;
+        background: #f5efff;
+        font-size: 28px;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 7px;
+        color: #594761;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        max-width: 430px;
+        margin: 0;
+        color: #9b8fa1;
+        font-size: 12px;
+        line-height: 2;
+    }
+
+    /* =========================================
+               RESPONSIVE
+            ========================================= */
+
+    @@media (max-width: 1199.98px) {
+        .analytics-primary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .top-content-grid {
+            grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+        }
+    }
+
+    @@media (max-width: 991.98px) {
+        .top-content-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .information-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 24px;
+        }
+
+        .information-row {
+            min-width: 0;
+        }
+
+        .analytics-primary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .details-container {
+            padding: 12px 12px 30px;
+        }
+
+        .details-breadcrumb {
+            gap: 7px;
+            margin-bottom: 16px;
+            font-size: 11px;
+        }
+
+        .details-hero {
+            align-items: stretch;
+            gap: 20px;
+            padding: 20px 17px;
+            border-radius: 20px;
+        }
+
+        .hero-title-row {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .hero-file-icon {
+            width: 53px;
+            height: 53px;
+            flex-basis: 53px;
+            border-radius: 17px;
+            font-size: 25px;
+        }
+
+        .hero-title-content h1 {
+            font-size: 20px;
+        }
+
+        .hero-actions {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+            .hero-actions > *,
+            .hero-actions .action-button {
+                width: 100%;
+            }
+
+        .delete-form {
+            width: 100%;
+        }
+
+        .action-button {
+            padding: 10px 9px;
+            font-size: 11px;
+        }
+
+        .panel {
+            border-radius: 18px;
+        }
+
+        .panel-heading {
+            padding: 17px;
+        }
+
+        .panel-heading-icon,
+        .section-icon {
+            width: 39px;
+            height: 39px;
+            flex-basis: 39px;
+            border-radius: 12px;
+        }
+
+        .panel-heading h2,
+        .section-heading h2 {
+            font-size: 14px;
+        }
+
+        .preview-body {
+            padding: 15px;
+        }
+
+        .audio-player-container {
+            padding: 21px 14px 15px;
+        }
+
+        .audio-play-button {
+            width: 47px;
+            height: 47px;
+            flex-basis: 47px;
+        }
+
+        .volume-button {
+            width: 34px;
+            height: 34px;
+            flex-basis: 34px;
+        }
+
+        .information-list {
+            display: block;
+            padding: 4px 17px 9px;
+        }
+
+        .information-row {
+            min-height: 50px;
+        }
+
+        .information-break {
+            max-width: 60%;
+        }
+
+        .description-content {
+            padding: 16px 18px 20px;
+            font-size: 12px;
+        }
+
+        .analytics-section {
+            margin-top: 25px;
+        }
+
+        .analytics-primary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .analytics-card {
+            min-height: 135px;
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .analytics-card-label {
+            font-size: 10px;
+        }
+
+        .analytics-card-icon {
+            width: 30px;
+            height: 30px;
+            flex-basis: 30px;
+        }
+
+        .analytics-number {
+            margin-top: 11px;
+            font-size: 25px;
+        }
+
+        .analytics-duration {
+            font-size: 20px;
+        }
+
+        .analytics-secondary-panel {
+            padding: 17px;
+            border-radius: 18px;
+        }
+
+        .progress-stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 15px;
+        }
+
+        .analytics-footer-info {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .qr-panel,
+        .recent-events-panel {
+            margin-top: 22px;
+        }
+
+        .qr-panel-heading {
+            align-items: flex-start;
+        }
+
+        .recent-events-list {
+            padding: 0 15px;
+        }
+
+        .recent-event-item {
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px 0;
+        }
+
+        .event-type-icon {
+            width: 37px;
+            height: 37px;
+            flex-basis: 37px;
+            border-radius: 12px;
+        }
+
+        .event-main {
+            flex-basis: calc(100% - 50px);
+        }
+
+        .event-date {
+            margin-right: 47px;
+            white-space: normal;
+        }
+    }
+
+    @@media (max-width: 420px) {
+        .hero-actions {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+            .hero-actions .action-button {
+                justify-content: center;
+            }
+
+        .information-row {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .information-value,
+        .information-break {
+            max-width: 100%;
+            text-align: right;
+        }
+
+        .custom-audio-controls {
+            gap: 8px;
+        }
+
+        .audio-text span {
+            font-size: 10px;
+        }
+
+        .volume-button {
+            display: none;
+        }
+
+        .analytics-card {
+            padding: 12px;
+        }
+
+        .analytics-number {
+            font-size: 23px;
+        }
+
+        .analytics-duration {
+            font-size: 18px;
+        }
+
+        .analytics-period {
+            font-size: 10px;
+        }
+    }
+
+    /* Respect reduced-motion preference */
+    @@media (prefers-reduced-motion: reduce) {
+        .my-media-details-page *, .my-media-details-page *::before, .my-media-details-page *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =========================================
+           COPY QR URL
+        ========================================= */
+
+        async function copyText(text) {
+            if (!text) {
+                alert("لینکی برای کپی وجود ندارد.");
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.setAttribute("readonly", "");
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    textArea.style.pointerEvents = "none";
+
+                    document.body.appendChild(textArea);
+                    textArea.select();
+
+                    const copied = document.execCommand("copy");
+                    textArea.remove();
+
+                    if (!copied) {
+                        throw new Error("Clipboard copy failed.");
+                    }
+                }
+
+                alert("لینک با موفقیت کپی شد.");
+            } catch (error) {
+                console.error("Copy URL failed.", error);
+                alert("کپی لینک انجام نشد. لطفاً لینک را به‌صورت دستی کپی کنید.");
+            }
+        }
+
+        document.querySelectorAll("[data-copy-url]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                copyText(button.dataset.copyUrl);
+            });
+        });
+
+        /* =========================================
+           PERSIAN DATE FORMATTING
+        ========================================= */
+
+        document.querySelectorAll(".persian-date[data-date]").forEach(function (element) {
+            const rawDate = element.dataset.date;
+
+            if (!rawDate) {
+                return;
+            }
+
+            const date = new Date(rawDate);
+
+            if (Number.isNaN(date.getTime())) {
+                return;
+            }
+
+            try {
+                const formatted = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hourCycle: "h23"
+                }).format(date);
+
+                element.textContent = formatted;
+            } catch (error) {
+                console.warn("Persian date formatting unavailable.", error);
+            }
+        });
+
+        /* =========================================
+           AUDIO PLAYER
+        ========================================= */
+
+        const audio = document.getElementById("mediaPlayer");
+
+        if (!audio) {
+            return;
+        }
+
+        const playButton = document.getElementById("audioPlayButton");
+        const playIcon = document.getElementById("playIcon");
+        const currentTime = document.getElementById("currentTime");
+        const duration = document.getElementById("duration");
+        const progressTrack = document.getElementById("progressTrack");
+        const progressFill = document.getElementById("progressFill");
+        const progressThumb = document.getElementById("progressThumb");
+        const volumeButton = document.getElementById("volumeButton");
+        const visualizer = document.getElementById("soundVisualizer");
+        const message = document.getElementById("audioPlayerMessage");
+
+        if (!playButton ||
+            !playIcon ||
+            !currentTime ||
+            !duration ||
+            !progressTrack ||
+            !progressFill ||
+            !progressThumb) {
+            return;
+        }
+
+        function formatTime(seconds) {
+            if (!Number.isFinite(seconds) || seconds < 0) {
+                return "00:00";
+            }
+
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+
+            if (hours > 0) {
+                return String(hours).padStart(2, "0") + ":" +
+                    String(minutes).padStart(2, "0") + ":" +
+                    String(secs).padStart(2, "0");
+            }
+
+            return String(minutes).padStart(2, "0") + ":" +
+                String(secs).padStart(2, "0");
+        }
+
+        function showMessage(text, isError) {
+            if (!message) {
+                return;
+            }
+
+            message.textContent = text || "";
+            message.classList.toggle("error", Boolean(isError));
+        }
+
+        function updateProgress() {
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+                progressFill.style.width = "0%";
+                progressThumb.style.left = "0%";
+                progressTrack.setAttribute("aria-valuenow", "0");
+                currentTime.textContent = formatTime(audio.currentTime);
+                return;
+            }
+
+            const percent = Math.max(
+                0,
+                Math.min(100, (audio.currentTime / audio.duration) * 100)
+            );
+
+            progressFill.style.width = percent + "%";
+            progressThumb.style.left = percent + "%";
+            progressTrack.setAttribute("aria-valuenow", String(Math.round(percent)));
+            currentTime.textContent = formatTime(audio.currentTime);
+        }
+
+        function updatePlayState(isPlaying) {
+            playIcon.textContent = isPlaying ? "Ⅱ" : "▶";
+            playButton.classList.toggle("playing", isPlaying);
+            playButton.setAttribute("aria-label", isPlaying ? "توقف موقت" : "پخش");
+            playButton.setAttribute("aria-pressed", String(isPlaying));
+
+            if (visualizer) {
+                visualizer.classList.toggle("active", isPlaying);
+            }
+        }
+
+        playButton.addEventListener("click", async function () {
+            showMessage("", false);
+
+            try {
+                if (audio.paused) {
+                    await audio.play();
+                } else {
+                    audio.pause();
+                }
+            } catch (error) {
+                console.error("Audio playback failed.", error);
+                showMessage("پخش فایل انجام نشد. لطفاً اتصال و دسترسی فایل را بررسی کنید.", true);
+            }
+        });
+
+        audio.addEventListener("play", function () {
+            updatePlayState(true);
+            showMessage("", false);
+        });
+
+        audio.addEventListener("pause", function () {
+            updatePlayState(false);
+        });
+
+        audio.addEventListener("loadedmetadata", function () {
+            duration.textContent = formatTime(audio.duration);
+            updateProgress();
+        });
+
+        audio.addEventListener("durationchange", function () {
+            duration.textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener("timeupdate", updateProgress);
+
+        audio.addEventListener("ended", function () {
+            updatePlayState(false);
+            currentTime.textContent = formatTime(audio.duration);
+            progressFill.style.width = "100%";
+            progressThumb.style.left = "100%";
+            progressTrack.setAttribute("aria-valuenow", "100");
+        });
+
+        audio.addEventListener("error", function () {
+            updatePlayState(false);
+            showMessage("بارگذاری فایل صوتی با خطا مواجه شد.", true);
+        });
+
+        audio.addEventListener("waiting", function () {
+            showMessage("در حال بارگذاری صوت...", false);
+        });
+
+        audio.addEventListener("canplay", function () {
+            showMessage("", false);
+        });
+
+        function seekToPosition(clientX) {
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+                return;
+            }
+
+            const rect = progressTrack.getBoundingClientRect();
+
+            if (rect.width <= 0) {
+                return;
+            }
+
+            const position = Math.max(
+                0,
+                Math.min(1, (clientX - rect.left) / rect.width)
+            );
+
+            audio.currentTime = position * audio.duration;
+            updateProgress();
+        }
+
+        progressTrack.addEventListener("click", function (event) {
+            seekToPosition(event.clientX);
+        });
+
+        progressTrack.addEventListener("keydown", function (event) {
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+                return;
+            }
+
+            const step = Math.min(10, audio.duration * .05);
+
+            if (event.key === "ArrowRight") {
+                event.preventDefault();
+                audio.currentTime = Math.min(audio.duration, audio.currentTime + step);
+            } else if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                audio.currentTime = Math.max(0, audio.currentTime - step);
+            } else if (event.key === "Home") {
+                event.preventDefault();
+                audio.currentTime = 0;
+            } else if (event.key === "End") {
+                event.preventDefault();
+                audio.currentTime = audio.duration;
+            }
+
+            updateProgress();
+        });
+
+        if (volumeButton) {
+            volumeButton.addEventListener("click", function () {
+                audio.muted = !audio.muted;
+
+                volumeButton.textContent = audio.muted ? "🔇" : "🔊";
+                volumeButton.setAttribute(
+                    "aria-label",
+                    audio.muted ? "فعال کردن صدا" : "قطع صدا"
+                );
+                volumeButton.setAttribute("aria-pressed", String(audio.muted));
+            });
+        }
+
+        updatePlayState(false);
+        updateProgress();
+    });
+</script>

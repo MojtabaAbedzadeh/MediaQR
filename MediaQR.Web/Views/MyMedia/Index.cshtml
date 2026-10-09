@@ -1,0 +1,512 @@
+﻿@model IReadOnlyList<MediaQR.Application.DTOs.Media.UserMediaListDto>
+
+@{
+    ViewData["Title"] = "فایل‌های من";
+}
+
+<div class="container-fluid py-4" dir="rtl">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a asp-controller="Dashboard"
+                   asp-action="Index"
+                   class="text-decoration-none text-muted">
+                    داشبورد
+                </a>
+
+                <span class="text-muted">/</span>
+
+                <span class="text-muted">
+                    فایل‌های من
+                </span>
+            </div>
+
+            <h1 class="h3 fw-bold mb-1">
+                فایل‌های من
+            </h1>
+
+            <p class="text-muted mb-0">
+                مدیریت فایل‌های صوتی، تصویری و ویدئویی شما
+            </p>
+        </div>
+
+        <div>
+            <a asp-controller="AudioMessage"
+               asp-action="Create"
+               class="btn btn-primary">
+                <i class="bi bi-plus-lg ms-1"></i>
+                ایجاد پیام صوتی
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- Summary -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                تعداد فایل‌ها
+                            </div>
+
+                            <div class="fs-3 fw-bold">
+                                @Model.Count
+                            </div>
+                        </div>
+
+                        <div class="media-stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                فایل‌های فعال
+                            </div>
+
+                            <div class="fs-3 fw-bold">
+                                @Model.Count(x => x.IsActive)
+                            </div>
+                        </div>
+
+                        <div class="media-stat-icon bg-success-subtle text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                فایل‌های صوتی
+                            </div>
+
+                            <div class="fs-3 fw-bold">
+                                @Model.Count(x => x.MediaType == "صوت")
+                            </div>
+                        </div>
+
+                        <div class="media-stat-icon bg-info-subtle text-info">
+                            <i class="bi bi-music-note-beamed"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="text-muted small mb-1">
+                                QRهای متصل
+                            </div>
+
+                            <div class="fs-3 fw-bold">
+                                @Model.Sum(x => x.QrCodeCount)
+                            </div>
+                        </div>
+
+                        <div class="media-stat-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-qr-code"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Media List -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-transparent border-0 p-4">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                <div>
+                    <h2 class="h5 fw-bold mb-1">
+                        فایل‌های رسانه‌ای
+                    </h2>
+
+                    <p class="text-muted small mb-0">
+                        فهرست فایل‌هایی که توسط شما ایجاد شده‌اند
+                    </p>
+                </div>
+
+                <span class="badge rounded-pill bg-light text-dark px-3 py-2">
+                    @Model.Count فایل
+                </span>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.Count == 0)
+        {
+            <div class="card-body py-5">
+
+                <div class="text-center py-5">
+
+                    <div class="media-empty-icon mb-4">
+                        <i class="bi bi-folder-x"></i>
+                    </div>
+
+                    <h3 class="h5 fw-bold mb-2">
+                        هنوز فایلی ایجاد نکرده‌اید
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        اولین پیام صوتی خود را ایجاد کنید تا فایل شما اینجا نمایش داده شود.
+                    </p>
+
+                    <a asp-controller="AudioMessage"
+                       asp-action="Create"
+                       class="btn btn-primary">
+                        <i class="bi bi-plus-lg ms-1"></i>
+                        ایجاد پیام صوتی
+                    </a>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="px-4">
+                                فایل
+                            </th>
+
+                            <th>
+                                نوع
+                            </th>
+
+                            <th>
+                                حجم
+                            </th>
+
+                            <th>
+                                QRهای متصل
+                            </th>
+
+                            <th>
+                                وضعیت
+                            </th>
+
+                            <th>
+                                تاریخ ایجاد
+                            </th>
+
+                            <th class="text-center">
+                                عملیات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var media in Model)
+                        {
+                            <tr>
+
+                                <!-- File -->
+                                <td class="px-4">
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div class="media-type-icon
+                                                    @(media.MediaType == "صوت"
+                                                                                             ? "audio"
+                                                                                             : media.MediaType == "تصویر"
+                                                                                                 ? "image"
+                                                                                                 : "video")">
+
+                                    @if (media.MediaType == "صوت")
+                                            {
+                                                <i class="bi bi-music-note-beamed"></i>
+                                            }
+                                            else if (media.MediaType == "تصویر")
+                                            {
+                                                <i class="bi bi-image"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-camera-video"></i>
+                                            }
+
+                                        </div>
+
+                                        <div class="min-width-0">
+
+                                            <div class="fw-semibold text-truncate media-title">
+                                                @media.Title
+                                            </div>
+
+                                            <div class="small text-muted text-truncate media-file-name">
+                                                @media.OriginalFileName
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Type -->
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        @media.MediaType
+                                    </span>
+                                </td>
+
+
+                                <!-- Size -->
+                                <td>
+                                    @FormatFileSize(media.FileSize)
+                                </td>
+
+
+                                <!-- QR -->
+                                <td>
+
+                                    @if (media.QrCodeCount > 0)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            @media.QrCodeCount QR
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">
+                                            بدون QR
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    @if (media.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle text-success">
+                                            فعال
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            غیرفعال
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Date -->
+                                <td>
+                                    <span class="small">
+                                        @media.CreatedAt.ToString("yyyy/MM/dd")
+                                    </span>
+                                </td>
+
+
+                                <!-- Actions -->
+                                <td class="text-center">
+
+                                    <div class="d-inline-flex align-items-center gap-1">
+
+                                        <a asp-controller="MyMedia"
+                                           asp-action="Details"
+                                           asp-route-id="@media.Id"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="مشاهده جزئیات">
+                                            <i class="bi bi-eye"></i>
+                                            جزئیات
+                                        </a>
+
+                                        @if (media.MediaType == "صوت")
+                                        {
+                                            <a asp-controller="AudioMessage"
+                                               asp-action="Create"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="ایجاد پیام صوتی جدید">
+                                                <i class="bi bi-play"></i>
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@functions
+{
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes:N0} B";
+
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024d:N1} KB";
+
+        if (bytes < 1024 * 1024 * 1024)
+            return $"{bytes / (1024d * 1024):N1} MB";
+
+        return $"{bytes / (1024d * 1024 * 1024):N2} GB";
+    }
+}
+
+
+<style>
+
+    .media-stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+    .media-type-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+        .media-type-icon.audio {
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+
+        .media-type-icon.image {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+        .media-type-icon.video {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+    .media-empty-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        border-radius: 24px;
+        background: rgba(13, 110, 253, 0.08);
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+    }
+
+    .media-title {
+        max-width: 260px;
+    }
+
+    .media-file-name {
+        max-width: 260px;
+    }
+
+    .min-width-0 {
+        min-width: 0;
+    }
+
+    @@media (max-width: 767.98px) {
+        .media-title, .media-file-name
+
+    {
+        max-width: 160px;
+    }
+
+    .table {
+        min-width: 900px;
+    }
+
+    }
+</style>

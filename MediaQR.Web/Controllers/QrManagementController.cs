@@ -1,302 +1,246 @@
 ﻿using MediaQR.Application.DTOs.Qr;
 using MediaQR.Application.Interfaces;
-using MediaQR.Infrastructure.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace MediaQR.Infrastructure.Services;
+namespace MediaQR.Web.Controllers;
 
-public class QrManagementService : IQrManagementService
+[Route("management/qr")]
+[Authorize(Roles = "Admin")]
+public class QrManagementController : Controller
 {
-    private readonly MediaDbContext _dbContext;
-    private readonly IQrCodeService _qrCodeService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IQrManagementService _qrManagementService;
+    private readonly ILogger<QrManagementController> _logger;
 
-    public QrManagementService(
-        MediaDbContext dbContext,
-        IQrCodeService qrCodeService,
-        IHttpContextAccessor httpContextAccessor)
+    public QrManagementController(
+        IQrManagementService qrManagementService,
+        ILogger<QrManagementController> logger)
     {
-        _dbContext = dbContext;
-        _qrCodeService = qrCodeService;
-        _httpContextAccessor = httpContextAccessor;
+        _qrManagementService = qrManagementService;
+        _logger = logger;
     }
 
-    public async Task<IReadOnlyList<QrCodeListItemDto>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    [HttpGet("")]
+    public async Task<IActionResult> Index(
+        CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
-        var isAdmin = IsCurrentUserAdmin();
-        var now = DateTime.UtcNow;
-
-        var query = _dbContext.QrCodes
-            .AsNoTracking()
-            .Include(x => x.MediaFile)
-            .AsQueryable();
-
-        if (!isAdmin)
+        try
         {
-            query = query.Where(
-                x => x.MediaFile.UserId == userId);
-        }
-
-        var qrCodes = await query
-            .OrderByDescending(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-
-        return qrCodes
-            .Select(x => new QrCodeListItemDto
-            {
-                Id = x.Id,
-                Code = x.Code,
-                Title = x.Title,
-                MediaFileId = x.MediaFileId,
-                MediaTitle = x.MediaFile.Title,
-                OriginalFileName = x.MediaFile.OriginalFileName,
-                MediaType = x.MediaFile.MediaType.ToString(),
-                IsActive = x.IsActive,
-                CreatedAt = x.CreatedAt,
-                ExpiresAt = x.ExpiresAt,
-                IsExpired =
-                    x.ExpiresAt.HasValue &&
-                    x.ExpiresAt.Value <= now,
-                QrUrl = BuildQrUrl(x.Code)
-            })
-            .ToList();
-    }
-
-    public async Task<QrCodeDetailsDto?> GetByIdAsync(
-        long id,
-        CancellationToken cancellationToken = default)
-    {
-        var userId = GetCurrentUserId();
-        var isAdmin = IsCurrentUserAdmin();
-
-        var query = _dbContext.QrCodes
-            .AsNoTracking()
-            .Include(x => x.MediaFile)
-            .Where(x => x.Id == id);
-
-        if (!isAdmin)
-        {
-            query = query.Where(
-                x => x.MediaFile.UserId == userId);
-        }
-
-        var qrCode = await query.FirstOrDefaultAsync(
-            cancellationToken);
-
-        if (qrCode == null)
-            return null;
-
-        var now = DateTime.UtcNow;
-
-        var qrUrl = BuildQrUrl(qrCode.Code);
-
-        var qrImageBytes =
-            await _qrCodeService.GenerateAsync(
-                qrUrl,
-                qrCode.OrderNumber,
+            var qrCodes = await _qrManagementService.GetAllAsync(
                 cancellationToken);
 
-        return new QrCodeDetailsDto
+            return View(qrCodes);
+        }
+        catch (UnauthorizedAccessException)
         {
-            Id = qrCode.Id,
-            Code = qrCode.Code,
-            Title = qrCode.Title,
-            Description = qrCode.Description,
+            return RedirectToAction("Login", "Account");
+        }
+        catch (OperationCanceledException)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading QR codes.");
 
-            MediaFileId = qrCode.MediaFileId,
-            MediaTitle = qrCode.MediaFile.Title,
-            MediaDescription = qrCode.MediaFile.Description,
-
-            OriginalFileName =
-                qrCode.MediaFile.OriginalFileName,
-
-            MediaType =
-                qrCode.MediaFile.MediaType.ToString(),
-
-            ContentType =
-                qrCode.MediaFile.ContentType,
-
-            FileSize =
-                qrCode.MediaFile.FileSize,
-
-            IsActive =
-                qrCode.IsActive,
-
-            CreatedAt =
-                qrCode.CreatedAt,
-
-            ExpiresAt =
-                qrCode.ExpiresAt,
-
-            IsExpired =
-                qrCode.ExpiresAt.HasValue &&
-                qrCode.ExpiresAt.Value <= now,
-
-            QrUrl = qrUrl,
-
-            QrImageBase64 =
-                Convert.ToBase64String(qrImageBytes)
-        };
+            return View("Error");
+        }
     }
 
-    public async Task<bool> UpdateAsync(
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> Details(
         long id,
-        UpdateQrCodeDto dto,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        if (dto == null)
-            throw new ArgumentNullException(nameof(dto));
-
-        var userId = GetCurrentUserId();
-        var isAdmin = IsCurrentUserAdmin();
-
-        var query = _dbContext.QrCodes
-            .AsQueryable()
-            .Where(x => x.Id == id);
-
-        if (!isAdmin)
+        try
         {
-            query = query.Where(
-                x => x.MediaFile.UserId == userId);
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            return View(qrCode);
         }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        catch (OperationCanceledException)
+        {
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading QR code {QrCodeId}.", id);
 
-        var qrCode = await query.FirstOrDefaultAsync(
-            cancellationToken);
-
-        if (qrCode == null)
-            return false;
-
-        qrCode.Title =
-            string.IsNullOrWhiteSpace(dto.Title)
-                ? null
-                : dto.Title.Trim();
-
-        qrCode.Description =
-            string.IsNullOrWhiteSpace(dto.Description)
-                ? null
-                : dto.Description.Trim();
-
-        qrCode.ExpiresAt = dto.ExpiresAt;
-        qrCode.IsActive = dto.IsActive;
-
-        await _dbContext.SaveChangesAsync(
-            cancellationToken);
-
-        return true;
+            return View("Error");
+        }
     }
 
-    public async Task<bool> SetActiveAsync(
+    [HttpGet("{id:long}/edit")]
+    public async Task<IActionResult> Edit(
         long id,
-        bool isActive,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
-        var isAdmin = IsCurrentUserAdmin();
-
-        var query = _dbContext.QrCodes
-            .AsQueryable()
-            .Where(x => x.Id == id);
-
-        if (!isAdmin)
+        try
         {
-            query = query.Where(
-                x => x.MediaFile.UserId == userId);
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            var model = new UpdateQrCodeDto
+            {
+                Title = qrCode.Title,
+                Description = qrCode.Description,
+                ExpiresAt = qrCode.ExpiresAt,
+                IsActive = qrCode.IsActive
+            };
+
+            ViewBag.QrCodeId = id;
+            ViewBag.QrCode = qrCode;
+
+            return View(model);
         }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Error loading QR code {QrCodeId} for edit.", id);
 
-        var qrCode = await query.FirstOrDefaultAsync(
-            cancellationToken);
-
-        if (qrCode == null)
-            return false;
-
-        qrCode.IsActive = isActive;
-
-        await _dbContext.SaveChangesAsync(
-            cancellationToken);
-
-        return true;
+            return View("Error");
+        }
     }
 
-    public async Task<bool> DeleteAsync(
+    [HttpPost("{id:long}/edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(
         long id,
-        CancellationToken cancellationToken = default)
+        UpdateQrCodeDto model,
+        CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
-        var isAdmin = IsCurrentUserAdmin();
-
-        var query = _dbContext.QrCodes
-            .AsQueryable()
-            .Where(x => x.Id == id);
-
-        if (!isAdmin)
+        if (!ModelState.IsValid)
         {
-            query = query.Where(
-                x => x.MediaFile.UserId == userId);
+            ViewBag.QrCodeId = id;
+
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            ViewBag.QrCode = qrCode;
+
+            return View(model);
         }
 
-        var qrCode = await query.FirstOrDefaultAsync(
-            cancellationToken);
+        try
+        {
+            var updated = await _qrManagementService.UpdateAsync(
+                id,
+                model,
+                cancellationToken);
 
-        if (qrCode == null)
-            return false;
+            if (!updated)
+                return NotFound();
 
-        _dbContext.QrCodes.Remove(qrCode);
+            TempData["SuccessMessage"] = "اطلاعات QR Code با موفقیت به‌روزرسانی شد.";
 
-        await _dbContext.SaveChangesAsync(
-            cancellationToken);
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Error updating QR code {QrCodeId}.", id);
 
-        return true;
+            ModelState.AddModelError(
+                string.Empty,
+                "خطا در به‌روزرسانی QR Code.");
+
+            ViewBag.QrCodeId = id;
+
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            ViewBag.QrCode = qrCode;
+
+            return View(model);
+        }
     }
 
-    private string GetCurrentUserId()
+    [HttpPost("{id:long}/toggle")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Toggle(
+        long id,
+        CancellationToken cancellationToken)
     {
-        var user =
-            _httpContextAccessor.HttpContext?.User;
-
-        if (user?.Identity?.IsAuthenticated != true)
+        try
         {
-            throw new UnauthorizedAccessException(
-                "برای انجام این عملیات باید وارد حساب کاربری شوید.");
+            var qrCode = await _qrManagementService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (qrCode == null)
+                return NotFound();
+
+            var newStatus = !qrCode.IsActive;
+
+            var updated = await _qrManagementService.SetActiveAsync(
+                id,
+                newStatus,
+                cancellationToken);
+
+            if (!updated)
+                return NotFound();
+
+            TempData["SuccessMessage"] = newStatus
+                ? "QR Code فعال شد."
+                : "QR Code غیرفعال شد.";
+
+            return RedirectToAction(nameof(Details), new { id });
         }
-
-        var userId =
-            user.FindFirstValue(
-                ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrWhiteSpace(userId))
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            throw new UnauthorizedAccessException(
-                "شناسه کاربر در اطلاعات احراز هویت یافت نشد.");
-        }
+            _logger.LogError(ex, "Error changing QR status for {QrCodeId}.", id);
 
-        return userId;
+            TempData["ErrorMessage"] = "خطا در تغییر وضعیت QR Code.";
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 
-    private bool IsCurrentUserAdmin()
+    [HttpPost("{id:long}/delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(
+        long id,
+        CancellationToken cancellationToken)
     {
-        return _httpContextAccessor
-            .HttpContext?
-            .User
-            .IsInRole("Admin") == true;
-    }
-
-    private string BuildQrUrl(string code)
-    {
-        var request =
-            _httpContextAccessor
-                .HttpContext?
-                .Request;
-
-        if (request == null)
+        try
         {
-            throw new InvalidOperationException(
-                "HTTP Request در دسترس نیست.");
-        }
+            var deleted = await _qrManagementService.DeleteAsync(
+                id,
+                cancellationToken);
 
-        return $"{request.Scheme}://{request.Host}/m/{code}";
+            if (!deleted)
+                return NotFound();
+
+            TempData["SuccessMessage"] = "QR Code با موفقیت حذف شد.";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Error deleting QR code {QrCodeId}.", id);
+
+            TempData["ErrorMessage"] = "خطا در حذف QR Code.";
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

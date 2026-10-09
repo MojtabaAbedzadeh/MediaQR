@@ -130,6 +130,7 @@ builder.Services.AddScoped<IRequestContextService, RequestContextService>();
 builder.Services.AddScoped<IUserAgentParser, UserAgentParser>();
 builder.Services.AddScoped<IAnalyticsReportService, AnalyticsReportService>();
 builder.Services.Configure<GeoIpOptions>(builder.Configuration.GetSection("GeoIp"));
+builder.Services.AddScoped<IUserMediaService, UserMediaService>();
 builder.Services.AddHttpClient<IGeoIpService, IpApiGeoIpService>(
     (serviceProvider, client) =>
     {
@@ -148,6 +149,7 @@ builder.Services.AddHttpClient<IGeoIpService, IpApiGeoIpService>(
     });
 builder.Services.Configure<MediaUrlSecurityOptions>(builder.Configuration.GetSection("MediaUrlSecurity"));
 builder.Services.AddSingleton<IMediaUrlSigner, MediaUrlSigner>();
+builder.Services.AddScoped<IUserMediaAnalyticsService, UserMediaAnalyticsService>();
 
 builder.Services.AddRateLimiter(options =>
 {
