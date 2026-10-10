@@ -1,37 +1,74 @@
-﻿<div class="side-menu-content">
+﻿<div class="menu-user">
+    <div class="menu-user-avatar">👤</div>
 
-    <a asp-controller="Home"
-       asp-action="Index"
-       class="menu-item">
-        <i class="bi bi-house"></i>
-        <span>صفحه اصلی</span>
-    </a>
-
-    <a asp-controller="MyQr"
-       asp-action="Index"
-       class="menu-item">
-        <i class="bi bi-qr-code"></i>
-        <span>QR Codeهای من</span>
-    </a>
-
-    <a asp-controller="Account"
-       asp-action="ChangePassword"
-       class="menu-item">
-        <i class="bi bi-key"></i>
-        <span>تغییر رمز عبور</span>
-    </a>
-
-    <form asp-controller="Account"
-          asp-action="Logout"
-          method="post">
-
-        @Html.AntiForgeryToken()
-
-        <button type="submit" class="menu-item">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>خروج از حساب</span>
-        </button>
-
-    </form>
-
+    <div class="menu-user-info">
+        <strong>
+            @(User.Identity?.Name ?? "کاربر")
+        </strong>
+        <small>حساب کاربری من</small>
+    </div>
 </div>
+
+<a asp-controller="Home"
+   asp-action="Index"
+   class="side-menu-item">
+    <span class="menu-item-icon">🏠</span>
+    <span class="menu-item-text">صفحه اصلی</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<a asp-controller="Dashboard"
+   asp-action="Index"
+   class="side-menu-item">
+    <span class="menu-item-icon">📊</span>
+    <span class="menu-item-text">داشبورد من</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<a asp-controller="AudioMessage"
+   asp-action="Create"
+   class="side-menu-item">
+    <span class="menu-item-icon">🎙️</span>
+    <span class="menu-item-text">ایجاد پیام صوتی</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<a asp-controller="MyMedia"
+   asp-action="Index"
+   class="side-menu-item">
+    <span class="menu-item-icon">🎵</span>
+    <span class="menu-item-text">رسانه‌های من</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<a asp-controller="MyQr"
+   asp-action="Index"
+   class="side-menu-item">
+    <span class="menu-item-icon">🔳</span>
+    <span class="menu-item-text">QR Codeهای من</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<div class="menu-separator"></div>
+
+<a asp-controller="Account"
+   asp-action="ChangePassword"
+   class="side-menu-item">
+    <span class="menu-item-icon">🔑</span>
+    <span class="menu-item-text">تغییر رمز عبور</span>
+    <span class="menu-arrow">←</span>
+</a>
+
+<form asp-controller="Account"
+      asp-action="Logout"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <button type="submit"
+            class="side-menu-item logout-item">
+        <span class="menu-item-icon">🚪</span>
+        <span class="menu-item-text">خروج از حساب</span>
+        <span class="menu-arrow">←</span>
+    </button>
+</form>

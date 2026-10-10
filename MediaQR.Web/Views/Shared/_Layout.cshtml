@@ -36,8 +36,8 @@
     <style>
 
         /* =========================================
-                                   GLOBAL
-                   ========================================= */
+                                           GLOBAL
+                           ========================================= */
 
         :root {
             --pink: #ff5fa2;
@@ -80,8 +80,8 @@
         }
 
         /* =========================================
-                   HEADER
-                ========================================= */
+                           HEADER
+                        ========================================= */
 
         .site-header {
             position: sticky;
@@ -114,8 +114,8 @@
 
 
         /* =========================================
-                   BRAND
-                ========================================= */
+                           BRAND
+                        ========================================= */
 
         .brand {
             display: flex;
@@ -159,8 +159,8 @@
 
 
         /* =========================================
-                   MENU BUTTON
-                ========================================= */
+                           MENU BUTTON
+                        ========================================= */
 
         .cute-toggler {
             width: 46px;
@@ -197,8 +197,8 @@
 
 
         /* =========================================
-                   OVERLAY
-                ========================================= */
+                           OVERLAY
+                        ========================================= */
 
         .menu-overlay {
             position: fixed;
@@ -220,8 +220,8 @@
 
 
         /* =========================================
-                   SIDE MENU
-                ========================================= */
+                           SIDE MENU
+                        ========================================= */
 
         .side-menu {
             position: fixed;
@@ -253,8 +253,8 @@
 
 
         /* =========================================
-                   SIDE MENU HEADER
-                ========================================= */
+                           SIDE MENU HEADER
+                        ========================================= */
 
         .side-menu-header {
             display: flex;
@@ -310,8 +310,8 @@
 
 
         /* =========================================
-                   CLOSE BUTTON
-                ========================================= */
+                           CLOSE BUTTON
+                        ========================================= */
 
         .close-menu-button {
             width: 42px;
@@ -334,8 +334,8 @@
 
 
         /* =========================================
-                   NAVIGATION
-                ========================================= */
+                           NAVIGATION
+                        ========================================= */
 
         .side-menu-nav {
             padding-top: 20px;
@@ -404,8 +404,8 @@
 
 
         /* =========================================
-                   SEPARATOR
-                ========================================= */
+                           SEPARATOR
+                        ========================================= */
 
         .menu-separator {
             height: 1px;
@@ -415,8 +415,8 @@
 
 
         /* =========================================
-                   USER
-                ========================================= */
+                           USER
+                        ========================================= */
 
         .menu-user {
             display: flex;
@@ -466,8 +466,8 @@
 
 
         /* =========================================
-                   LOGOUT
-                ========================================= */
+                           LOGOUT
+                        ========================================= */
 
         .logout-item {
             color: #c95378;
@@ -481,8 +481,8 @@
 
 
         /* =========================================
-                   LOGIN
-                ========================================= */
+                           LOGIN
+                        ========================================= */
 
         .side-menu-login {
             min-height: 55px;
@@ -509,8 +509,8 @@
 
 
         /* =========================================
-                   FOOTER
-                ========================================= */
+                           FOOTER
+                        ========================================= */
 
         .side-menu-footer {
             margin-top: auto;
@@ -547,8 +547,8 @@
 
 
         /* =========================================
-                   MOBILE
-                ========================================= */
+                           MOBILE
+                        ========================================= */
 
         @@media (max-width: 576px) {
             .site-header {
@@ -589,8 +589,8 @@
         }
 
         /* =========================================
-                                   BACKGROUND DECORATIONS
-                   ========================================= */
+                                           BACKGROUND DECORATIONS
+                           ========================================= */
 
         body::before,
         body::after {
@@ -620,8 +620,8 @@
         }
 
         /* =========================================
-                                   USER AREA
-                   ========================================= */
+                                           USER AREA
+                           ========================================= */
 
         .user-area {
             display: flex;
@@ -659,8 +659,8 @@
 
 
         /* =========================================
-                                   BUTTONS
-                                ========================================= */
+                                           BUTTONS
+                                        ========================================= */
 
         .cute-btn {
             border: none;
@@ -727,8 +727,8 @@
 
 
         /* =========================================
-                                   TOGGLER
-                                ========================================= */
+                                           TOGGLER
+                                        ========================================= */
 
         .cute-toggler {
             border: none;
@@ -744,8 +744,8 @@
 
 
         /* =========================================
-                                   PAGE
-                                ========================================= */
+                                           PAGE
+                                        ========================================= */
 
         .page-container {
             width: 100%;
@@ -761,8 +761,8 @@
 
 
         /* =========================================
-                                   FOOTER
-                                ========================================= */
+                                           FOOTER
+                                        ========================================= */
 
         .main-footer {
             width: calc(100% - 30px);
@@ -797,8 +797,8 @@
 
 
         /* =========================================
-                                   MOBILE
-                                ========================================= */
+                                           MOBILE
+                                        ========================================= */
 
         @@media (max-width: 768px) {
             .main-navbar {
@@ -867,14 +867,35 @@
 
 
         /* =========================================
-                                   BOOTSTRAP OVERRIDES
-                                ========================================= */
+                                           BOOTSTRAP OVERRIDES
+                                        ========================================= */
 
         .btn:focus,
         button:focus,
         a:focus {
             outline: none !important;
             box-shadow: 0 0 0 3px rgba(255, 95, 162, .15) !important;
+        }
+
+        .side-menu-nav form {
+            width: 100%;
+            margin: 0;
+        }
+
+            .side-menu-nav form .side-menu-item {
+                text-align: right;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+
+        .side-menu-nav .logout-item .menu-item-icon {
+            background: #fff0f3;
+        }
+
+        .side-menu-nav .side-menu-item:focus-visible,
+        .side-menu-nav .side-menu-login:focus-visible {
+            outline: 3px solid rgba(155, 108, 255, .35);
+            outline-offset: 2px;
         }
 
     </style>
@@ -895,7 +916,21 @@
 
             <div class="navbar-inner container-fluid">
 
-                <!-- BRAND -->
+                <!-- MENU BUTTON: RIGHT -->
+                <button type="button"
+                        id="menuButton"
+                        class="cute-toggler"
+                        aria-label="نمایش منو"
+                        aria-controls="sideMenu"
+                        aria-expanded="false">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </button>
+
+                <!-- BRAND: LEFT -->
                 <a class="brand"
                    asp-area=""
                    asp-controller="Home"
@@ -911,21 +946,6 @@
                     </span>
 
                 </a>
-
-
-                <!-- MENU BUTTON -->
-                <button type="button"
-                        id="menuButton"
-                        class="cute-toggler"
-                        aria-label="نمایش منو"
-                        aria-controls="sideMenu"
-                        aria-expanded="false">
-
-                    <span></span>
-                    <span></span>
-                    <span></span>
-
-                </button>
 
             </div>
 
@@ -1003,19 +1023,17 @@
             }
             else
             {
-                <a class="side-menu-item"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Index">
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="side-menu-item">
                     <span class="menu-item-icon">🏠</span>
-                    <span class="menu-item-text">خانه</span>
+                    <span class="menu-item-text">صفحه اصلی</span>
                     <span class="menu-arrow">←</span>
                 </a>
 
-                <a class="side-menu-item"
-                   asp-area=""
-                   asp-controller="Home"
-                   asp-action="Privacy">
+                <a asp-controller="Home"
+                   asp-action="Privacy"
+                   class="side-menu-item">
                     <span class="menu-item-icon">🔒</span>
                     <span class="menu-item-text">حریم خصوصی</span>
                     <span class="menu-arrow">←</span>
@@ -1023,15 +1041,21 @@
 
                 <div class="menu-separator"></div>
 
-                <a asp-area=""
-                   asp-controller="Account"
+                <a asp-controller="Account"
                    asp-action="Login"
                    class="side-menu-login">
                     <span>✨</span>
                     <span>ورود به حساب</span>
                 </a>
-            }
 
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="side-menu-item">
+                    <span class="menu-item-icon">👤</span>
+                    <span class="menu-item-text">ایجاد حساب کاربری</span>
+                    <span class="menu-arrow">←</span>
+                </a>
+            }
         </nav>
 
 
