@@ -1,4 +1,4 @@
-@font-face {
+﻿@font-face {
     font-family: 'IRANSansWebFaNum';
     src: url('/fonts/IRANSansWeb_Regular.woff2') format('woff2');
     font-weight: 400;
@@ -1276,4 +1276,157 @@ h6,
         width: 170px;
         height: 170px;
     }
+}
+
+/* ========================================
+   MediaQR - Sidebar Menu
+   ======================================== */
+
+.side-menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    direction: rtl;
+    box-sizing: border-box;
+}
+
+    /* لینک‌ها و دکمه‌های منو */
+    .side-menu-content .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        color: #475569;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.7;
+        text-align: right;
+        text-decoration: none;
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+        /* آیکون‌ها */
+        .side-menu-content .menu-item i {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 22px;
+            width: 22px;
+            height: 22px;
+            font-size: 19px;
+            line-height: 1;
+            color: #64748b;
+            transition: color 0.2s ease;
+        }
+
+        /* متن منو */
+        .side-menu-content .menu-item span {
+            flex: 1;
+            min-width: 0;
+        }
+
+    /* حذف استایل پیش‌فرض فرم خروج */
+    .side-menu-content form {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+        /* حذف ظاهر پیش‌فرض دکمه */
+        .side-menu-content form button.menu-item {
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: inherit;
+            text-transform: none;
+        }
+
+    /* حالت Hover */
+    .side-menu-content .menu-item:hover {
+        color: #2563eb;
+        background-color: #eff6ff;
+        border-color: #dbeafe;
+        text-decoration: none;
+    }
+
+        .side-menu-content .menu-item:hover i {
+            color: #2563eb;
+        }
+
+    /* حالت انتخاب‌شده */
+    .side-menu-content .menu-item.active {
+        color: #1d4ed8;
+        background-color: #dbeafe;
+        border-color: #bfdbfe;
+        font-weight: 700;
+    }
+
+        .side-menu-content .menu-item.active i {
+            color: #2563eb;
+        }
+
+    /* وضعیت فوکوس برای صفحه‌کلید */
+    .side-menu-content .menu-item:focus-visible {
+        outline: 3px solid rgba(59, 130, 246, 0.35);
+        outline-offset: 2px;
+    }
+
+    /* حالت کلیک */
+    .side-menu-content .menu-item:active {
+        transform: scale(0.99);
+    }
+
+    /* جدا کردن گزینه خروج از سایر گزینه‌ها */
+    .side-menu-content form {
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+        /* رنگ متفاوت خروج */
+        .side-menu-content form .menu-item {
+            color: #dc2626;
+        }
+
+            .side-menu-content form .menu-item i {
+                color: #ef4444;
+            }
+
+            .side-menu-content form .menu-item:hover {
+                color: #b91c1c;
+                background-color: #fef2f2;
+                border-color: #fecaca;
+            }
+
+                .side-menu-content form .menu-item:hover i {
+                    color: #dc2626;
+                }
+
+/* نمایش مناسب در موبایل */
+@media (max-width: 576px) {
+    .side-menu-content {
+        padding: 8px;
+        gap: 6px;
+    }
+
+        .side-menu-content .menu-item {
+            min-height: 46px;
+            padding: 10px 12px;
+            font-size: 13px;
+            gap: 10px;
+        }
+
+            .side-menu-content .menu-item i {
+                font-size: 18px;
+            }
 }
