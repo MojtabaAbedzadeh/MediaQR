@@ -116,6 +116,9 @@ namespace MediaQR.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<long?>("CoverImageId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -157,6 +160,8 @@ namespace MediaQR.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CoverImageId");
 
                     b.ToTable("MediaFiles", (string)null);
                 });
@@ -417,6 +422,16 @@ namespace MediaQR.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("QrCode");
+                });
+
+            modelBuilder.Entity("MediaQR.Domain.Entities.MediaFile", b =>
+                {
+                    b.HasOne("MediaQR.Domain.Entities.MediaFile", "CoverImage")
+                        .WithMany()
+                        .HasForeignKey("CoverImageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CoverImage");
                 });
 
             modelBuilder.Entity("MediaQR.Domain.Entities.QrCode", b =>

@@ -123,6 +123,16 @@
 
                 else if (Model.MediaType == "Audio")
                 {
+                    @if (!string.IsNullOrWhiteSpace(Model.CoverImageUrl))
+                    {
+                        <div class="audio-cover-image">
+                            <img src="@Model.CoverImageUrl"
+                                 alt="تصویر همراه پیام صوتی: @Model.Title"
+                                 loading="eager"
+                                 decoding="async" />
+                        </div>
+                    }
+
                     <div class="audio-player-container">
 
 
@@ -1572,6 +1582,39 @@
         left: 0;
         right: auto;
         transform: translate(-50%, -50%);
+    }
+
+    /* =========================================
+       AUDIO COVER IMAGE
+    ========================================= */
+
+    .audio-cover-image {
+        width: 100%;
+        margin-bottom: 20px;
+        overflow: hidden;
+        border-radius: 24px;
+        background: #fff4fa;
+        border: 1px solid #f4e5f1;
+        box-shadow: 0 12px 30px rgba(150, 95, 155, .14);
+    }
+
+        .audio-cover-image img {
+            display: block;
+            width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+            margin: 0 auto;
+        }
+
+    @@media (max-width: 600px) {
+        .audio-cover-image {
+            margin-bottom: 15px;
+            border-radius: 18px;
+        }
+
+            .audio-cover-image img {
+                max-height: 350px;
+            }
     }
 </style>
 }

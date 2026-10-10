@@ -35,19 +35,49 @@ public class ViewerController : Controller
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(code))
-        {
             return NotFound();
-        }
 
         var media = await _mediaViewerService.GetByCodeAsync(
             code,
             cancellationToken);
 
         if (media == null)
-        {
             return NotFound();
+
+        // تولید URL امن، مستقل از ثبت Analytics
+        var expiresAt = DateTimeOffset.UtcNow.AddSeconds(
+            _mediaUrlSecurityOptions.LifetimeSeconds);
+
+        var expires = expiresAt.ToUnixTimeSeconds();
+
+        var signature = _mediaUrlSigner.CreateSignature(
+            code,
+            expiresAt);
+
+        media.ContentUrl = Url.Action(
+            "Content",
+            "Viewer",
+            new
+            {
+                code,
+                expires,
+                signature
+            });
+
+        if (media.CoverImageId.HasValue)
+        {
+            media.CoverImageUrl = Url.Action(
+                "Cover",
+                "Viewer",
+                new
+                {
+                    code,
+                    expires,
+                    signature
+                });
         }
 
+        // ثبت Analytics نباید مانع نمایش محتوا شود.
         try
         {
             await _analyticsService.TrackAsync(
@@ -57,27 +87,6 @@ public class ViewerController : Controller
                     EventType = AnalyticsEventType.Scan
                 },
                 cancellationToken);
-
-            var expiresAt =
-                DateTimeOffset.UtcNow.AddSeconds(
-                    _mediaUrlSecurityOptions.LifetimeSeconds);
-
-            var signature =
-                _mediaUrlSigner.CreateSignature(
-                    code,
-                    expiresAt);
-
-            var contentUrl = Url.Action(
-                "Content",
-                "Viewer",
-                new
-                {
-                    code,
-                    expires = expiresAt.ToUnixTimeSeconds(),
-                    signature
-                });
-
-            media.ContentUrl = contentUrl;
         }
         catch (OperationCanceledException)
         {
@@ -147,5 +156,57 @@ public class ViewerController : Controller
             stream,
             media.ContentType,
             enableRangeProcessing: true);
+    }
+
+    [HttpGet("/media/{code}/cover")]
+    public async Task<IActionResult> Cover(
+    string code,
+    long expires,
+    string signature,
+    CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            return NotFound();
+
+        if (expires <= 0 || string.IsNullOrWhiteSpace(signature))
+            return Unauthorized();
+
+        DateTimeOffset expiresAt;
+
+        try
+        {
+            expiresAt = DateTimeOffset.FromUnixTimeSeconds(expires);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return Unauthorized();
+        }
+
+        if (!_mediaUrlSigner.ValidateSignature(code, expiresAt, signature))
+            return Unauthorized();
+
+        var media = await _mediaViewerService.GetByCodeAsync(
+            code,
+            cancellationToken);
+
+        if (media?.CoverImageId == null ||
+            string.IsNullOrWhiteSpace(media.CoverImageContentType))
+        {
+            return NotFound();
+        }
+
+        var stream = await _mediaViewerService.OpenCoverContentAsync(
+            code,
+            cancellationToken);
+
+        if (stream == null)
+            return NotFound();
+
+        Response.Headers["Cache-Control"] = "private, no-store";
+
+        return File(
+            stream,
+            media.CoverImageContentType,
+            enableRangeProcessing: false);
     }
 }

@@ -12,4 +12,7 @@ public class MediaViewerDto
     public string ContentType { get; set; } = null!;
     public string MediaType { get; set; } = null!;
     public string StoragePath { get; set; } = null!;
+    public long? CoverImageId { get; set; }
+    public string? CoverImageContentType { get; set; }
+    public string? CoverImageUrl { get; set; }
 }

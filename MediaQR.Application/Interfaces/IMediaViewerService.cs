@@ -11,4 +11,8 @@ public interface IMediaViewerService
     Task<Stream?> OpenContentAsync(
         string code,
         CancellationToken cancellationToken = default);
+
+    Task<Stream?> OpenCoverContentAsync(
+    string code,
+    CancellationToken cancellationToken = default);
 }

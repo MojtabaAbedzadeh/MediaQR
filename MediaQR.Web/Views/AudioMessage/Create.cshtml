@@ -5,8 +5,8 @@
 }
 <style>
     /* =========================================================
-           CREATE AUDIO PAGE
-        ========================================================= */
+                   CREATE AUDIO PAGE
+                ========================================================= */
 
     .create-audio-page {
         position: relative;
@@ -17,8 +17,8 @@
 
 
     /* =========================================================
-           BACKGROUND
-        ========================================================= */
+                   BACKGROUND
+                ========================================================= */
 
     .audio-bg-shape {
         position: fixed;
@@ -48,8 +48,8 @@
 
 
     /* =========================================================
-           WRAPPER
-        ========================================================= */
+                   WRAPPER
+                ========================================================= */
 
     .create-audio-wrapper {
         position: relative;
@@ -61,8 +61,8 @@
 
 
     /* =========================================================
-           HEADER
-        ========================================================= */
+                   HEADER
+                ========================================================= */
 
     .create-audio-header {
         display: flex;
@@ -116,8 +116,8 @@
 
 
     /* =========================================================
-           FORM CARD
-        ========================================================= */
+                   FORM CARD
+                ========================================================= */
 
     .audio-form-card {
         padding: 32px;
@@ -131,8 +131,8 @@
 
 
     /* =========================================================
-           VALIDATION
-        ========================================================= */
+                   VALIDATION
+                ========================================================= */
 
     .audio-validation {
         padding: 12px 15px;
@@ -150,8 +150,8 @@
 
 
     /* =========================================================
-           FORM GROUP
-        ========================================================= */
+                   FORM GROUP
+                ========================================================= */
 
     .audio-form-group {
         margin-bottom: 23px;
@@ -185,8 +185,8 @@
 
 
     /* =========================================================
-           INPUT
-        ========================================================= */
+                   INPUT
+                ========================================================= */
 
     .audio-input-wrapper {
         position: relative;
@@ -227,8 +227,8 @@
     }
 
     /* =========================================================
-           TEXTAREA
-        ========================================================= */
+                   TEXTAREA
+                ========================================================= */
 
     .audio-textarea-wrapper {
         position: relative;
@@ -278,8 +278,8 @@
 
 
     /* =========================================================
-           UPLOAD
-        ========================================================= */
+                   UPLOAD
+                ========================================================= */
 
     .audio-upload-box {
         position: relative;
@@ -370,8 +370,8 @@
 
 
     /* =========================================================
-           FILE INFO
-        ========================================================= */
+                   FILE INFO
+                ========================================================= */
 
     .audio-file-info {
         display: flex;
@@ -409,8 +409,8 @@
 
 
     /* =========================================================
-           SELECTED FILE
-        ========================================================= */
+                   SELECTED FILE
+                ========================================================= */
 
     .selected-file {
         display: none;
@@ -474,8 +474,8 @@
 
 
     /* =========================================================
-           ERROR
-        ========================================================= */
+                   ERROR
+                ========================================================= */
 
     .audio-error {
         display: block;
@@ -487,8 +487,8 @@
 
 
     /* =========================================================
-           SUBMIT
-        ========================================================= */
+                   SUBMIT
+                ========================================================= */
 
     .create-audio-button {
         width: 100%;
@@ -541,8 +541,8 @@
 
 
     /* =========================================================
-           SECURITY
-        ========================================================= */
+                   SECURITY
+                ========================================================= */
 
     .form-security-note {
         display: flex;
@@ -556,8 +556,8 @@
 
 
     /* =========================================================
-           FOOTER
-        ========================================================= */
+                   FOOTER
+                ========================================================= */
 
     .create-audio-footer {
         display: flex;
@@ -586,8 +586,8 @@
 
 
     /* =========================================================
-           RESPONSIVE
-        ========================================================= */
+                   RESPONSIVE
+                ========================================================= */
 
     @@media (max-width: 767px) {
         .create-audio-page {
@@ -665,6 +665,193 @@
 
         .upload-formats span {
             padding: 4px 7px;
+        }
+    }
+
+    /* =========================================================
+               COVER IMAGE UPLOAD
+            ========================================================= */
+
+    .cover-upload-box {
+        position: relative;
+        overflow: hidden;
+        border: 2px dashed #ead6e5;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #fff9fc, #faf7ff);
+        transition: border-color .25s ease, background .25s ease;
+    }
+
+        .cover-upload-box:hover,
+        .cover-upload-box.dragging {
+            border-color: #c58bdc;
+            background: linear-gradient(135deg, #fff2f9, #f5f0ff);
+        }
+
+    .cover-file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .cover-upload-content {
+        min-height: 170px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .cover-upload-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #ffe1ef, #e9ddff);
+        box-shadow: 0 8px 22px rgba(170, 90, 150, .10);
+        font-size: 25px;
+    }
+
+    .cover-upload-content strong {
+        color: #624964;
+        font-size: 13px;
+    }
+
+    .cover-upload-content > span {
+        color: #a596a6;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .cover-upload-formats {
+        display: flex;
+        gap: 6px;
+        margin-top: 3px;
+    }
+
+        .cover-upload-formats span {
+            padding: 4px 9px;
+            border-radius: 7px;
+            background: #fff;
+            border: 1px solid #f0e6ef;
+            color: #9a879b;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+    /* Selected image preview */
+
+    .cover-selected-file {
+        display: none;
+        align-items: center;
+        gap: 13px;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #fff1f7, #f5f0ff);
+        border: 1px solid #f1e1ed;
+    }
+
+        .cover-selected-file.show {
+            display: flex;
+        }
+
+    .cover-preview-image {
+        width: 76px;
+        height: 76px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        object-fit: cover;
+        background: #fff;
+        border: 1px solid rgba(225, 205, 225, .7);
+    }
+
+    .cover-file-details {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .cover-file-details strong {
+            color: #684f6c;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .cover-file-details span {
+            color: #a99aaa;
+            font-size: 10px;
+            direction: ltr;
+            text-align: right;
+        }
+
+    .cover-remove-button {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 10px;
+        background: #fff;
+        color: #c75b7e;
+        font-size: 20px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .cover-remove-button:hover {
+            background: #ffe8ef;
+            transform: rotate(90deg);
+        }
+
+    .cover-upload-hint {
+        margin-top: 10px;
+        padding: 11px 13px;
+        border-radius: 13px;
+        background: #faf7fb;
+        color: #9a899e;
+        font-size: 10px;
+        line-height: 1.9;
+    }
+
+        .cover-upload-hint strong {
+            color: #806589;
+        }
+
+    .cover-image-error {
+        display: none;
+        margin-top: 8px;
+        color: #d35476;
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+        .cover-image-error.show {
+            display: block;
+        }
+
+    @@media (max-width: 450px) {
+        .cover-upload-content {
+            min-height: 155px;
+            padding: 18px;
+        }
+
+        .cover-preview-image {
+            width: 62px;
+            height: 62px;
+        }
+
+        .cover-selected-file {
+            gap: 9px;
+            padding: 9px;
         }
     }
 </style>
@@ -818,6 +1005,83 @@
 
                     </div>
 
+                    <!-- =========================
+                         COVER IMAGE
+                    ========================== -->
+
+                    <div class="audio-form-group">
+
+                        <label asp-for="CoverImage">
+                            <span class="label-icon">🖼️</span>
+                            تصویر همراه پیام
+
+                            <small>اختیاری</small>
+                        </label>
+
+                        <div class="cover-upload-box" id="coverUploadBox">
+
+                            <input asp-for="CoverImage"
+                                   type="file"
+                                   id="CoverImage"
+                                   class="cover-file-input"
+                                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+
+                            <label for="CoverImage" class="cover-upload-content">
+
+                                <div class="cover-upload-icon">🌷</div>
+
+                                <strong>تصویر دلخواهت را انتخاب کن</strong>
+
+                                <span>
+                                    برای انتخاب تصویر کلیک کن یا آن را اینجا رها کن
+                                </span>
+
+                                <div class="cover-upload-formats">
+                                    <span>JPG</span>
+                                    <span>PNG</span>
+                                    <span>WEBP</span>
+                                </div>
+
+                            </label>
+                        </div>
+
+                        <div class="cover-upload-hint">
+                            <strong>✨ یک تصویر برای خاطره‌ات</strong>
+                            <br />
+                            تصویر در صفحه نمایش پیام صوتی قابل مشاهده خواهد بود.
+                            حداکثر حجم پیشنهادی: ۲۰ مگابایت.
+                        </div>
+
+                        <div id="coverImageError"
+                             class="cover-image-error"
+                             role="alert">
+                        </div>
+
+                        <div id="coverSelectedFile" class="cover-selected-file">
+
+                            <img id="coverPreviewImage"
+                                 class="cover-preview-image"
+                                 alt="پیش‌نمایش تصویر همراه پیام" />
+
+                            <div class="cover-file-details">
+                                <strong id="coverFileName"></strong>
+                                <span id="coverFileSize"></span>
+                            </div>
+
+                            <button type="button"
+                                    id="removeCoverImage"
+                                    class="cover-remove-button"
+                                    aria-label="حذف تصویر">
+                                ×
+                            </button>
+
+                        </div>
+
+                        <span asp-validation-for="CoverImage"
+                              class="audio-error">
+                        </span>
+
+                    </div>
 
                     <!-- =========================
                          PHONE NUMBER
@@ -1219,6 +1483,186 @@
             }
 
         });
+
+                /* =========================================================
+           COVER IMAGE: PREVIEW, VALIDATION & DRAG/DROP
+        ========================================================= */
+
+        const coverInput = document.getElementById("CoverImage");
+        const coverUploadBox = document.getElementById("coverUploadBox");
+        const coverSelectedFile = document.getElementById("coverSelectedFile");
+        const coverPreviewImage = document.getElementById("coverPreviewImage");
+        const coverFileName = document.getElementById("coverFileName");
+        const coverFileSize = document.getElementById("coverFileSize");
+        const removeCoverImage = document.getElementById("removeCoverImage");
+        const coverImageError = document.getElementById("coverImageError");
+
+        const maxCoverSize = 20 * 1024 * 1024;
+
+        const allowedCoverTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        let coverPreviewUrl = null;
+
+        function showCoverError(message) {
+            coverImageError.textContent = message;
+            coverImageError.classList.add("show");
+        }
+
+        function clearCoverError() {
+            coverImageError.textContent = "";
+            coverImageError.classList.remove("show");
+        }
+
+        function clearCoverPreview() {
+            if (coverPreviewUrl) {
+                URL.revokeObjectURL(coverPreviewUrl);
+                coverPreviewUrl = null;
+            }
+
+            coverPreviewImage.removeAttribute("src");
+            coverFileName.textContent = "";
+            coverFileSize.textContent = "";
+            coverSelectedFile.classList.remove("show");
+        }
+
+        function formatCoverSize(bytes) {
+            if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(1) + " کیلوبایت";
+            }
+
+            return (bytes / (1024 * 1024)).toFixed(2) + " مگابایت";
+        }
+
+        function resetCoverInput() {
+            coverInput.value = "";
+            clearCoverPreview();
+        }
+
+        function validateCoverFile(file) {
+            if (!file) {
+                return "لطفاً یک تصویر انتخاب کنید.";
+            }
+
+            const extension = file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+            const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+
+            if (
+                !allowedExtensions.includes(extension) ||
+                !allowedCoverTypes.includes(file.type)
+            ) {
+                return "فرمت تصویر باید JPG، PNG یا WebP باشد.";
+            }
+
+            if (file.size > maxCoverSize) {
+                return "حجم تصویر نباید بیشتر از ۲۰ مگابایت باشد.";
+            }
+
+            if (file.size === 0) {
+                return "فایل تصویر خالی است.";
+            }
+
+            return null;
+        }
+
+        function displayCoverFile(file) {
+            clearCoverError();
+
+            const error = validateCoverFile(file);
+
+            if (error) {
+                resetCoverInput();
+                showCoverError(error);
+                return;
+            }
+
+            clearCoverPreview();
+
+            coverPreviewUrl = URL.createObjectURL(file);
+
+            coverPreviewImage.src = coverPreviewUrl;
+            coverFileName.textContent = file.name;
+            coverFileSize.textContent = formatCoverSize(file.size);
+
+            coverSelectedFile.classList.add("show");
+        }
+
+        if (coverInput) {
+
+            coverInput.addEventListener("change", function () {
+                const file = this.files && this.files[0];
+
+                if (file) {
+                    displayCoverFile(file);
+                } else {
+                    clearCoverPreview();
+                    clearCoverError();
+                }
+            });
+
+            removeCoverImage.addEventListener("click", function () {
+                resetCoverInput();
+                clearCoverError();
+            });
+
+            ["dragenter", "dragover"].forEach(function (eventName) {
+                coverUploadBox.addEventListener(eventName, function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    coverUploadBox.classList.add("dragging");
+                });
+            });
+
+            ["dragleave", "drop"].forEach(function (eventName) {
+                coverUploadBox.addEventListener(eventName, function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    coverUploadBox.classList.remove("dragging");
+                });
+            });
+
+            coverUploadBox.addEventListener("drop", function (event) {
+                const files = event.dataTransfer?.files;
+
+                if (!files || files.length === 0) {
+                    return;
+                }
+
+                const file = files[0];
+
+                // اعتبارسنجی پیش از اختصاص فایل به input
+                const error = validateCoverFile(file);
+
+                if (error) {
+                    resetCoverInput();
+                    showCoverError(error);
+                    return;
+                }
+
+                const transfer = new DataTransfer();
+                transfer.items.add(file);
+
+                coverInput.files = transfer.files;
+
+                displayCoverFile(file);
+            });
+
+            // جلوگیری از باقی ماندن آدرس موقت تصویر در حافظه
+            window.addEventListener("beforeunload", function () {
+                if (coverPreviewUrl) {
+                    URL.revokeObjectURL(coverPreviewUrl);
+                }
+            });
+        }
 
     </script>
 }

@@ -38,4 +38,6 @@ public class CreateAudioMessageViewModel
     [Required(ErrorMessage = "انتخاب فایل صوتی الزامی است.")]
     [Display(Name = "فایل صوتی")]
     public IFormFile? AudioFile { get; set; }
+
+    public IFormFile? CoverImage { get; set; }
 }

@@ -13,4 +13,7 @@ public class CreateMediaDto
     public string? OrderNumber { get; set; }
 
     public IFormFile? File { get; set; }
+
+    // تصویر اختیاری همراه رسانه
+    public IFormFile? CoverImage { get; set; }
 }

@@ -31,6 +31,7 @@ public class MediaViewerService : IMediaViewerService
         var qrCode = await _dbContext.QrCodes
             .AsNoTracking()
             .Include(x => x.MediaFile)
+            .ThenInclude(x => x.CoverImage)
             .FirstOrDefaultAsync(
                 x => x.Code == code,
                 cancellationToken);
@@ -82,6 +83,15 @@ public class MediaViewerService : IMediaViewerService
 
             MediaType = media.MediaType.ToString(),
 
+            CoverImageId = media.CoverImage is { IsActive: true }
+                ? media.CoverImage.Id
+                : null,
+
+            CoverImageContentType = media.CoverImage is { IsActive: true }
+                ? media.CoverImage.ContentType
+                : null,
+
+            CoverImageUrl = null,
             StoragePath = media.StoragePath
         };
     }
@@ -119,6 +129,50 @@ public class MediaViewerService : IMediaViewerService
 
         return await _fileStorageService.OpenReadAsync(
             qrCode.MediaFile.StoragePath,
+            cancellationToken);
+    }
+
+    public async Task<Stream?> OpenCoverContentAsync(
+    string code,
+    CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            return null;
+
+        code = code.Trim();
+
+        var now = DateTime.UtcNow;
+
+        var qrCode = await _dbContext.QrCodes
+            .AsNoTracking()
+            .Include(x => x.MediaFile)
+                .ThenInclude(x => x.CoverImage)
+            .FirstOrDefaultAsync(
+                x => x.Code == code,
+                cancellationToken);
+
+        if (qrCode == null ||
+            !qrCode.IsActive ||
+            (qrCode.ExpiresAt.HasValue && qrCode.ExpiresAt.Value <= now))
+        {
+            return null;
+        }
+
+        var media = qrCode.MediaFile;
+
+        if (media == null || !media.IsActive)
+            return null;
+
+        var cover = media.CoverImage;
+
+        if (cover == null || !cover.IsActive)
+            return null;
+
+        if (cover.MediaType != MediaQR.Domain.Enums.MediaType.Image)
+            return null;
+
+        return await _fileStorageService.OpenReadAsync(
+            cover.StoragePath,
             cancellationToken);
     }
 }

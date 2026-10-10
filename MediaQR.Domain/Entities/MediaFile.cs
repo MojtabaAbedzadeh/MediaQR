@@ -16,6 +16,8 @@ public class MediaFile
     public MediaType MediaType { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public long? CoverImageId { get; set; }
+    public MediaFile? CoverImage { get; set; }
     // ارتباط با QR Code ها
     public ICollection<QrCode> QrCodes { get; set; } = new List<QrCode>();
 }

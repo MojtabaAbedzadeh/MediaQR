@@ -57,6 +57,7 @@ public class AudioMessageController : Controller
                 Description = string.IsNullOrWhiteSpace(model.Description) ? null : model.Description.Trim(),
                 PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim(),
                 OrderNumber = string.IsNullOrWhiteSpace(model.OrderNumber) ? null : model.OrderNumber.Trim(),
+                CoverImage = model.CoverImage,
                 File = model.AudioFile
             };
 

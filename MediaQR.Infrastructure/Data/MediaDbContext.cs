@@ -67,6 +67,13 @@ public class MediaDbContext : IdentityDbContext<ApplicationUser>
 
             entity.Property(x => x.UserId)
                 .HasMaxLength(450);
+
+            entity.HasOne(x => x.CoverImage)
+                .WithMany()
+                .HasForeignKey(x => x.CoverImageId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.CoverImageId);
         });
 
 

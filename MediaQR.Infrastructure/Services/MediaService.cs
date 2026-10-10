@@ -50,72 +50,165 @@ public class MediaService : IMediaService
         var userId = GetCurrentUserId();
 
         if (string.IsNullOrWhiteSpace(dto.Title))
-        {
-            throw new InvalidOperationException(
-                "عنوان رسانه الزامی است.");
-        }
+            throw new InvalidOperationException("عنوان رسانه الزامی است.");
 
-        if (dto.File == null)
-        {
-            throw new InvalidOperationException(
-                "انتخاب فایل الزامی است.");
-        }
+        if (dto.File == null || dto.File.Length == 0)
+            throw new InvalidOperationException("انتخاب فایل صوتی الزامی است.");
 
+        // اعتبارسنجی فایل صوتی
         var mediaType = _mediaFileValidator.Validate(
-    dto.File.FileName,
-    dto.File.ContentType,
-    dto.File.Length,
-    _fileValidationOptions);
+            dto.File.FileName,
+            dto.File.ContentType,
+            dto.File.Length,
+            _fileValidationOptions);
 
-        await using var validationStream =
-            dto.File.OpenReadStream();
+        await using (var validationStream = dto.File.OpenReadStream())
+        {
+            await _fileSignatureValidator.ValidateAsync(
+                validationStream,
+                mediaType,
+                Path.GetExtension(dto.File.FileName),
+                cancellationToken);
+        }
 
-        var extension =
-            Path.GetExtension(dto.File.FileName);
+        if (mediaType != MediaQR.Domain.Enums.MediaType.Audio)
+        {
+            throw new InvalidOperationException(
+                "در این فرم فقط فایل صوتی مجاز است.");
+        }
 
-        await _fileSignatureValidator.ValidateAsync(
-            validationStream,
-            mediaType,
-            extension,
-            cancellationToken);
+        var coverImage = dto.CoverImage;
 
-        string? storagePath = null;
+        // اعتبارسنجی تصویر کاور
+        if (coverImage != null)
+        {
+            if (coverImage.Length == 0)
+                throw new InvalidOperationException("فایل تصویر خالی است.");
+
+            var extension = Path.GetExtension(coverImage.FileName);
+
+            var allowedExtensions = new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
+            if (string.IsNullOrWhiteSpace(extension) ||
+                !allowedExtensions.Contains(extension))
+            {
+                throw new InvalidOperationException(
+                    "فرمت تصویر باید JPG، PNG یا WEBP باشد.");
+            }
+
+            var imageType = _mediaFileValidator.Validate(
+                coverImage.FileName,
+                coverImage.ContentType,
+                coverImage.Length,
+                _fileValidationOptions);
+
+            if (imageType != MediaQR.Domain.Enums.MediaType.Image)
+            {
+                throw new InvalidOperationException(
+                    "فایل انتخاب‌شده یک تصویر معتبر نیست.");
+            }
+
+            await using var imageValidationStream =
+                coverImage.OpenReadStream();
+
+            await _fileSignatureValidator.ValidateAsync(
+                imageValidationStream,
+                imageType,
+                extension,
+                cancellationToken);
+        }
+
+        string? audioStoragePath = null;
+        string? coverStoragePath = null;
+
+        // شروع تراکنش قبل از ذخیره رکوردهای دیتابیس
+        await using var transaction =
+            await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            await using var uploadStream =
-                dto.File.OpenReadStream();
+            // 1. ذخیره فایل صوتی در فضای ذخیره‌سازی
+            await using (var audioStream = dto.File.OpenReadStream())
+            {
+                audioStoragePath = await _fileStorageService.SaveAsync(
+                    audioStream,
+                    dto.File.FileName,
+                    dto.File.ContentType,
+                    cancellationToken);
+            }
 
-            storagePath = await _fileStorageService.SaveAsync(
-                uploadStream,
-                dto.File.FileName,
-                dto.File.ContentType,
-                cancellationToken);
+            // 2. ذخیره اختیاری تصویر کاور
+            MediaFile? coverMedia = null;
 
-            var code = await GenerateUniqueCodeAsync(
-                cancellationToken);
+            if (coverImage != null)
+            {
+                await using var imageStream = coverImage.OpenReadStream();
+
+                coverStoragePath = await _fileStorageService.SaveAsync(
+                    imageStream,
+                    coverImage.FileName,
+                    coverImage.ContentType,
+                    cancellationToken);
+
+                coverMedia = new MediaFile
+                {
+                    Title = $"{dto.Title.Trim()} - تصویر همراه",
+                    UserId = userId,
+                    OriginalFileName = Path.GetFileName(coverImage.FileName),
+                    StoredFileName = Path.GetFileName(coverStoragePath),
+                    StoragePath = coverStoragePath,
+                    ContentType = coverImage.ContentType,
+                    FileSize = coverImage.Length,
+                    MediaType = MediaQR.Domain.Enums.MediaType.Image,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _dbContext.MediaFiles.Add(coverMedia);
+
+                // برای دریافت شناسه کاور؛ همچنان داخل تراکنش است.
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            // 3. ساخت رسانه اصلی
+            var code = await GenerateUniqueCodeAsync(cancellationToken);
 
             var mediaFile = new MediaFile
             {
                 Title = dto.Title.Trim(),
                 UserId = userId,
-                Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
-                OriginalFileName = dto.File.FileName,
-                StoredFileName = Path.GetFileName(storagePath),
-                StoragePath = storagePath,
+                Description = string.IsNullOrWhiteSpace(dto.Description)
+                    ? null
+                    : dto.Description.Trim(),
+                OriginalFileName = Path.GetFileName(dto.File.FileName),
+                StoredFileName = Path.GetFileName(audioStoragePath),
+                StoragePath = audioStoragePath,
                 ContentType = dto.File.ContentType,
                 FileSize = dto.File.Length,
-                MediaType =  mediaType,
+                MediaType = mediaType,
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CoverImageId = coverMedia?.Id
             };
 
+            // 4. ساخت QR مرتبط با فایل صوتی
             var qrCode = new QrCode
             {
                 MediaFile = mediaFile,
                 Code = code,
-                PhoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim(),
-                OrderNumber = string.IsNullOrWhiteSpace(dto.OrderNumber) ? null : dto.OrderNumber.Trim(),
+                PhoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber)
+                    ? null
+                    : dto.PhoneNumber.Trim(),
+                OrderNumber = string.IsNullOrWhiteSpace(dto.OrderNumber)
+                    ? null
+                    : dto.OrderNumber.Trim(),
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
@@ -130,49 +223,63 @@ public class MediaService : IMediaService
             _dbContext.MediaFiles.Add(mediaFile);
             _dbContext.QrCodes.Add(qrCode);
 
+            // 5. ذخیره رسانه اصلی و QR
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // 6. نهایی کردن تمام تغییرات دیتابیس
+            await transaction.CommitAsync(cancellationToken);
 
             return new CreateMediaResultDto
             {
-                MediaFileId =
-                    mediaFile.Id,
-
-                QrCodeId =
-                    qrCode.Id,
-
-                Title =
-                    mediaFile.Title,
-
-                OriginalFileName =
-                    mediaFile.OriginalFileName,
-
-                MediaType =
-                    mediaFile.MediaType.ToString(),
-
-                QrCode =
-                    qrCode.Code,
-
-                QrUrl =
-                    qrUrl,
-
-                QrImageBase64 =
-                    Convert.ToBase64String(
-                        qrImageBytes)
+                MediaFileId = mediaFile.Id,
+                QrCodeId = qrCode.Id,
+                Title = mediaFile.Title,
+                OriginalFileName = mediaFile.OriginalFileName,
+                MediaType = mediaFile.MediaType.ToString(),
+                QrCode = qrCode.Code,
+                QrUrl = qrUrl,
+                QrImageBase64 = Convert.ToBase64String(qrImageBytes)
             };
         }
         catch
         {
-            if (!string.IsNullOrWhiteSpace(storagePath))
+            // لغو تمام تغییرات دیتابیس، از جمله رکورد کاور
+            try
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+            }
+            catch
+            {
+                // خطای اصلی حفظ می‌شود.
+            }
+
+            // حذف فایل صوتی در صورت ذخیره شدن
+            if (!string.IsNullOrWhiteSpace(audioStoragePath))
             {
                 try
                 {
                     await _fileStorageService.DeleteAsync(
-                        storagePath,
+                        audioStoragePath,
                         CancellationToken.None);
                 }
                 catch
                 {
-                    // جلوگیری از مخفی شدن خطای اصلی
+                    // خطای اصلی حفظ می‌شود.
+                }
+            }
+
+            // حذف تصویر کاور در صورت ذخیره شدن
+            if (!string.IsNullOrWhiteSpace(coverStoragePath))
+            {
+                try
+                {
+                    await _fileStorageService.DeleteAsync(
+                        coverStoragePath,
+                        CancellationToken.None);
+                }
+                catch
+                {
+                    // خطای اصلی حفظ می‌شود.
                 }
             }
 
